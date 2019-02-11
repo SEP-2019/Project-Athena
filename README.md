@@ -21,6 +21,8 @@ npm start
 
 Client:
 npm start
+or
+nodemon start
 
 ```
 
