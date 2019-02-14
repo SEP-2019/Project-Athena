@@ -1,11 +1,11 @@
-var mysql = require('../../sql/connection');
-var format = require('../../validation/format');
-var crypto = require('crypto');
+const mysql = require('../../sql/connection');
+const format = require('../../validation/format');
+const crypto = require('crypto');
 
 exports.insertStudentUser = (username, password, email, id) => {
 	return new Promise(function(res, rej) {
 		// Connect to database
-		var promise = new Promise(function(resolve, reject) {
+		let promise = new Promise(function(resolve, reject) {
 			mysql.getConnection(function(err, conn) {
 				if (err) { reject(err); }
 				resolve(conn);
@@ -14,8 +14,8 @@ exports.insertStudentUser = (username, password, email, id) => {
 
 		// Await for connection
 		promise.then(function(value) {
-			var connection = value;
-			var error;
+			let connection = value;
+			let error;
 
 			// Check for missing input params
 			if (!username) {
@@ -52,7 +52,7 @@ exports.insertStudentUser = (username, password, email, id) => {
 			}
 
 			// Hash the password
-			var hash = crypto.createHash('sha512').update(password).digest('base64');
+			let hash = crypto.createHash('sha512').update(password).digest('base64');
 
 			// Begin transaction with database
 			connection.beginTransaction(function(error) {

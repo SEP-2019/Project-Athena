@@ -1,13 +1,13 @@
-var express = require('express');
-var users = require('../logic/users/users');
-var router = express.Router();
+const express = require('express');
+const users = require('../logic/users/users');
+const router = express.Router();
 
 /* GET users listing. */
 router.post('/addStudentUser', function(req, res, next) {
-	var username = req.query.username;
-	var password = req.query.password;
-	var email = req.query.email;
-	var id = req.query.student_id;
+	let username = req.query.username;
+	let password = req.query.password;
+	let email = req.query.email;
+	let id = req.query.student_id;
 	users.insertStudentUser(username, password, email, id)
 	.then(function(val) {
 		console.log(val);

@@ -1,6 +1,6 @@
-var mysql = require('mysql');
+const mysql = require('mysql');
 
-var db_config = {
+const db_config = {
 	connectionLimit: 100,
 	host: 'us-cdbr-iron-east-03.cleardb.net',
 	user: 'bd17b1984d3b71',
@@ -9,6 +9,6 @@ var db_config = {
 	database: 'heroku_f11d5f6ef0dc063'
 }
 
-var pool = mysql.createPool(db_config);
+let pool = mysql.createPool(db_config);
 
 module.exports = pool;

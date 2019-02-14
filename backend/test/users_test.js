@@ -1,7 +1,7 @@
-var mocha = require('mocha');
-var users = require('../logic/users/users.js');
-var assert = require('assert');
-var nock = require('nock');
+const mocha = require('mocha');
+const users = require('../logic/users/users.js');
+const assert = require('assert');
+const nock = require('nock');
 
 /*
 const host = 'http://localhost:3000';
@@ -83,7 +83,7 @@ describe('Tests add student user', function() {
 		     	});
 	});
 
-	var expectedInvalidUsername = 'invalid format username';
+	const expectedInvalidUsername = 'invalid format username';
 	it('responds with invalid format username 1', function (done) {
 		users.insertStudentUser('usernameWithSymbols123%@^', 'password', 'email@email.com', '123456789')
 			.then(response => {
@@ -115,7 +115,7 @@ describe('Tests add student user', function() {
 		     	});
 	});
 	
-	var expectedInvalidPass = 'invalid format password';
+	const expectedInvalidPass = 'invalid format password';
 	it('responds with invalid format password 1', function(done) {
 		users.insertStudentUser('username', 'short', 'email@email.com', '123456789')
 			.then(response => {
@@ -134,6 +134,59 @@ describe('Tests add student user', function() {
 			.then(response => {
 				return new Promise(function (resolve) {
 					assert.equal(response, expectedInvalidPass);
+					resolve();
+				}).then(done);
+		     	});
+	});
+
+	const expectedInvalidEmail = 'invalid format email';
+	it('responds with invalid format email 1', function (done) {
+		users.insertStudentUser('username',
+		                        'password',
+		                        'email',
+		                        '123456789')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, expectedInvalidEmail);
+					resolve();
+				}).then(done);
+		     	});
+	});
+
+	it('responds with invalid format email 2', function (done) {
+		users.insertStudentUser('username',
+		                        'password',
+		                        'email#@gma.com',
+		                        '123456789')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, expectedInvalidEmail);
+					resolve();
+				}).then(done);
+		     	});
+	});
+
+	it('responds with invalid format email 3', function (done) {
+		users.insertStudentUser('username',
+		                        'password',
+		                        'email@g.c',
+		                        '123456789')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, expectedInvalidEmail);
+					resolve();
+				}).then(done);
+		     	});
+	});
+
+	it('responds with invalid format email 4', function (done) {
+		users.insertStudentUser('username',
+		                        'password',
+		                        'email.2.2.12@@gmai.test.com',
+		                        '123456789')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, expectedInvalidEmail);
 					resolve();
 				}).then(done);
 		     	});
