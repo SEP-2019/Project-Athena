@@ -9,23 +9,11 @@ const HeaderBar = props => (
         <TemporaryDrawer />
       </div> */}
       <div />
-      <div className="HeaderBar_logo">
+      <div className="HeaderBar_project_name">
         <a href="/">James McGill</a>
       </div>
       <div className="spaceFiller" />
-      <div className="HeaderBar_navigation-tabs">
-        <ul>
-          <li>
-            <a href="/Home">Home</a>
-          </li>
-          <li>
-            <a href="/Courses_registration">Courses Registration</a>
-          </li>
-          <li>
-            <a href="/Blep">Blep</a>
-          </li>
-        </ul>
-      </div>
+      <div className="HeaderBar_logo" />
     </nav>
   </header>
 );

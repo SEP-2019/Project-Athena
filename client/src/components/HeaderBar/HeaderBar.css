@@ -15,10 +15,10 @@
   padding: 0 1rem;
 }
 
-.HeaderBar_logo {
+.HeaderBar_project_name {
   margin-left: 0.5rem;
 }
-.HeaderBar_logo a {
+.HeaderBar_project_name a {
   color: white;
   text-decoration: none;
   font-size: 1.5rem;
@@ -28,23 +28,9 @@
   flex: 1;
 }
 
-.HeaderBar_navigation-tabs ul {
+.HeaderBar_logo {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
-}
-
-.HeaderBar_navigation-tabs li {
-  padding: 0 0.5rem;
-}
-
-.HeaderBar_navigation-tabs a {
-  color: white;
-  text-decoration: none;
-}
-
-.HeaderBar_navigation-tabs a:hover,
-.HeaderBar_navigation-tabs a:active {
-  color: rgb(250, 241, 110);
 }
