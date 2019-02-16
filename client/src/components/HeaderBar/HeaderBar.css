@@ -1,5 +1,4 @@
 .HeaderBar {
-  position: fixed; /* absolute? */
   width: 100%;
   height: 65px; /* arbritrary height */
   top: 0;
