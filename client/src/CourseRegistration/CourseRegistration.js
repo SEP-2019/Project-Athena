@@ -7,9 +7,9 @@ class CourseRegistration extends Component {
       <div className="course-registration">
         <div className="instruction">Select the courses that you have already taken.</div>
         <div className="content">
-            <div className="selection">
+            <div className="selection-side">
             </div>
-            <div className="selected">
+            <div className="selected-side">
             </div>
         </div>
 
