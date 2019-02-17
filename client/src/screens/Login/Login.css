@@ -1,0 +1,22 @@
+.header{
+    position: absolute;
+    width: 1440px;
+    height: 100px;
+    left: 0px;
+    top: 0px;
+    background: #FFFFFF;
+}
+
+.title{
+    position: absolute;
+    left: 30px;
+    top: 30px;
+
+    font-weight: 500;
+    font-size: 36px;
+    color: #B20007;
+}
+
+body{
+    background: #F9F9F9;
+}
