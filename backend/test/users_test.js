@@ -262,4 +262,34 @@ describe('Tests add student user', function() {
 				}).then(done);
 		     	});
 	});
+
+	it('responds with true 4', function(done) {
+		users.deleteStudentUser('username1', '123456789')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, 'true');
+					resolve();
+				}).then(done);
+		     	});
+	});
+
+	it('responds with true 5', function(done) {
+		users.deleteStudentUser('username2', '234567890')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, 'true');
+					resolve();
+				}).then(done);
+		     	});
+	});
+
+	it('responds with true 6', function(done) {
+		users.deleteStudentUser('username3', '535235231')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, 'true');
+					resolve();
+				}).then(done);
+		     	});
+	});
 });
