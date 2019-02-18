@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import "./CourseRegistration.css";
-import WithHeaderBar from "../../hocs/WithHeaderBar";
+import React, { Component } from 'react';
+import './CourseRegistration.css';
+import WithHeaderBar from '../../hocs/WithHeaderBar';
 
 class CourseRegistration extends Component {
   render() {

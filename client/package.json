@@ -26,7 +26,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "pretty": "prettier --write --semi --print-width 80 src/**/*.{css,js,jsx,json,ts,tsx}"
+    "pretty": "prettier --write --semi --single-quote --print-width 80 src/**/*.{css,js,jsx,json,ts,tsx}"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -41,6 +41,6 @@
     "trailingComma": "es5",
     "tabWidth": 2,
     "semi": true,
-    "singleQuote": false
+    "singleQuote": true
   }
 }

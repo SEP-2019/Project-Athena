@@ -1,5 +1,5 @@
-import * as React from "react";
-import HeaderBar from "../../components/HeaderBar";
+import * as React from 'react';
+import HeaderBar from '../../components/HeaderBar';
 
 export default Component => {
   class WithHeaderBar extends React.PureComponent {

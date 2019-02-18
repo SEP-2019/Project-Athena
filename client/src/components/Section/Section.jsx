@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 import {
   alignContent,
   alignItems,
@@ -8,7 +8,7 @@ import {
   justifyContent,
   space,
   width,
-} from "styled-system";
+} from 'styled-system';
 
 export default styled.div`
   ${space};
@@ -19,8 +19,8 @@ export default styled.div`
   ${justifyContent};
   ${alignItems};
   ${alignContent};
-  display: ${({ display }) => display || "flex"};
+  display: ${({ display }) => display || 'flex'};
   position: relative;
-  overflow-y: ${({ overflowY }) => overflowY || "initial"};
-  overflow-x: ${({ overflowX }) => overflowX || "initial"};
+  overflow-y: ${({ overflowY }) => overflowY || 'initial'};
+  overflow-x: ${({ overflowX }) => overflowX || 'initial'};
 `;

@@ -1,1 +1,1 @@
-export { default } from "./WithHeaderBar"
+export { default } from './WithHeaderBar';
