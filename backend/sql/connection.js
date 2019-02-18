@@ -32,7 +32,8 @@ async function getNewConnection() {
 		conn.beginTransaction = util.promisify(conn.beginTransaction);
 		return(conn);
 	} catch (error) {
-		console.log(error);
+		console.error(error);
+		throw new Error(error.message);
 	}
 }
 

@@ -1,11 +1,19 @@
 const mysql = require('../../sql/connection');
 
-async function queryCourseByTag(tag){
-    //if an invalid tag is passed, an empty object is returned
+async function queryCourseByTag(tag) {
+    if (!tag) {
+        throw Error("Undefined tag")
+    }
+
     let connection = await mysql.getNewConnection();
-    let courses = await connection.query('SELECT course_code FROM course_tag WHERE course_tag.tag_name LIKE ?', tag);
-    await connection.release();
-    return (JSON.parse(JSON.stringify(courses)));
+    try {
+        let courses = await connection.query('SELECT course_code FROM course_tag WHERE course_tag.tag_name LIKE ?', tag);
+        connection.release();
+        return (JSON.parse(JSON.stringify(courses)));
+    } catch (error) {
+        connection.release();
+        console.error(error);
+        throw new Error(error.message);
+    }
 }
-//queryCourseByTag('Engineering').then(response => console.log(JSON.parse(JSON.stringify(response))));
 module.exports.queryCourseByTag = queryCourseByTag;
