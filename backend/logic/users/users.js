@@ -6,7 +6,7 @@ exports.insertStudentUser = (username, password, email, id) => {
 	return new Promise(function(res, rej) {
 		// Connect to database
 		let promise = new Promise(function(resolve, reject) {
-			mysql.getConnection(function(err, conn) {
+			mysql.pool.getConnection(function(err, conn) {
 				if (err) { reject(err); }
 				resolve(conn);
 			});
