@@ -3,6 +3,16 @@ const users = require('../logic/users/users.js');
 const assert = require('assert');
 const nock = require('nock');
 
+const expectedInvalidUsername = 'invalid format username';
+const expectedInvalidPass = 'invalid format password';
+const expectedInvalidEmail = 'invalid format email';
+const expectedInvalidId = 'invalid format id';
+
+async function afterStudentInsert(username,done){
+	await users.deleteStudentAndUserByUsername(username);
+	done();
+};
+
 /*
 const host = 'http://localhost:3000';
 const addStudentURL = '/users/addStudentUser';
@@ -83,7 +93,6 @@ describe('Tests add student user', function() {
 		     	});
 	});
 
-	const expectedInvalidUsername = 'invalid format username';
 	it('responds with invalid format username 1', function (done) {
 		users.insertStudentUser('usernameWithSymbols123%@^', 'password', 'email@email.com', '123456789')
 			.then(response => {
@@ -115,7 +124,6 @@ describe('Tests add student user', function() {
 		     	});
 	});
 	
-	const expectedInvalidPass = 'invalid format password';
 	it('responds with invalid format password 1', function(done) {
 		users.insertStudentUser('username', 'short', 'email@email.com', '123456789')
 			.then(response => {
@@ -127,10 +135,11 @@ describe('Tests add student user', function() {
 	});
 
 	it('responds with invalid format password 2', function (done) {
+		let studentId = 123456789;
 		users.insertStudentUser('username',
 		                        'thisIsARidiculouslyLongPasswordAndStuffButKeepGoingBecauseYeahSoDontDoThis',
 		                        'email',
-		                        '123456789')
+		                        studentId)
 			.then(response => {
 				return new Promise(function (resolve) {
 					assert.equal(response, expectedInvalidPass);
@@ -139,7 +148,6 @@ describe('Tests add student user', function() {
 		     	});
 	});
 
-	const expectedInvalidEmail = 'invalid format email';
 	it('responds with invalid format email 1', function (done) {
 		users.insertStudentUser('username',
 		                        'password',
@@ -192,23 +200,35 @@ describe('Tests add student user', function() {
 		     	});
 	});
 
-	it('responds with true 1', function(done) {
-		users.insertStudentUser('username1', 'password', 'email@email.com', '123456789')
+	it('responds with invalid format id 1', function (done) {
+		users.insertStudentUser('username', 'passWITHsymbo!@#AOZ;]', 'email@email.com', '2apfqw42')
 			.then(response => {
 				return new Promise(function (resolve) {
-					assert.equal(response, 'true');
+					assert.equal(response, expectedInvalidId);
 					resolve();
 				}).then(done);
 		     	});
 	});
 
-	it('responds with true 2', function (done) {
-		users.insertStudentUser('username', 'passWITHsymbo!@#AOZ;]', 'email@email.com', '2af24gae1')
+	it('responds with true 1', function(done) {
+		let username = 'username1';
+		users.insertStudentUser(username, 'password', 'email@email.com', '2344124')
 			.then(response => {
 				return new Promise(function (resolve) {
 					assert.equal(response, 'true');
 					resolve();
-				}).then(done);
+				}).then(afterStudentInsert(username, done));
+		     	});
+	});
+
+	it('responds with true 2', function (done) {
+		let username = 'username';
+		users.insertStudentUser(username, 'passWITHsymbo!@#AOZ;]', 'email@email.com', '2311')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, 'true');
+					resolve();
+				}).then(afterStudentInsert(username, done));
 		     	});
 	});
 });

@@ -6,7 +6,8 @@
     "start": "node ./bin/www",
     "start-server": "npm start",
     "test": "mocha",
-    "ci": "start-server-and-test start-server http://localhost:3000 test"
+    "ci": "start-server-and-test start-server http://localhost:3000 test",
+    "dev": "nodemon app.js"
   },
   "dependencies": {
     "chai": "^4.2.0",

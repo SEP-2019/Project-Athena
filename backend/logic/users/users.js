@@ -3,17 +3,20 @@ const format = require('../../validation/format');
 const crypto = require('crypto');
 
 exports.insertStudentUser = (username, password, email, id) => {
-	return new Promise(function(res, rej) {
+	return new Promise(function (res, rej) {
+
 		// Connect to database
-		let promise = new Promise(function(resolve, reject) {
-			mysql.getConnection(function(err, conn) {
-				if (err) { reject(err); }
+		let promise = new Promise(function (resolve, reject) {
+			mysql.pool.getConnection(function (err, conn) {
+				if (err) {
+					reject(err);
+				}
 				resolve(conn);
 			});
 		});
 
 		// Await for connection
-		promise.then(function(value) {
+		promise.then(function (value) {
 			let connection = value;
 			let error;
 
@@ -42,6 +45,8 @@ exports.insertStudentUser = (username, password, email, id) => {
 				error = 'invalid format password'
 			} else if (!format.verifyEmail(email)) {
 				error = 'invalid format email'
+			} else if (!format.verifyId(id)) {
+				error = 'invalid format id'
 			}
 
 			if (error) {
@@ -55,33 +60,65 @@ exports.insertStudentUser = (username, password, email, id) => {
 			let hash = crypto.createHash('sha512').update(password).digest('base64');
 
 			// Begin transaction with database
-			connection.beginTransaction(function(error) {
-				if (error) { res(logError(connection, error)); return; }
+			connection.beginTransaction(function (error) {
+				if (error) {
+					res(logError(connection, error));
+					return;
+				}
 				// Test and insert into users table
 				connection.query('INSERT INTO users VALUES(?, ?, ?);',
-				                 [username, email, hash],
-				                 function (error, results, fields) {
-					if (error) { res(logError(connection, error)); return; }
-					// Test and insert into students table
-					connection.query('INSERT INTO students VALUES(?, ?);',
-					                 [id, username],
-					                 function (error, results, fields) {
-						if (error) { res(logError(connection, error)); return; }
-						// Commit transaction
-						connection.commit(function(error) {
-							if (error) { res(logError(connection, error)); return; }
-							connection.release();
-							res('true');
-						});
+					[username, email, hash],
+					function (error, results, fields) {
+						if (error) {
+							res(logError(connection, error));
+							return;
+						}
+						// Test and insert into students table
+						connection.query('INSERT INTO students VALUES(?, ?);',
+							[id, username],
+							function (error, results, fields) {
+								if (error) {
+									res(logError(connection, error));
+									return;
+								}
+								// Commit transaction
+								connection.commit(function (error) {
+									if (error) {
+										res(logError(connection, error));
+										return;
+									}
+									connection.release();
+									res('true');
+								});
+							});
 					});
-				});
 			});
-		}, function(reason) {
+		}, function (reason) {
 			console.error('Failed to establish connection to database');
 			console.error(reason);
 			res('false');
 		});
 	});
+}
+
+async function deleteStudentAndUserByUsername(username) {
+	let connection = await mysql.getNewConnection();
+
+	if (!format.verifyUsername(username)) {
+		connection.release();
+		console.error('invalid username');
+		throw Error('invalid username');
+	}
+	try {
+		let query = 'SET SQL_SAFE_UPDATES = 0; DELETE FROM students WHERE students.username LIKE ?;DELETE FROM users WHERE users.username LIKE ?; SET SQL_SAFE_UPDATES = 1;'
+		await connection.beginTransaction();
+		await connection.query(query, [username, username]);
+		await connection.commit();
+	} catch (error) {
+		console.error(error)
+		connection.rollback();
+		connection.release();
+	}
 }
 
 function logError(connection, error) {
@@ -90,3 +127,5 @@ function logError(connection, error) {
 	connection.release();
 	return 'false';
 }
+
+exports.deleteStudentAndUserByUsername = deleteStudentAndUserByUsername;
