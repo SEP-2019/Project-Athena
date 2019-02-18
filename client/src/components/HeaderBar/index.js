@@ -1,1 +1,1 @@
-export { default } from "./HeaderBar.jsx"
+export { default } from "./HeaderBar"
