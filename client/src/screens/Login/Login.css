@@ -1,26 +1,26 @@
-.header{
-	height: 100px;
-	background: #FFFFFF;
+.header {
+  height: 100px;
+  background: #ffffff;
 }
 
-.title{
-	left: 30px;
-	top: 30px;
+.title {
+  left: 30px;
+  top: 30px;
 
-	font-weight: 500;
-	font-size: 36px;
-	color: #B20007;
+  font-weight: 500;
+  font-size: 36px;
+  color: #b20007;
 }
 
-.description{
-    max-width: 70%;
+.description {
+  max-width: 70%;
 }
 
-body{
-	background: #F9F9F9;
+body {
+  background: #f9f9f9;
 }
 
-.footer{
-	height: 100px;
-	background: #B20007;
+.footer {
+  height: 100px;
+  background: #b20007;
 }
