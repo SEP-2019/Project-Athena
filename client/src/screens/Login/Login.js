@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import "./Login.css"
 import Section from "../../components/Section";
-import LoginForm from "../../components/LoginForm"
 
 class Login extends Component {
 	state = {
