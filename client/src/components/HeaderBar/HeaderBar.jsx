@@ -1,5 +1,5 @@
-import React from "react";
-import "./HeaderBar.css";
+import React from 'react';
+import './HeaderBar.css';
 // import TemporaryDrawer from "../Drawer/TemporaryDrawer";
 
 const HeaderBar = props => (

@@ -125,5 +125,3 @@ function logError(connection, error) {
 	connection.release();
 	return 'false';
 }
-
-module.exports.deleteStudentAndUserByUsername = deleteStudentAndUserByUsername;
