@@ -1,6 +1,7 @@
 const mysql = require('../../sql/connection');
 const format = require('../../validation/format');
 const crypto = require('crypto');
+const hasher = require('../../validation/hash');
 
 exports.insertStudentUser = (username, password, email, id) => {
 	return new Promise(function (res, rej) {
@@ -16,7 +17,7 @@ exports.insertStudentUser = (username, password, email, id) => {
 		});
 
 		// Await for connection
-		promise.then(function (value) {
+		promise.then(function(value) {
 			let connection = value;
 			let error;
 
@@ -40,13 +41,13 @@ exports.insertStudentUser = (username, password, email, id) => {
 
 			// Check for invalid formatting
 			if (!format.verifyUsername(username)) {
-				error = 'invalid format username'
+				error = 'invalid format username';
 			} else if (!format.verifyPassword(password)) {
-				error = 'invalid format password'
+				error = 'invalid format password';
 			} else if (!format.verifyEmail(email)) {
-				error = 'invalid format email'
+				error = 'invalid format email';
 			} else if (!format.verifyId(id)) {
-				error = 'invalid format id'
+				error = 'invalid format id';
 			}
 
 			if (error) {
@@ -57,14 +58,11 @@ exports.insertStudentUser = (username, password, email, id) => {
 			}
 
 			// Hash the password
-			let hash = crypto.createHash('sha512').update(password).digest('base64');
+			let hash = hasher.hashPass(password);
 
 			// Begin transaction with database
-			connection.beginTransaction(function (error) {
-				if (error) {
-					res(logError(connection, error));
-					return;
-				}
+			connection.beginTransaction(function(error) {
+				if (error) { res(logError(connection, error)); return; }
 				// Test and insert into users table
 				connection.query('INSERT INTO users VALUES(?, ?, ?);',
 					[username, email, hash],
@@ -93,7 +91,7 @@ exports.insertStudentUser = (username, password, email, id) => {
 							});
 					});
 			});
-		}, function (reason) {
+		}, function(reason) {
 			console.error('Failed to establish connection to database');
 			console.error(reason);
 			res('false');
@@ -128,4 +126,4 @@ function logError(connection, error) {
 	return 'false';
 }
 
-exports.deleteStudentAndUserByUsername = deleteStudentAndUserByUsername;
+module.exports.deleteStudentAndUserByUsername = deleteStudentAndUserByUsername;
