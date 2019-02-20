@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Divider from '@material-ui/core/Divider';
 import { Tabs, Tab, TabPanel, TabList } from 'react-web-tabs';
+
 import MandatoryPanel from '../../components/Tabs/MandatoryPanel';
 import ComplementaryPanel from '../../components/Tabs/ComplementaryPanel';
 import WithHeaderBar from '../../hocs/WithHeaderBar';

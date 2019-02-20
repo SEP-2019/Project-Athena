@@ -6,9 +6,11 @@
 
 .interest-list {
   padding: 1rem 1.5rem;
+  height: 350px;
   border: 1px solid rgb(0, 0, 0, 0.2);
   flex: 1;
   margin-bottom: 15px;
+  overflow-y: scroll;
 }
 input[type='checkbox'] {
   visibility: hidden;
