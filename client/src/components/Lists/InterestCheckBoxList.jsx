@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import Button from '@material-ui/core/Button';
+
 import './InterestCheckBoxList.css';
 import SmallCheckbox from '../CheckBoxes/SmallCheckbox';
 
+let isApplied = false;
 class InterestCheckBoxList extends Component {
   constructor(props) {
     super(props);
@@ -27,9 +30,10 @@ class InterestCheckBoxList extends Component {
       this.selectedCheckboxes.add(checkbox);
       console.log(checkbox, 'is selected');
     }
+    isApplied = false;
   }
 
-  uncheckAll = variant => uncheckAllEvent => {
+  uncheckAll = uncheckAllEvent => {
     uncheckAllEvent.preventDefault();
     const { interests } = this.state;
     interests.forEach(interest => (interest.checked = false));
@@ -42,50 +46,35 @@ class InterestCheckBoxList extends Component {
     }
     if (isCleared) {
       this.props.enqueueSnackbar('Your selections have been cleared', {
-        variant,
+        variant: 'info',
+        action: <Button size="small">{'Dismiss'}</Button>,
+        autoHideDuration: 1500,
       });
     }
     isCleared = false;
+    isApplied = false;
   };
 
-  handleFormSubmit = variant => formSubmitEvent => {
+  handleFormSubmit = formSubmitEvent => {
     formSubmitEvent.preventDefault();
-
     for (const checkbox of this.selectedCheckboxes) {
       console.log(checkbox, 'is Applied.');
-      this.props.enqueueSnackbar(checkbox + ' selection has been applied.', {
-        variant,
+    }
+    if (!isApplied && this.selectedCheckboxes.size !== 0) {
+      this.props.enqueueSnackbar('Your selections have been applied.', {
+        variant: 'success',
+        action: <Button size="small">{'dismiss'}</Button>,
+        autoHideDuration: 1500,
       });
     }
+    isApplied = true;
   };
-
-  // createCheckbox = (interest, index) => (
-  //   <div className="checkbox_area" key={index}>
-  //     <input
-  //       id={interest.name}
-  //       type="checkbox"
-  //       name={interest.name}
-  //       checked={interest.checked}
-  //       onChange={e =>
-  //         this.handleChange(index, e.target.checked, e.target.name)
-  //       }
-  //     />
-  //     <label for={interest.name} className="checkbox_label">
-  //       {interest.name}
-  //     </label>
-  //     <label for={interest.name} className="custom_checkbox" />
-  //   </div>
-  // );
 
   render() {
     return (
-      <form
-        className="interest_selection"
-        onSubmit={this.handleFormSubmit('success')}
-      >
+      <form className="interest_selection" onSubmit={this.handleFormSubmit}>
         <h4>My Interests</h4>
         <div className="interest-list">
-          {/* {this.props.interests.map(this.createCheckbox)} */}
           {this.props.interests.map((interest, index) => (
             <SmallCheckbox
               key={index}
@@ -99,7 +88,7 @@ class InterestCheckBoxList extends Component {
           ))}
         </div>
         <div className="btn_container">
-          <button className="btn" onClick={this.uncheckAll('info')}>
+          <button className="btn" onClick={this.uncheckAll}>
             CANCEL
           </button>
           <button className="btn" type="submit">
