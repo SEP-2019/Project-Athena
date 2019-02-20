@@ -28,6 +28,8 @@ exports.verifyId = id => {
 }
 
 exports.verifyUsername = username => {
+	if(!username)
+		return false;
 	if (String(username).length > MAX_USERNAME_LENGTH) {
 		return false;
 	}

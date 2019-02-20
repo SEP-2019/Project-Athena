@@ -6,11 +6,9 @@ const db_config = {
 	connectionLimit: 100,
 	host: 'us-cdbr-iron-east-03.cleardb.net',
 	user: 'bd17b1984d3b71',
-	password: 'cc800052',
+	password: '5945ae958d07ae4',
 	connectionTimeout: 10000,
-	database: 'heroku_f11d5f6ef0dc063',
-	multipleStatements: true
-
+	database: 'heroku_f11d5f6ef0dc063'
 	//PROD database 
 	/*
 	connectionLimit: 100,

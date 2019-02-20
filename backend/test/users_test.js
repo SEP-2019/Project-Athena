@@ -9,7 +9,7 @@ const expectedInvalidEmail = 'invalid format email';
 const expectedInvalidId = 'invalid format id';
 
 async function afterStudentInsert(username){
-	await users.deleteStudentAndUserByUsername(username);
+	await users.deleteStudentUser(username);
 	//done();
 };
 
@@ -260,6 +260,22 @@ describe('Tests add student user', function() {
 					resolve();
 				}).then(afterStudentInsert(username))
 				.then(done);
-		     	});
+				 })
+			.catch(error => {
+				afterStudentInsert(username)
+				console.log(error)
+				throw error
+			});
 	});
+
+	it('responds with true 5', function() {
+		let username = "testusername"
+		return users.insertStudentUser(username, "password", "email@mail.com", '123456789').then(
+			() => users.deleteStudentUser(username).then(response => {
+				assert.strictEqual(true, response)
+			})
+		)
+	});
+
 });
+
