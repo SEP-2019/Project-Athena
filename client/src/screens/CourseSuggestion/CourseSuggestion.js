@@ -32,7 +32,17 @@ class CourseSuggestion extends Component {
             <CourseSuggestionPanel />
           </TabPanel>
           <TabPanel tabId="two">
-            <CourseSuggestionPanel />
+            <div className="page">
+              <div className="course-registration">
+                <div className="instruction">
+                  Select the courses that you have already taken.
+                </div>
+                <div className="content">
+                  <div className="selection-side" />
+                  <div className="selected-side" />
+                </div>
+              </div>
+            </div>
           </TabPanel>
         </Tabs>
       </div>
