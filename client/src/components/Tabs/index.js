@@ -1,1 +1,2 @@
-export { default } from './CourseSuggestionPannel';
+export { default } from './MandatoryPanel';
+export { default } from './ComplementaryPanel';

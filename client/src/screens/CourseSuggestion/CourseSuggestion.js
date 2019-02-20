@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Divider from '@material-ui/core/Divider';
 import { Tabs, Tab, TabPanel, TabList } from 'react-web-tabs';
-import CourseSuggestionPanel from '../../components/Tabs/CourseSuggestionPanel';
+import MandatoryPanel from '../../components/Tabs/MandatoryPanel';
+import ComplementaryPanel from '../../components/Tabs/ComplementaryPanel';
 import WithHeaderBar from '../../hocs/WithHeaderBar';
 import './CourseSuggestion.css';
 import './Tabs.css';
@@ -12,37 +13,27 @@ class CourseSuggestion extends Component {
     return (
       <div>
         <div className="main_page_message">
-          Here are your remaining courses and suggestions for your complementary
-          courses. You can add them to your curriculum.
+          Here are your remaining mandatory courses and suggestions for your
+          complementary courses. You can add them to your curriculum.
         </div>
         <Tabs
-          defaultTab="one"
+          defaultTab="Mandatory Courses"
           onChange={tabId => {
             console.log(tabId);
           }}
         >
           <TabList>
             <span className="spacer" />
-            <Tab tabFor="one">Mandatory Courses</Tab>
-            <Tab tabFor="two">Complementary Courses</Tab>
+            <Tab tabFor="Mandatory Courses">Mandatory Courses</Tab>
+            <Tab tabFor="Complementary Courses">Complementary Courses</Tab>
             <span className="spacer" />
           </TabList>
           <Divider />
-          <TabPanel tabId="one">
-            <CourseSuggestionPanel />
+          <TabPanel tabId="Mandatory Courses">
+            <MandatoryPanel />
           </TabPanel>
-          <TabPanel tabId="two">
-            <div className="page">
-              <div className="course-registration">
-                <div className="instruction">
-                  Select the courses that you have already taken.
-                </div>
-                <div className="content">
-                  <div className="selection-side" />
-                  <div className="selected-side" />
-                </div>
-              </div>
-            </div>
+          <TabPanel tabId="Complementary Courses">
+            <ComplementaryPanel />
           </TabPanel>
         </Tabs>
       </div>

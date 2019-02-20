@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './InterestCheckBoxList.css';
-import SmallCheckbox from '../CheckBoxes/Test/SmallCheckbox';
+import SmallCheckbox from '../CheckBoxes/SmallCheckbox';
 
 class InterestCheckBoxList extends Component {
   constructor(props) {
