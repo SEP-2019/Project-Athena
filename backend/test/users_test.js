@@ -1,3 +1,4 @@
+require('dotenv').config();
 const mocha = require('mocha');
 const users = require('../logic/users/users.js');
 const assert = require('assert');
