@@ -1,8 +1,10 @@
+const util = require("util");
+
 const mysql = require("../../sql/connection");
 const format = require("../../validation/format");
 const hasher = require("../../validation/hash");
 
-exports.insertStudentUser = (username, password, email, id) => {
+var insertStudentUser = (username, password, email, id) => {
   return new Promise(function(res, rej) {
     // Connect to database
     let promise = new Promise(function(resolve, reject) {
@@ -107,9 +109,37 @@ exports.insertStudentUser = (username, password, email, id) => {
   });
 };
 
+var getCompletedCourses = async studentID => {
+  let courses = [];
+
+  const sql_query = `SELECT course_code, semester
+  		FROM course_offerings
+  		WHERE (id, semester)
+  		IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`;
+
+  mysql.query = util.promisify(mysql.query);
+
+  let results;
+  try {
+    results = await mysql.query(sql_query, [studentID]);
+  } catch (err) {
+    console.log(err);
+  }
+
+  if (results) {
+    courses = JSON.stringify(results);
+  }
+  return courses;
+};
+
 function logError(connection, error) {
   console.error(error);
   connection.rollback();
   connection.release();
   return "false";
 }
+
+module.exports = {
+  insertStudentUser,
+  getCompletedCourses
+};
