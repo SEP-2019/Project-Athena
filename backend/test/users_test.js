@@ -43,45 +43,45 @@ describe('POST /users/addStudentUser', function() {
 */
 
 describe("Tests add student user", function() {
-  it("responds with undefined username", function(done) {
+  it("responds with invalid format username", function(done) {
     users
       .insertStudentUser(null, "password", "email@email.com", "123456789")
       .then(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, "undefined username");
+          assert.equal(response, "invalid format username");
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with undefined password", function(done) {
+  it("responds with invalid format password", function(done) {
     users
       .insertStudentUser("username", null, "email@email.com", "123456789")
       .then(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, "undefined password");
+          assert.equal(response, "invalid format password");
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with undefined email", function(done) {
+  it("responds with invalid format email", function(done) {
     users
       .insertStudentUser("username", "password", null, "123456789")
       .then(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, "undefined email");
+          assert.equal(response, "invalid format email");
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with undefined id", function(done) {
+  it("responds with invalid format id", function(done) {
     users
       .insertStudentUser("username", "password", "email@email.com", null)
       .then(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, "undefined id");
+          assert.equal(response, "invalid format id");
           resolve();
         }).then(done);
       });
