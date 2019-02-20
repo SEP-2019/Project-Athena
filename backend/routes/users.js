@@ -3,7 +3,7 @@ const users = require('../logic/users/users');
 const router = express.Router();
 
 /*
-* @api {get} /getCompletedCourses
+* @api {get} /addStudentUser
 * @apiDescription This endpoint will add a student and an associated user
 * @apiParam (body) {string} username, {string} password, {string} email, {int} student_id
 * @apiExample {curl} Example usage:
