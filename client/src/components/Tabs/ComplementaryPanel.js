@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import InterestCheckBoxList from '../Lists/InterestCheckBoxList';
 import PropTypes from 'prop-types';
 import { SnackbarProvider, withSnackbar } from 'notistack';
-import './CourseSuggestionPanel.css';
+import './ComplementaryPanel.css';
 
 const interests = [
   { name: 'Robotics', checked: false },
@@ -17,7 +17,7 @@ const interests = [
 
 const InterestCheckBoxListWithSnackBar = withSnackbar(InterestCheckBoxList);
 
-class CourseSuggestionPanel extends Component {
+class ComplementaryPanel extends Component {
   state = {};
   render() {
     return (
@@ -42,4 +42,4 @@ InterestCheckBoxList.propTypes = {
   enqueueSnackbar: PropTypes.func.isRequired,
 };
 
-export default CourseSuggestionPanel;
+export default ComplementaryPanel;
