@@ -5,11 +5,23 @@ let logger = require('morgan');
 let bodyParser = require('body-parser');
 require('dotenv').config();
 
+<<<<<<< HEAD
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+var coursesRouter = require('./routes/courses');
+var app = express();
+||||||| merged common ancestors
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+
+var app = express();
+=======
+
 let indexRouter = require('./routes/index');
 let usersRouter = require('./routes/users');
-let coursesRouter = require('./routes/courses');
 
 let app = express();
+>>>>>>> origin/dev
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -19,5 +31,7 @@ app.use(cookieParser());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/courses', coursesRouter);
+
+
 
 module.exports = app;
