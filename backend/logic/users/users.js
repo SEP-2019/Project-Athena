@@ -5,8 +5,7 @@ const util = require("util");
 
 var insertStudentUser = async (username, password, email, id) => {
   // Connect to database
-  let connection = await mysql.getNewConnection()
-  let error = false 
+  let error = false
   // Check for invalid formatting
   //todo, handle errors after formatting configured to throw errors 
   if (!format.verifyUsername(username)) {
@@ -21,7 +20,6 @@ var insertStudentUser = async (username, password, email, id) => {
 
   console.error(error)
   if (!error == false) {
-    connection.release();
     console.error(error);
     //TODO replace this with an error when tests are fixed for it 
     return error;
@@ -30,6 +28,7 @@ var insertStudentUser = async (username, password, email, id) => {
   // Hash the password
   let hash = hasher.hashPass(password);
   try {
+    let connection = await mysql.getNewConnection()
     await connection.beginTransaction();
     await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
     await connection.query("INSERT INTO students VALUES(?, ?);", [id, username]);
@@ -41,7 +40,7 @@ var insertStudentUser = async (username, password, email, id) => {
     connection.rollback();
     connection.release();
     console.error(error);
-    return false; 
+    return false;
   }
 };
 
