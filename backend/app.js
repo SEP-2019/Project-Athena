@@ -18,9 +18,6 @@ app.use(session({ secret: 'keyboard cat',resave: true, saveUninitialized:true}))
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 
-require('./routes/users.js')(passport);
-require('./logic/users.js')(passport);
-
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -31,4 +28,7 @@ app.use('/users', usersRouter);
 app.use('/courses', coursesRouter);
 app.use('/tags', tagsRouter);
 
-module.exports = app;
+module.exports = {
+    app,
+    passport
+}

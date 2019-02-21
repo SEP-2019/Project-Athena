@@ -2,7 +2,11 @@ const express = require("express");
 const users = require("../logic/users/users");
 //const curriculum = require("../logic/courses/curriculum");
 const router = express.Router();
+<<<<<<< HEAD
 const app = require("../app.js");
+=======
+const app = require("../app.js")
+>>>>>>> Some changes to accessibility of passport from other files
 
 /**
  * @api {post} /addStudentUser
@@ -127,8 +131,14 @@ router.get("/getCompletedCourses", async (req, res) => {
   res.status(200).send(courses);
 });
 
+<<<<<<< HEAD
 /* Retrieve user's username and password and compare to stored values for logging in */
 router.post('/login', app.passport.authenticate('local-signin',  {/*Subject to change later*/}));
+=======
+router.post('/login', app.passport.authenticate('local-signin',  { successRedirect: '/dashboard',
+                                                          failureRedirect: '/signin'}
+                                                          ));
+>>>>>>> Some changes to accessibility of passport from other files
 
 
 

@@ -1,6 +1,12 @@
 const mysql = require('../../sql/connection');
 const format = require('../../validation/format');
 const hasher = require('../../validation/hash');
+<<<<<<< HEAD
+=======
+const util = require("util");
+var app = require("../app");
+var bCrypt = require('bcrypt-nodejs');
+>>>>>>> Some changes to accessibility of passport from other files
 
 var insertStudentUser = async (username, password, email, id) => {
   // Connect to database
@@ -167,12 +173,12 @@ var getCompletedCourses = async studentID => {
   return courses;
 };
 
-var login = async (passport) => {
+var login = async () => {
 	
 	let LocalStrategy = require('passport-local').Strategy;
 		
 	//LOCAL SIGNIN
-	passport.use('local-signin', new LocalStrategy(  
+	app.passport.use('local-signin', new LocalStrategy(  
 	{
 		// by default, local strategy uses username and password, we will override with email
 		usernameField : 'username',
@@ -218,7 +224,7 @@ var login = async (passport) => {
 				return done(null, false, { message: 'Incorrect username.' });
 			}
 
-			if (!isValidPassword(userInfo[0].password,password)) {
+			if (!isValidPassword(userInfo[0].password, password)) {
 				return done(null, false, { message: 'Incorrect password.' });
 			}
 
