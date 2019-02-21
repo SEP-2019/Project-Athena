@@ -4,23 +4,23 @@ const MIN_PASSWORD_LENGTH = 8;
 const MAX_EMAIL_LENGTH = 384;
 const ID_LENGTH = 9;
 
-function isAlphabet(str) {
-	return String(str).match(/^[a-z]+$/i);
-}
-
-function isAlphabetWithSpace(str) {
-	return String(str).match(/^[a-z ]+$/i);
-}
+//todo throw error on failure of format methods 
 
 function isAlphanumeric(str) {
+	if (!str)
+		return false
 	return String(str).match(/^[a-z0-9]+$/i);
 }
 
 function isNumeric(str) {
+	if (!str)
+		return false
 	return String(str).match(/^[0-9]*$/);
 }
 
 exports.verifyUsername = username => {
+	if (!username)
+		return false
 	if (String(username).length > MAX_USERNAME_LENGTH) {
 		return false;
 	}
@@ -28,6 +28,8 @@ exports.verifyUsername = username => {
 }
 
 exports.verifyPassword = password => {
+	if (!password)
+		return false
 	if (String(password).length > MAX_PASSWORD_LENGTH || String(password).length < MIN_PASSWORD_LENGTH) {
 		return false;
 	}
@@ -35,6 +37,8 @@ exports.verifyPassword = password => {
 }
 
 exports.verifyEmail = email => {
+	if (!email)
+		return false
 	if (String(email).length > MAX_EMAIL_LENGTH) {
 		return false;
 	}
@@ -42,5 +46,7 @@ exports.verifyEmail = email => {
 }
 
 exports.verifyId = id => {
+	if (!id)
+		return false
 	return (isNumeric(id) && (String(id).length == ID_LENGTH));
 }
