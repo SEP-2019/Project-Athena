@@ -2,6 +2,7 @@ let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
+let passport = require('passport')
 let bodyParser = require('body-parser');
 require('dotenv').config();
 
@@ -11,6 +12,14 @@ let coursesRouter = require('./routes/courses');
 let tagsRouter = require('./routes/tags');
 
 let app = express();
+
+// For Passport
+app.use(session({ secret: 'keyboard cat',resave: true, saveUninitialized:true})); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+
+require('./routes/users.js')(passport);
+require('./logic/users.js')(passport);
 
 app.use(logger('dev'));
 app.use(bodyParser.json());

@@ -2,6 +2,7 @@ const express = require("express");
 const users = require("../logic/users/users");
 //const curriculum = require("../logic/courses/curriculum");
 const router = express.Router();
+const app = require("../app.js");
 
 /**
  * @api {post} /addStudentUser
@@ -125,5 +126,10 @@ router.get("/getCompletedCourses", async (req, res) => {
   const courses = await users.getCompletedCourses(student_id);
   res.status(200).send(courses);
 });
+
+/* Retrieve user's username and password and compare to stored values for logging in */
+router.post('/login', app.passport.authenticate('local-signin',  {/*Subject to change later*/}));
+
+
 
 module.exports = router;

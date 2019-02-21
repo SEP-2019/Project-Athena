@@ -167,10 +167,76 @@ var getCompletedCourses = async studentID => {
   return courses;
 };
 
+var login = async (passport) => {
+	
+	let LocalStrategy = require('passport-local').Strategy;
+		
+	//LOCAL SIGNIN
+	passport.use('local-signin', new LocalStrategy(  
+	{
+		// by default, local strategy uses username and password, we will override with email
+		usernameField : 'username',
+		passwordField : 'password',
+		passReqToCallback : true // allows us to pass back the entire request to the callback
+	},
+	
+	function(req, username, password, done) {
+		let error;
+
+		let isValidPassword = function(userpass, password){
+			return hasher.hashPass(password) === userpass; 
+		}
+		// Check for missing input params
+		if (!username) {
+			error = 'Undefined username';
+		} else if (!password) {
+			error = 'Undefined password';
+		}
+
+		if (error) {
+			return done(error);
+		}
+
+		// Check for invalid formatting
+		if (!format.verifyUsername(username)) {
+			error = 'Invalid format username';
+		} else if (!format.verifyPassword(password)) {
+			error = 'Invalid format password';
+		}
+
+		if (error) {
+			return done(error);
+		}
+
+		// Begin transaction with database
+		try {
+			let connection = await mysql.getNewConnection()
+			let userInfo = await connection.query('SELECT * FROM users WHERE username = ?;',[username]);
+			connection.release();
+
+			if(!userInfo) {
+				return done(null, false, { message: 'Incorrect username.' });
+			}
+
+			if (!isValidPassword(userInfo[0].password,password)) {
+				return done(null, false, { message: 'Incorrect password.' });
+			}
+
+			return done(null,userInfo[0]);
+		} 
+		catch (error) {
+			connection.release();
+			console.error(error);
+			return done(error);
+		}
+	}));
+}
+
 module.exports = {
   insertStudentUser,
   deleteStudentUser,
   insertAdminUser,
   deleteAdminUser,
-  getCompletedCourses
+  getCompletedCourses,
+  login
 };
