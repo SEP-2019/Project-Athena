@@ -52,11 +52,11 @@ var getCompletedCourses = async studentID => {
   		WHERE (id, semester)
   		IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`;
 
-  mysql.query = util.promisify(mysql.query);
+  let conn = await mysql.getNewConnection();
 
   let results;
   try {
-    results = await mysql.query(sql_query, [studentID]);
+    results = await conn.query(sql_query, [studentID]);
   } catch (err) {
     console.log(err);
   }
@@ -67,7 +67,51 @@ var getCompletedCourses = async studentID => {
   return courses;
 };
 
+var getStudentData = async studentID => {
+  let data;
+  
+  let sql_query = `SELECT course_code, semester
+  		FROM course_offerings
+  		WHERE (id, semester)
+  		IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`;
+
+  let conn = await mysql.getNewConnection();
+
+  let courses;
+  try {
+    courses = await conn.query(sql_query, [studentID]);
+  } catch (err) {
+    console.log(err);
+  }
+
+  sql_query = `SELECT curriculum_name FROM student_major WHERE student_id = ?;`;
+
+  let major;
+  try {
+    major = await conn.query(sql_query, [studentID]);
+  } catch (err) {
+    console.log(err);
+  }  
+
+  sql_query = `SELECT curriculum_name FROM student_minor WHERE student_id = ?;`;
+
+  let minor;
+  try {
+    minor = await conn.query(sql_query, [studentID]);
+  } catch (err) {
+    console.log(err);
+  }  
+
+  let results = {'major':major, 'minor':minor, 'courses':courses};
+
+  if (results) {
+    data = JSON.stringify(results);
+  }
+  return data;
+};
+
 module.exports = {
   insertStudentUser,
-  getCompletedCourses
+  getCompletedCourses,
+  getStudentData
 };
