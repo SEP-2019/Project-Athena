@@ -10,11 +10,7 @@ describe('Test retrieve course by tag', function() {
                 if (JSON.stringify(course) == JSON.stringify(searchingFor))
                     found = true;
             }
-            if (found){
-                assert(true,true);
-            }else{
-                assert(true, false);
-            }
+            assert(true,found)
         });
     });
 });
