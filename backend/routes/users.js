@@ -95,5 +95,11 @@ router.get("/getStudentData", async (req, res) => {
   const data = await users.getStudentData(student_id);
   res.status(200).send(data);
 });
-
+try {
+const data = await users.getStudentData(student_id);
+res.status(200).send(data);
+}catch(error){
+//for now just send back generic 500, will have to edit later on to return specific error codes based on what happened
+res.status(500).send(error)
+}
 module.exports = router;
