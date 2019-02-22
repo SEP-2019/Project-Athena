@@ -68,6 +68,7 @@ var deleteStudentUser = async (username) => {
     await connection.query('DELETE FROM students WHERE student_id = ?;', [student_id[0].student_id]);
     await connection.query('DELETE FROM users WHERE username = ?;', [username]);
     await connection.commit();
+    connection.release();
     return true;
   } catch (error) {
     console.error(error)
@@ -143,6 +144,7 @@ var deleteAdminUser = async (username) => {
     await connection.query('DELETE FROM staff_members WHERE staff_id = ?;', [staff_id[0].staff_id]);
     await connection.query('DELETE FROM users WHERE username = ?;', [username]);
     await connection.commit();
+    connection.release();
     return true;
   } catch (error) {
     console.error(error)
