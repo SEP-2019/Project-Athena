@@ -56,6 +56,7 @@ var getCompletedCourses = async studentID => {
   let results;
   try {
     results = await connection.query(sql_query, [studentID]);
+    connection.release();
   } catch (err) {
     connection.release();
     console.log(err);
