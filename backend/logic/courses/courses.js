@@ -13,7 +13,7 @@ async function queryCourseByTag(tag) {
     } catch (error) {
         connection.release();
         console.error(error);
-        throw Error(error.message);
+        throw error;
     }
 }
 module.exports.queryCourseByTag = queryCourseByTag;
