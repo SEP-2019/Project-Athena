@@ -1,8 +1,16 @@
 const courses = require('../logic/courses/courses.js');
 const assert = require('assert');
+const mysql = require('../sql/connection')
 
 describe('Test retrieve course by tag', function() {
-    it('responds with valid', function(){
+    it('responds with valid', async function(){
+        connection = await mysql.getNewConnection()
+        connection.query(`INSERT INTO courses (course_code,title, department) VALUES 
+        (?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,['ECSE 428','Software engineering in practice', 'ECSE']);
+        connection.query(`INSERT INTO tags(name) VALUES
+        (?);`,['Engineering'])
+        connection.query(`INSERT INTO course_tag (course_code, tag_name) VALUES
+        (?,?);`,['ECSE 428', 'Engineering'])
         return courses.queryCourseByTag('Engineering').then(function(res){
             let found = false;
             let searchingFor = {course_code: 'ECSE 428'};
@@ -10,11 +18,7 @@ describe('Test retrieve course by tag', function() {
                 if (JSON.stringify(course) == JSON.stringify(searchingFor))
                     found = true;
             }
-            if (found){
-                assert(true,true);
-            }else{
-                assert(true, false);
-            }
+            assert(true,found)
         });
     });
 });
