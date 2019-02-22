@@ -297,15 +297,17 @@ describe("Tests add student user", function() {
   });
 });
 
-
-describe('Test retrieve student data', function() {
-  it('responds with valid', function(){
-      return users.getStudentData(2).then(function(res){
-          let found = false;
-          let searchingFor = {"major":[],"minor":[],"courses":[{"course_code":"ECSE 428","semester":"winter"}]};
-          if (JSON.stringify(course) == JSON.stringify(searchingFor))
-              found = true;
-          assert(true,found);
-      });
+describe("Test retrieve student data", function() {
+  it("responds with valid", function() {
+    return users.getStudentData(2).then(function(res) {
+      let found = false;
+      let searchingFor = {
+        major: [],
+        minor: [],
+        courses: [{ course_code: "ECSE 428", semester: "winter" }]
+      };
+      if (JSON.stringify(course) == JSON.stringify(searchingFor)) found = true;
+      assert(true, found);
+    });
   });
 });
