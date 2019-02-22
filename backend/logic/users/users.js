@@ -1,13 +1,13 @@
-const mysql = require('../../sql/connection');
-const format = require('../../validation/format');
-const hasher = require('../../validation/hash');
+const mysql = require("../../sql/connection");
+const format = require("../../validation/format");
+const hasher = require("../../validation/hash");
 const util = require("util");
 
 var insertStudentUser = async (username, password, email, id) => {
   // Connect to database
-  let error = false
+  let error = false;
   // Check for invalid formatting
-  //todo, handle errors after formatting configured to throw errors 
+  //todo, handle errors after formatting configured to throw errors
   if (!format.verifyUsername(username)) {
     error = "invalid format username";
   } else if (!format.verifyPassword(password)) {
@@ -18,23 +18,30 @@ var insertStudentUser = async (username, password, email, id) => {
     error = "invalid format id";
   }
 
-  console.error(error)
+  console.error(error);
   if (!error == false) {
     console.error(error);
-    //TODO replace this with an error when tests are fixed for it 
+    //TODO replace this with an error when tests are fixed for it
     return error;
   }
 
   // Hash the password
   let hash = hasher.hashPass(password);
   try {
-    let connection = await mysql.getNewConnection()
+    let connection = await mysql.getNewConnection();
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
-    await connection.query("INSERT INTO students VALUES(?, ?);", [id, username]);
+    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [
+      username,
+      email,
+      hash
+    ]);
+    await connection.query("INSERT INTO students VALUES(?, ?);", [
+      id,
+      username
+    ]);
     await connection.commit();
     connection.release();
-    //TODO remove this after test refactoring 
+    //TODO remove this after test refactoring
     return true;
   } catch (error) {
     connection.rollback();
@@ -69,7 +76,7 @@ var getCompletedCourses = async studentID => {
 
 var getStudentData = async studentID => {
   let data;
-  
+
   let sql_query = `SELECT course_code, semester
   		FROM course_offerings
   		WHERE (id, semester)
@@ -91,7 +98,7 @@ var getStudentData = async studentID => {
     major = await conn.query(sql_query, [studentID]);
   } catch (err) {
     console.log(err);
-  }  
+  }
 
   sql_query = `SELECT curriculum_name FROM student_minor WHERE student_id = ?;`;
 
@@ -100,9 +107,9 @@ var getStudentData = async studentID => {
     minor = await conn.query(sql_query, [studentID]);
   } catch (err) {
     console.log(err);
-  }  
+  }
 
-  let results = {'major':major, 'minor':minor, 'courses':courses};
+  let results = { major: major, minor: minor, courses: courses };
 
   if (results) {
     data = JSON.stringify(results);

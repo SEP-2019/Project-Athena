@@ -33,15 +33,14 @@ const router = express.Router();
 *
 * @author: Steven Li + Alex Lam
 */
-router.post('/addStudentUser', function (req, res, next) {
-	let username = req.body.username;
-	let password = req.body.password;
-	let email = req.body.email;
-	let id = req.body.student_id;
-	users.insertStudentUser(username, password, email, id)
-		.then(function (val) {
-			res.send(val);
-		});
+router.post("/addStudentUser", function(req, res, next) {
+  let username = req.body.username;
+  let password = req.body.password;
+  let email = req.body.email;
+  let id = req.body.student_id;
+  users.insertStudentUser(username, password, email, id).then(function(val) {
+    res.send(val);
+  });
 });
 
 /*Receive the User's completed Courses and compare them to curriculum*/
@@ -92,11 +91,9 @@ router.get("/getCompletedCourses", async (req, res) => {
  */
 router.get("/getStudentData", async (req, res) => {
   const student_id = req.query.studentID;
-	//const courses = await users.getCompletedCourses(student_id);
-	const data = await users.getStudentData(student_id);
+  //const courses = await users.getCompletedCourses(student_id);
+  const data = await users.getStudentData(student_id);
   res.status(200).send(data);
 });
-
-
 
 module.exports = router;
