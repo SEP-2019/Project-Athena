@@ -3,31 +3,8 @@ const format = require('../../validation/format');
 const hasher = require('../../validation/hash');
 
 var insertStudentUser = async (username, password, email, id) => {
-  // Connect to database
-  let error = false
   // Check for invalid formatting
-  //todo, handle errors after formatting configured to throw errors 
-  if (!format.verifyUsername(username)) {
-    error = "invalid format username";
-  } else if (!format.verifyPassword(password)) {
-    error = "invalid format password";
-  } else if (!format.verifyEmail(email)) {
-    error = "invalid format email";
-  } else if (!format.verifyStudentId(id)) {
-    error = "invalid format id";
-  }
-
-  if (!error == false) {
-    console.error(error);
-    throw new Error(error);
-  }
-
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    throw new Error("failed to establish connection with database");
-  }
+  format.verifyStudentUserInput(username, password, email, id)
 
   // Hash the password
   let hash = hasher.hashPass(password);
@@ -39,150 +16,40 @@ var insertStudentUser = async (username, password, email, id) => {
     await connection.query("INSERT INTO students VALUES(?, ?);", [id, username]);
     await connection.commit();
     connection.release();
+    //TODO remove this after test refactoring 
     return true;
   } catch (error) {
     connection.rollback();
     connection.release();
-    console.error(error);
-    throw new Error(false);
-  }
-};
-
-var deleteStudentUser = async (username) => {
-  if (!format.verifyUsername(username)) {
-    let error = "invalid username";
-    console.error(error);
-    throw new Error(error);
-  }
-
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    console.error(error);
-    throw new Error("failed to establish connection with database");
-  }
-
-  try {
-    await connection.beginTransaction();
-    let student_id = await connection.query('SELECT student_id FROM students WHERE username = ?;', username)
-    await connection.query('DELETE FROM students WHERE student_id = ?;', [student_id[0].student_id]);
-    await connection.query('DELETE FROM users WHERE username = ?;', [username]);
-    await connection.commit();
-    connection.release();
-    return true;
-  } catch (error) {
-    console.error(error)
-    connection.rollback();
-    connection.release();
-    throw new Error(false);
-  }
-};
-
-var insertAdminUser = async (username, password, email, id) => {
-  // Connect to database
-  let error = false
-  // Check for invalid formatting
-  //todo, handle errors after formatting configured to throw errors 
-  if (!format.verifyUsername(username)) {
-    error = "invalid format username";
-  } else if (!format.verifyPassword(password)) {
-    error = "invalid format password";
-  } else if (!format.verifyEmail(email)) {
-    error = "invalid format email";
-  } else if (!format.verifyAdminId(id)) {
-    error = "invalid format id";
-  }
-
-  if (!error == false) {
-    console.error(error);
-    throw new Error(error);
-  }
-
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    throw new Error("failed to establish connection with database");
-  }
-
-
-  // Hash the password
-  let hash = hasher.hashPass(password);
-  try {
-    await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
-    await connection.query("INSERT INTO staff_members VALUES(?, ?);", [id, username]);
-    await connection.commit();
-    connection.release();
-    return true;
-  } catch (error) {
-    connection.rollback();
-    connection.release();
-    console.error(error);
-    throw new Error(false);
-  }
-};
-
-var deleteAdminUser = async (username) => {
-  if (!format.verifyUsername(username)) {
-    let error = "invalid username";
-    console.error(error);
-    throw new Error(error);
-  }
-
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    console.error(error);
-    throw new Error("failed to establish connection with database");
-  }
-
-  try {
-    await connection.beginTransaction();
-    let staff_id = await connection.query('SELECT staff_id FROM staff_members WHERE username = ?;', username)
-    await connection.query('DELETE FROM staff_members WHERE staff_id = ?;', [staff_id[0].staff_id]);
-    await connection.query('DELETE FROM users WHERE username = ?;', [username]);
-    await connection.commit();
-    connection.release();
-    return true;
-  } catch (error) {
-    console.error(error)
-    connection.rollback();
-    connection.release();
-    throw new Error(false);
+    throw error;
   }
 };
 
 var getCompletedCourses = async studentID => {
   let courses = [];
+  let connection = await mysql.getNewConnection();
+  let results;
 
   const sql_query = `SELECT course_code, semester
   		FROM course_offerings
   		WHERE (id, semester)
   		IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`;
-  
-  let connection = await mysql.getNewConnection();
-  let results;
+
   try {
     results = await connection.query(sql_query, [studentID]);
+    if (results) {
+      courses = JSON.parse(JSON.stringify(results));
+    }
+    console.log(courses)
     connection.release();
+    return courses;
   } catch (err) {
     connection.release();
-    console.log(err);
+    throw err;
   }
-
-  if (results) {
-    courses = JSON.stringify(results);
-  }
-  return courses;
 };
 
 module.exports = {
   insertStudentUser,
-  deleteStudentUser,
-  insertAdminUser,
-  deleteAdminUser,
   getCompletedCourses
 };
