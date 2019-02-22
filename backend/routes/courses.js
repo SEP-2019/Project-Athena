@@ -4,7 +4,7 @@ const router = express.Router();
 
 /*
 * @api {get} /getCourseByTag
-* @apiDescription 
+* @apiDescription get list of courses that match a tag
 * @apiParam (query) {string} tag
 * @apiExample {curl} Example usage: GET /courses/getCourseByTag?tag=engineering
 *

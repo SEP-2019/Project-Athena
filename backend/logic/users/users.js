@@ -1,7 +1,6 @@
 const mysql = require('../../sql/connection');
 const format = require('../../validation/format');
 const hasher = require('../../validation/hash');
-const util = require("util");
 
 var insertStudentUser = async (username, password, email, id) => {
   // Connect to database
@@ -27,8 +26,9 @@ var insertStudentUser = async (username, password, email, id) => {
 
   // Hash the password
   let hash = hasher.hashPass(password);
+  let connection = await mysql.getNewConnection()
+
   try {
-    let connection = await mysql.getNewConnection()
     await connection.beginTransaction();
     await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
     await connection.query("INSERT INTO students VALUES(?, ?);", [id, username]);
@@ -51,13 +51,13 @@ var getCompletedCourses = async studentID => {
   		FROM course_offerings
   		WHERE (id, semester)
   		IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`;
-
-  mysql.query = util.promisify(mysql.query);
-
+  
+  let connection = await mysql.getNewConnection();
   let results;
   try {
-    results = await mysql.query(sql_query, [studentID]);
+    results = await connection.query(sql_query, [studentID]);
   } catch (err) {
+    connection.release();
     console.log(err);
   }
 
