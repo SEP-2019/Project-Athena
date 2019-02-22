@@ -3,26 +3,8 @@ const format = require('../../validation/format');
 const hasher = require('../../validation/hash');
 
 var insertStudentUser = async (username, password, email, id) => {
-  // Connect to database
-  let error = false
   // Check for invalid formatting
-  //todo, handle errors after formatting configured to throw errors 
-  if (!format.verifyUsername(username)) {
-    error = "invalid format username";
-  } else if (!format.verifyPassword(password)) {
-    error = "invalid format password";
-  } else if (!format.verifyEmail(email)) {
-    error = "invalid format email";
-  } else if (!format.verifyId(id)) {
-    error = "invalid format id";
-  }
-
-  console.error(error)
-  if (!error == false) {
-    console.error(error);
-    //TODO replace this with an error when tests are fixed for it 
-    return error;
-  }
+  format.verifyStudentUserInput(username, password, email, id)
 
   // Hash the password
   let hash = hasher.hashPass(password);
@@ -39,33 +21,32 @@ var insertStudentUser = async (username, password, email, id) => {
   } catch (error) {
     connection.rollback();
     connection.release();
-    console.error(error);
-    return false;
+    throw error;
   }
 };
 
 var getCompletedCourses = async studentID => {
   let courses = [];
+  let connection = await mysql.getNewConnection();
+  let results;
 
   const sql_query = `SELECT course_code, semester
   		FROM course_offerings
   		WHERE (id, semester)
   		IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`;
-  
-  let connection = await mysql.getNewConnection();
-  let results;
+
   try {
     results = await connection.query(sql_query, [studentID]);
+    if (results) {
+      courses = JSON.parse(JSON.stringify(results));
+    }
+    console.log(courses)
     connection.release();
+    return courses;
   } catch (err) {
     connection.release();
-    console.log(err);
+    throw err;
   }
-
-  if (results) {
-    courses = JSON.stringify(results);
-  }
-  return courses;
 };
 
 module.exports = {
