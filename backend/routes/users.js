@@ -10,7 +10,7 @@ const router = express.Router();
 * @apiExample {curl} Example usage:
 * Http: 
 	POST /users/addStudentUser HTTP/1.1
-	Host: localhost:3000
+	Host: localhost:3001
 	Content-Type: application/json
 	{
 		"username": "alex1234",
@@ -20,7 +20,7 @@ const router = express.Router();
 	}
 * Curl:
 	curl -X POST \
-	http://localhost:3000/users/addStudentUser \
+	http://localhost:3001/users/addStudentUser \
 	-H 'Content-Type: application/json' \
 	-d '{
 		"username": "alex1234",
@@ -33,15 +33,14 @@ const router = express.Router();
 *
 * @author: Steven Li + Alex Lam
 */
-router.post('/addStudentUser', function (req, res, next) {
-	let username = req.body.username;
-	let password = req.body.password;
-	let email = req.body.email;
-	let id = req.body.student_id;
-	users.insertStudentUser(username, password, email, id)
-		.then(function (val) {
-			res.send(val);
-		});
+router.post("/addStudentUser", function(req, res, next) {
+  let username = req.body.username;
+  let password = req.body.password;
+  let email = req.body.email;
+  let id = req.body.student_id;
+  users.insertStudentUser(username, password, email, id).then(function(val) {
+    res.send(val);
+  });
 });
 
 /*Receive the User's completed Courses and compare them to curriculum*/
@@ -64,7 +63,7 @@ router.post("/completedCourses/comparison", function(req, res) {
  * @apiDescription This endpoint will return user (student) completed courses
  * @apiParam (query) {Integer} studentID
  * @apiExample {curl} Example usage:
- * 		curl -X GET -H "Content-Type: application/json" 'http://localhost:3000/users/getCompletedCourses?studentID=12345'
+ * 		curl -X GET -H "Content-Type: application/json" 'http://localhost:3001/users/getCompletedCourses?studentID=12345'
  *
  * @returns An json of completed course code, e.g [{"course_code":"ECSE422","semester":"W2019"},{"course_code":"ECSE428","semester":"F2019"}]
  *
@@ -76,7 +75,5 @@ router.get("/getCompletedCourses", async (req, res) => {
   const courses = await users.getCompletedCourses(student_id);
   res.status(200).send(courses);
 });
-
-
 
 module.exports = router;
