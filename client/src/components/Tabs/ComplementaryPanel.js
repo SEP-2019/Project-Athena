@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { SnackbarProvider, withSnackbar } from 'notistack';
 
 import InterestCheckBoxList from '../Lists/InterestCheckBoxList';
+import CourseSuggestionList from '../Lists/CourseSuggestionList';
 import './ComplementaryPanel.css';
 
 const interests = [
@@ -40,6 +41,7 @@ class ComplementaryPanel extends Component {
         <div className="spacer" />
         <h4 className="list_courses">
           Display Suggested Courses in appropriate interest section
+          <CourseSuggestionList />
         </h4>
         <div className="spacer" />
       </div>
