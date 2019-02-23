@@ -2,6 +2,7 @@ const mocha = require("mocha");
 const users = require("../logic/users/users.js");
 const assert = require("assert");
 const nock = require("nock");
+const mysql = require("../sql/connection");
 
 /*
 const host = 'http://localhost:3000';
@@ -627,5 +628,42 @@ describe("Tests add admin user", function() {
           resolve();
         }).then(done);
       });
+  });
+});
+
+describe("Test retrieve student data", function() {
+  it("responds with valid", function() {});
+  it("responds with valid", async function() {
+    connection = await mysql.getNewConnection();
+    connection.query(
+      `INSERT INTO courses (course_code,title, department) VALUES (?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,
+      ["ECSE 428", "Software engineering in practice", "ECSE"]
+    );
+    connection.query(
+      `INSERT INTO course_offerings (id, semester, course_code) VALUES (?,?,?) ON DUPLICATE KEY UPDATE id=id;`,
+      [321123, "winter", "ECSE 428"]
+    );
+    connection.query(
+      `INSERT INTO users (username,email, password) VALUES (?,?,?) ON DUPLICATE KEY UPDATE username=username;`,
+      ["testUser", "email@domain.com", 12345678]
+    );
+    connection.query(
+      `INSERT INTO students (student_id,username) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id=student_id;`,
+      [123321123, "testUser"]
+    );
+    connection.query(
+      `INSERT INTO student_course_offerings (student_id,offering_id,semester) VALUES (?,?,?);`,
+      [123321123, 321123, "winter"]
+    );
+    return users.getStudentData(123321123).then(function(res) {
+      let found = false;
+      let searchingFor = {
+        major: [],
+        minor: [],
+        courses: [{ course_code: "ECSE 428", semester: "winter" }]
+      };
+      if (JSON.stringify(course) == JSON.stringify(searchingFor)) found = true;
+      assert(true, found);
+    });
   });
 });

@@ -126,4 +126,27 @@ router.get("/getCompletedCourses", async (req, res) => {
   res.status(200).send(courses);
 });
 
+/**
+ *
+ * @api {get} /getStudentData
+ * @apiDescription This endpoint will return user (student) completed courses, major and minors
+ * @apiParam (query) {Integer} studentID
+ * @apiExample {curl} Example usage:
+ * 		curl -X GET -H "Content-Type: application/json" 'http://localhost:3000/users/getStudentData?studentID=12345'
+ *
+ * @returns An json of current major & minors, and completed course code, e.g {"major":"Electrical Major","minor":"Software Minor","courses":[{"course_code":"ECSE422","semester":"W2019"},{"course_code":"ECSE428","semester":"F2019"}]}
+ *
+ * @author: Feras Al Taha
+ *
+ */
+router.get("/getStudentData", async (req, res) => {
+  const student_id = req.query.studentID;
+  try {
+    const data = await users.getStudentData(student_id);
+    res.status(200).send(data);
+  } catch (error) {
+    //for now just send back generic 500, will have to edit later on to return specific error codes based on what happened
+    res.status(500).send(error.message);
+  }
+});
 module.exports = router;
