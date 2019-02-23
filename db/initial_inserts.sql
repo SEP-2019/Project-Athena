@@ -16,6 +16,7 @@ VALUES
 
 INSERT INTO `
 users`
+(username, email, password)
 VALUES
     ('academicStaff1', 'academic.staff.1@mcgill.ca', 'qxGPhzqRSjmjwmaSaC6z7UrouwrJrUQYfqdBiSk3GqnTus4BeoPT5TicDtT2xoP0YTJBTMgdBGG9Wyw36DhFzA=='),
     ('academicStaff5', 'staff.email.internal.sample@internal.mcgill.ca', '2bjEO8IVgKQinHUGt2lYZuWrtwq8ERFfE+6ZVmWwhvgYrJiCAmt2UyVd/1oanS333ypHVkpzPjRYQg+TQrd3uw=='),
