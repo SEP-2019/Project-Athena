@@ -1,19 +1,153 @@
-const mysql = require('../../sql/connection');
+const mysql = require("../../sql/connection");
+const format = require("../../validation/format");
 
-async function queryCourseByTag(tag) {
-    if (!tag) {
-        throw Error("Undefined tag")
+/**
+ * Returns a list of courses matching the tag
+ * @author Alex Lam
+ * @param {string} tag
+ * @returns A list of courses in JSON format
+ * @throws Undefined tag if tag is null
+ *         error if MySQL connection failed
+ */
+var queryCourseByTag = async function queryCourseByTag(tag) {
+  if (!tag) {
+    throw Error("Undefined tag");
+  }
+
+  let connection = await mysql.getNewConnection();
+  try {
+    let courses = await connection.query(
+      "SELECT course_code FROM course_tag WHERE course_tag.tag_name LIKE ?",
+      tag
+    );
+    connection.release();
+    return JSON.parse(JSON.stringify(courses));
+  } catch (error) {
+    connection.release();
+    console.error(error);
+    throw Error(error.message);
+  }
+};
+
+/**
+ * Adds a student's completed courses into the database
+ * @author Steven Li
+ * @param {int} studentId
+ * @param {JSON} courses
+ * @returns true if successful
+ * @throws error if MySQL connection failed
+ *         invalid format courses if JSON format is incorrect
+ *         false if insertion failed
+ */
+var addCompletedCourses = async (studentId, courses) => {
+  await format.verifyCourse(courses);
+  let connection = await mysql.getNewConnection();
+
+  try {
+    // Obtain all current course offerings and put them into a hashtable for fast lookup
+    let results = await connection.query(
+      "SELECT course_code, semester, section, id FROM course_offerings;"
+    );
+    let hashTable = {};
+    for (let i = 0; i < results.length; i++) {
+      hashTable[
+        results[i].course_code + results[i].semester + results[i].section
+      ] = results[i].id;
     }
 
-    let connection = await mysql.getNewConnection();
-    try {
-        let courses = await connection.query('SELECT course_code FROM course_tag WHERE course_tag.tag_name LIKE ?', tag);
-        connection.release();
-        return (JSON.parse(JSON.stringify(courses)));
-    } catch (error) {
-        connection.release();
-        console.error(error);
-        throw Error(error.message);
+    await connection.beginTransaction();
+    // Insert each course of the student into the database. If a course does not exist then
+    // throw an error.
+    for (let course in courses) {
+      for (let i = 0; i < courses[course].length; i++) {
+        let id =
+          hashTable[
+            course + courses[course][i].semester + courses[course][i].section
+          ];
+        await connection.query(
+          "INSERT INTO student_course_offerings VALUES(?, ?, ?);",
+          [studentId, id, courses[course][i].semester]
+        );
+      }
     }
-}
-module.exports.queryCourseByTag = queryCourseByTag;
+
+    await connection.commit();
+    connection.release();
+    return true;
+  } catch (error) {
+    console.error(error);
+    await connection.rollback();
+    connection.release();
+    throw new Error(false);
+  }
+};
+
+/**
+ * Returns all available courses from the database
+ * @author Steven Li
+ * @returns a list of available courses from the database in JSON format
+ * @throws error if MySQL connection failed
+ */
+var getAllCourses = async () => {
+  let connection = await mysql.getNewConnection();
+  let courses;
+  let result;
+  try {
+    result = await connection.query("SELECT * FROM courses;");
+  } catch (err) {
+    console.error(err);
+  }
+  connection.release();
+
+  if (result) {
+    courses = result;
+  }
+  return courses;
+};
+
+/**
+ * Adds a list of course offerings into the database
+ * @author Steven Li
+ * @param {JSON} courseOfferings
+ * @returns true if successful
+ * @throws error if MySQL connection failed
+ *         invalid format course offerings if JSON format is wrong
+ *         false if insertion failed
+ */
+var addCourseOfferings = async courseOfferings => {
+  await format.verifyCourseOffering(courseOfferings);
+  let connection = await mysql.getNewConnection();
+  let query =
+    "INSERT INTO course_offerings (id, semester, scheduled_time, course_code, section) VALUES (?, ?, ?, ?, ?);";
+  try {
+    await connection.beginTransaction();
+    // Insert each course offering into the database
+    for (let courseCode in courseOfferings) {
+      for (let i = 0; i < courseOfferings[courseCode].length; i++) {
+        await connection.query(query, [
+          courseOfferings[courseCode][i].id,
+          courseOfferings[courseCode][i].semester,
+          courseOfferings[courseCode][i].scheduled_time,
+          courseCode,
+          courseOfferings[courseCode][i].section
+        ]);
+      }
+    }
+
+    await connection.commit();
+    connection.release();
+    return true;
+  } catch (error) {
+    console.error(error);
+    await connection.rollback();
+    connection.release();
+    throw new Error(false);
+  }
+};
+
+module.exports = {
+  queryCourseByTag,
+  addCompletedCourses,
+  addCourseOfferings,
+  getAllCourses
+};
