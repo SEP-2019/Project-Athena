@@ -12,6 +12,12 @@ function isAlphanumeric(str) {
 	return String(str).match(/^[a-z0-9]+$/i);
 }
 
+function isAlphabet(str) {
+	if (!str)
+		return false
+	return String(str).match(/^[a-z]+$/i);
+}
+
 function isNumeric(str) {
 	if (!str)
 		return false
@@ -49,4 +55,16 @@ exports.verifyId = id => {
 	if (!id)
 		return false
 	return (isNumeric(id) && (String(id).length == ID_LENGTH));
+}
+
+exports.verifyCourseCode = courseCode => {
+	// Odd example: ISLA 522D2 
+	var department = courseCode.substring(0, 4);
+	var space = courseCode.charAt(5);
+	var cousreNumber = courseCode.split(space, 2);
+	courseNumber = courseNumber[1];
+	if(!courseCode)
+		return false
+	return (isAlphabet(department) && space == " " && isAlphanumeric(courseNumber));
+	
 }

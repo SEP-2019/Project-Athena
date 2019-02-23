@@ -58,7 +58,7 @@ router.post('/createCourse', function(req, res, next) {
   const title = req.body.title;
   const email = req.body.email;
   const departement = req.body.departement;
-  users.insertStudentUser(title, email, departement)
+  users.addCourse(title, email, departement)
     .then(val => {
       res.send(val);
     })
