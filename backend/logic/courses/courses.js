@@ -21,7 +21,7 @@ var queryCourseByTag = async function queryCourseByTag(tag) {
   }
 };
 
-var addCompletedCourses = async (studentId, courses, section) => {
+var addCompletedCourses = async (studentId, courses) => {
   if (!format.verifyStudentId(studentId)) {
     throw new Error("invalid format id");
   }
@@ -37,7 +37,9 @@ var addCompletedCourses = async (studentId, courses, section) => {
   try {
     await connection.beginTransaction();
     // Obtain all current course offerings and put them into a hashtable for fast lookup
-    let results = await connection.query("SELECT * FROM course_offerings;");
+    let results = await connection.query(
+      "SELECT course_code, semester, section, id FROM course_offerings;"
+    );
     let hashTable = {};
     for (let i = 0; i < results.length; i++) {
       hashTable[
@@ -72,7 +74,6 @@ var addCompletedCourses = async (studentId, courses, section) => {
 };
 
 async function populateHashTableCourseOfferings(results) {
-
   return hashTable;
 }
 

@@ -3,42 +3,43 @@ const users = require("../logic/users/users");
 //const curriculum = require("../logic/courses/curriculum");
 const router = express.Router();
 
-/*
-* @api {post} /addStudentUser
-* @apiDescription This endpoint will add a student and an associated user
-* @apiParam (body) {string} username, {string} password, {string} email, {int} student_id
-* @apiExample {curl} Example usage:
-* Http: 
-	POST /users/addStudentUser HTTP/1.1
-	Host: localhost:3001
-	Content-Type: application/json
-	{
-		"username": "alex1234",
-		"password": "test1234:",
-		"email" : "alex@email.com",
-		"student_id" : 123456789
-	}
-* Curl:
-	curl -X POST \
-	http://localhost:3001/users/addStudentUser \
-	-H 'Content-Type: application/json' \
-	-d '{
-		"username": "alex1234",
-		"password": "test1234:",
-		"email" : "alex@email.com",
-		"student_id" : 123456789
-	}'
-*
-* @returns true if student was added successfully or false if not
-*
-* @author: Steven Li + Alex Lam
-*/
-router.post('/addStudentUser', function(req, res, next) {
+/**
+ * @api {post} /addStudentUser
+ * @apiDescription This endpoint will add a student and an associated user
+ * @apiParam (body) {string} username, {string} password, {string} email, {int} student_id
+ * @apiExample {curl} Example usage:
+ * Http:
+ *	POST /users/addStudentUser HTTP/1.1
+ *	Host: localhost:3001
+ *	Content-Type: application/json
+ *	{
+ *		"username": "alex1234",
+ *		"password": "test1234:",
+ *		"email" : "alex@email.com",
+ *		"student_id" : 123456789
+ *	}
+ * Curl:
+ *	curl -X POST \
+ *	http://localhost:3001/users/addStudentUser \
+ *	-H 'Content-Type: application/json' \
+ *	-d '{
+ *		"username": "alex1234",
+ *		"password": "test1234:",
+ *		"email" : "alex@email.com",
+ *		"student_id" : 123456789
+ *	}'
+ *
+ * @returns true if student was added successfully or false if not
+ *
+ * @author: Steven Li + Alex Lam
+ */
+router.post("/addStudentUser", function(req, res, next) {
   const username = req.body.username;
   const password = req.body.password;
   const email = req.body.email;
   const id = req.body.student_id;
-  users.insertStudentUser(username, password, email, id)
+  users
+    .insertStudentUser(username, password, email, id)
     .then(val => {
       res.send(val);
     })
@@ -47,42 +48,43 @@ router.post('/addStudentUser', function(req, res, next) {
     });
 });
 
-/*
-* @api {post} /addAdminUser
-* @apiDescription This endpoint will add an admin and an associated user
-* @apiParam (body) {string} username, {string} password, {string} email, {int} admin_id
-* @apiExample {curl} Example usage:
-* Http: 
-*	POST /users/addAdminUser HTTP/1.1
-*	Host: localhost:3001
-*	Content-Type: application/json
-*	{
-*		"username": "administrator",
-*		"password": "passAdmin",
-*		"email" : "test.email@email.com",
-*		"admin_id" : 43925
-*	}
-* Curl:
-*	curl -X POST \
-*	http://localhost:3001/users/addAdminUser \
-*	-H 'Content-Type: application/json' \
-*	-d '{
-*		"username": "administrator",
-*		"password": "passAdmin",
-*		"email" : "test.email@email.com",
-*		"admin_id" : 43925
-*	}'
-*
-* @returns true if admin was added successfully or false if not
-*
-* @author: Steven Li
-*/
-router.post('/addAdminUser', function(req, res, next) {
+/**
+ * @api {post} /addAdminUser
+ * @apiDescription This endpoint will add an admin and an associated user
+ * @apiParam (body) {string} username, {string} password, {string} email, {int} admin_id
+ * @apiExample {curl} Example usage:
+ * Http:
+ *	POST /users/addAdminUser HTTP/1.1
+ *	Host: localhost:3001
+ *	Content-Type: application/json
+ *	{
+ *		"username": "administrator",
+ *		"password": "passAdmin",
+ *		"email" : "test.email@email.com",
+ *		"admin_id" : 43925
+ *	}
+ * Curl:
+ *	curl -X POST \
+ *	http://localhost:3001/users/addAdminUser \
+ *	-H 'Content-Type: application/json' \
+ *	-d '{
+ *		"username": "administrator",
+ *		"password": "passAdmin",
+ *		"email" : "test.email@email.com",
+ *		"admin_id" : 43925
+ *	}'
+ *
+ * @returns true if admin was added successfully or false if not
+ *
+ * @author: Steven Li
+ */
+router.post("/addAdminUser", function(req, res, next) {
   const username = req.body.username;
   const password = req.body.password;
   const email = req.body.email;
   const id = req.body.admin_id;
-  users.insertAdminUser(username, password, email, id)
+  users
+    .insertAdminUser(username, password, email, id)
     .then(val => {
       res.send(val);
     })
@@ -90,7 +92,6 @@ router.post('/addAdminUser', function(req, res, next) {
       res.status(500).send(err.message);
     });
 });
-
 
 /*Receive the User's completed Courses and compare them to curriculum*/
 router.post("/completedCourses/comparison", function(req, res) {

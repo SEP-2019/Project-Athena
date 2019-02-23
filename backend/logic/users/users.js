@@ -22,12 +22,7 @@ var insertStudentUser = async (username, password, email, id) => {
     throw new Error(error);
   }
 
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    throw new Error("failed to establish connection with database");
-  }
+  let connection = await mysql.getNewConnection();
 
   // Hash the password
   let hash = hasher.hashPass(password);
@@ -98,13 +93,7 @@ var insertAdminUser = async (username, password, email, id) => {
     throw new Error(error);
   }
 
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    throw new Error("failed to establish connection with database");
-  }
-
+  let connection = await mysql.getNewConnection();
 
   // Hash the password
   let hash = hasher.hashPass(password);
