@@ -40,7 +40,7 @@ router.post('/addStudentUser',asyncMiddleware(async function (req, res, next) {
  * @apiDescription This endpoint will return user (student) completed courses
  * @apiParam (query) {Integer} studentID
  * @apiExample {curl} Example usage:
- * 		curl -X GET -H "Content-Type: application/json" 'http://localhost:3000/users/getCompletedCourses?studentID=12345'
+ * 		curl -X GET -H "Content-Type: application/json" 'http://localhost:3001/users/getCompletedCourses?studentID=12345'
  *
  * @returns An json of completed course code, e.g [{"course_code":"ECSE422","semester":"W2019"},{"course_code":"ECSE428","semester":"F2019"}]
  *
