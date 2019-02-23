@@ -30,12 +30,12 @@ var insertStudentUser = async (username, password, email, id) => {
 
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [
+    await connection.query("INSERT INTO users (username, email, password) VALUES(?, ?, ?);", [
       username,
       email,
       hash
     ]);
-    await connection.query("INSERT INTO students VALUES(?, ?);", [
+    await connection.query("INSERT INTO students (student_id, username) VALUES(?, ?);", [
       id,
       username
     ]);
