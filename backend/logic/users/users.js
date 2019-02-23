@@ -35,7 +35,7 @@ var insertStudentUser = async (username, password, email, id) => {
       email,
       hash
     ]);
-    await connection.query("INSERT INTO students VALUES(?, ?);", [
+    await connection.query("INSERT INTO students (student_id, username) VALUES(?, ?);", [
       id,
       username
     ]);
