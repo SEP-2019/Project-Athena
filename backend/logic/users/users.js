@@ -1,7 +1,6 @@
 const mysql = require("../../sql/connection");
 const format = require("../../validation/format");
 const hasher = require("../../validation/hash");
-const util = require("util");
 
 var insertStudentUser = async (username, password, email, id) => {
   // Connect to database
@@ -30,15 +29,14 @@ var insertStudentUser = async (username, password, email, id) => {
 
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users (username, email, password) VALUES(?, ?, ?);", [
-      username,
-      email,
-      hash
-    ]);
-    await connection.query("INSERT INTO students (student_id, username) VALUES(?, ?);", [
-      id,
-      username
-    ]);
+    await connection.query(
+      "INSERT INTO users (username, email, password) VALUES(?, ?, ?);",
+      [username, email, hash]
+    );
+    await connection.query(
+      "INSERT INTO students (student_id, username) VALUES(?, ?);",
+      [id, username]
+    );
     await connection.commit();
     connection.release();
     return true;
@@ -112,15 +110,14 @@ var insertAdminUser = async (username, password, email, id) => {
   let hash = hasher.hashPass(password);
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users (username, email, password) VALUES(?, ?, ?);", [
-      username,
-      email,
-      hash
-    ]);
-    await connection.query("INSERT INTO staff_members (id, username) VALUES(?, ?);", [
-      id,
-      username
-    ]);
+    await connection.query(
+      "INSERT INTO users (username, email, password) VALUES(?, ?, ?);",
+      [username, email, hash]
+    );
+    await connection.query(
+      "INSERT INTO staff_members (staff_id, username) VALUES(?, ?);",
+      [id, username]
+    );
     await connection.commit();
     connection.release();
     return true;
@@ -215,11 +212,11 @@ var getStudentData = async studentID => {
       [studentID]
     );
     major = await conn.query(
-      `SELECT curriculum_name FROM student_major WHERE student_id = ?;`,
+      `SELECT curriculum_name FROM student_majors WHERE student_id = ?;`,
       [studentID]
     );
     minor = await conn.query(
-      `SELECT curriculum_name FROM student_minor WHERE student_id = ?;`,
+      `SELECT curriculum_name FROM student_minors WHERE student_id = ?;`,
       [studentID]
     );
     conn.release();
