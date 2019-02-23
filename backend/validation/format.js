@@ -25,7 +25,10 @@ exports.verifyUsername = username => {
 	if (String(username).length > MAX_USERNAME_LENGTH) {
 		throw invalidInputException(`Invalid format username, username must be less than or equal to ${MAX_USERNAME_LENGTH} characters in length`)
 	}
-	return isAlphanumeric(username);
+	if(!isAlphanumeric(username)){
+		throw invalidInputException('Username must be alphanumeric')
+	}
+	return true;
 }
 
 exports.verifyPassword = password => {

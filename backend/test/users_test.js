@@ -1,254 +1,197 @@
-const mocha = require("mocha");
 const users = require("../logic/users/users.js");
 const assert = require("assert");
-const nock = require("nock");
 
-/*
-const host = 'http://localhost:3000';
-const addStudentURL = '/users/addStudentUser';
+//Helper method to check if an async function throws a given error.
+async function assertThrowsAsync(fn, exception) {
+  let f = () => {};
+  try {
+    await fn();
+  } catch (error) {
+    f = () => {
+      throw error
+    }
+  } finally {
+    assert.throws(f, exception)
+  }
+}
 
-describe('POST /users/addStudentUser', function() {
-	it('responds with undefined username', function() {
-		nock(host)
-			.post(addStudentURL, {'password': 'password',
-			                      'email': 'email@email.com',
-			                      'student_id': '123456789'})
-			.reply(200, 'undefined username');	
-	});
-
-	it('responds with undefined password', function() {
-		nock(host)
-			.post(addStudentURL, {'username': 'username',
-			               'email': 'email@email.com',
-			               'student_id': '123456789'})
-			.reply(200, 'undefined password');
-	});
-
-	it('responds with undefined email', function() {
-		nock(host)
-			.post(addStudentURL, {'username': 'username',
-			                      'password': 'password',
-			                      'student_id': '123456789'})
-			.reply(200, 'undefined email');
-	});
-
-	it('responds with undefined id', function() {
-		nock(host)
-			.post(addStudentURL, {'username': 'username',
-			                      'password': 'password',
-			                      'student_id': '123456789'})
-			.reply(200, 'undefined id');
-	});
-});
-*/
-
-describe("Tests add student user", function() {
-  it("responds with invalid format username", function(done) {
-    users
-      .insertStudentUser(null, "password", "email@email.com", "123456789")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, "invalid format username");
-          resolve();
-        }).then(done);
-      });
+describe("Tests add student user", async function () {
+  it("responds with invalid format username 10", async function () {
+    let errorMessage = "no error"
+    try {
+      await users.insertStudentUser(null, "password", "email@email.com", "123456789")
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Username cannot be empty")
   });
 
-  it("responds with invalid format password", function(done) {
-    users
-      .insertStudentUser("username", null, "email@email.com", "123456789")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, "invalid format password");
-          resolve();
-        }).then(done);
-      });
+  it("responds with invalid format password", async function () {
+    let errorMessage = "no error"
+    try {
+      await users.insertStudentUser("username", null, "email@email.com", "123456789")
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Password cannot be empty")
   });
 
-  it("responds with invalid format email", function(done) {
-    users
-      .insertStudentUser("username", "password", null, "123456789")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, "invalid format email");
-          resolve();
-        }).then(done);
-      });
+  it("responds with invalid format email", async function () {
+    let errorMessage = "no error"
+    try {
+      await users.insertStudentUser("username", "password", null, "123456789")
+    } catch (error) {
+      console.log(error.message)
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Email cannot be empty")
   });
 
-  it("responds with invalid format id", function(done) {
-    users
-      .insertStudentUser("username", "password", "email@email.com", null)
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, "invalid format id");
-          resolve();
-        }).then(done);
-      });
+  it("responds with invalid format id", async function () {
+    let errorMessage = "no error"
+    try {
+      await users.insertStudentUser("username", "password", "email@email.com", null)
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Id cannot be empty")
   });
 
   const expectedInvalidUsername = "invalid format username";
-  it("responds with invalid format username 1", function(done) {
-    users
-      .insertStudentUser(
-        "usernameWithSymbols123%@^",
-        "password",
-        "email@email.com",
-        "123456789"
-      )
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidUsername);
-          resolve();
-        }).then(done);
-      });
+  it("responds with invalid format username 1", async function () {
+    let errorMessage = "no error"
+    try {
+      await users.insertStudentUser("usernameWithSymbols123%@^", "password", "email@email.com", "123456789")
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Username must be alphanumeric")
   });
 
-  it("responds with invalid format username 2", function(done) {
-    users
-      .insertStudentUser(
-        "username123%@^",
-        "password",
-        "email@email.com",
-        "123456789"
-      )
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidUsername);
-          resolve();
-        }).then(done);
-      });
-  });
-
-  it("responds with invalid format username 3", function(done) {
-    users
-      .insertStudentUser(
+  it("responds with invalid format username 3", async function () {
+    let errorMessage = "no error"
+    try {
+      await users.insertStudentUser(
         "RidiculouslyLongUsernameThatHasZeroPurposeToBeMadeAndAddedIntoTheDatabase",
         "password",
         "email@email.com",
         "123456789"
       )
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidUsername);
-          resolve();
-        }).then(done);
-      });
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Invalid format username, username must be less than or equal to 64 characters in length")
   });
 
-  const expectedInvalidPass = "invalid format password";
-  it("responds with invalid format password 1", function(done) {
-    users
-      .insertStudentUser("username", "short", "email@email.com", "123456789")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidPass);
-          resolve();
-        }).then(done);
-      });
+  it("responds with invalid format password 1", async function () {
+    let errorMessage = "no error"
+    try {
+      await users.insertStudentUser("username", "short", "email@email.com", "123456789")
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Invalid password format, password must be between 8 and 64 characters")
   });
 
-  it("responds with invalid format password 2", function(done) {
-    users
+  it("responds with invalid format password 2", async function () {
+    let errorMessage = "no error"
+    try {
+      await users
       .insertStudentUser(
         "username",
         "thisIsARidiculouslyLongPasswordAndStuffButKeepGoingBecauseYeahSoDontDoThis",
         "email",
         "123456789"
       )
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidPass);
-          resolve();
-        }).then(done);
-      });
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, 'Invalid password format, password must be between 8 and 64 characters')
   });
 
-  const expectedInvalidEmail = "invalid format email";
-  it("responds with invalid format email 1", function(done) {
-    users
+  it("responds with invalid format email 1", async function () {
+    let errorMessage = "no error"
+    try {
+      await users
       .insertStudentUser("username", "password", "email", "123456789")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidEmail);
-          resolve();
-        }).then(done);
-      });
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, 'Invalid email format')
   });
 
-  it("responds with invalid format email 2", function(done) {
-    users
+  it("responds with invalid format email 2", async function () {
+    let errorMessage = "no error"
+    try {
+      await users
       .insertStudentUser("username", "password", "email#@gma.com", "123456789")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidEmail);
-          resolve();
-        }).then(done);
-      });
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, 'Invalid email format')
   });
 
-  it("responds with invalid format email 3", function(done) {
-    users
+  it("responds with invalid format email 3", async function () {
+    let errorMessage = "no error"
+    try {
+      await users
       .insertStudentUser("username", "password", "email@g.c", "123456789")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidEmail);
-          resolve();
-        }).then(done);
-      });
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Invalid email format")
   });
 
-  it("responds with invalid format email 4", function(done) {
-    users
+  it("responds with invalid format email 4", async function () {
+    let errorMessage = "no error"
+    try {
+      await users
       .insertStudentUser(
         "username",
         "password",
         "email.2.2.12@@gmai.test.com",
         "123456789"
       )
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidEmail);
-          resolve();
-        }).then(done);
-      });
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Invalid email format")
   });
 
-  const expectedInvalidId = "invalid format id";
-  it("responds with invalid format id 1", function(done) {
-    users
+  it("responds with invalid format id 1", async function () {
+    let errorMessage = "no error"
+    try {
+      await users
       .insertStudentUser("username", "password", "email@email.com", "1234")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidId);
-          resolve();
-        }).then(done);
-      });
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Id must be 9 characters long")
   });
 
-  it("responds with invalid format id 2", function(done) {
-    users
+  it("responds with invalid format id 2", async function () {
+    let errorMessage = "no error"
+    try {
+      await users
       .insertStudentUser("username", "password", "email@email.com", "1234ABDS2")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidId);
-          resolve();
-        }).then(done);
-      });
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Id must be a number")
   });
 
-  it("responds with invalid format id 3", function(done) {
-    users
+  it("responds with invalid format id 3", async function () {
+    let errorMessage = "no error"
+    try {
+      await users
       .insertStudentUser("username", "password", "email@email.com", "ab#%@a141")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, expectedInvalidId);
-          resolve();
-        }).then(done);
-      });
+    } catch (error) {
+      errorMessage = error.message
+    }
+    assert.equal(errorMessage, "Id must be a number")
   });
 
-  it("responds with true 1", function(done) {
+  it("responds with true 1", function () {
     users
       .insertStudentUser(
         "username1",
@@ -257,14 +200,14 @@ describe("Tests add student user", function() {
         "123456789"
       )
       .then(response => {
-        return new Promise(function(resolve) {
+        return new Promise(function (resolve) {
           assert.equal(response, "true");
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with true 2", function(done) {
+  it("responds with true 2", function (done) {
     users
       .insertStudentUser(
         "username2",
@@ -273,14 +216,14 @@ describe("Tests add student user", function() {
         "234567890"
       )
       .then(response => {
-        return new Promise(function(resolve) {
+        return new Promise(function (resolve) {
           assert.equal(response, "true");
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with true 3", function(done) {
+  it("responds with true 3", function (done) {
     users
       .insertStudentUser(
         "username3",
@@ -289,7 +232,7 @@ describe("Tests add student user", function() {
         "535235231"
       )
       .then(response => {
-        return new Promise(function(resolve) {
+        return new Promise(function (resolve) {
           assert.equal(response, "true");
           resolve();
         }).then(done);
