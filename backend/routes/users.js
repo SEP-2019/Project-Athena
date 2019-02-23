@@ -146,7 +146,7 @@ router.get("/getStudentData", async (req, res) => {
     res.status(200).send(data);
   } catch (error) {
     //for now just send back generic 500, will have to edit later on to return specific error codes based on what happened
-    res.status(500).send(error);
+    res.status(500).send(error.message);
   }
 });
 module.exports = router;
