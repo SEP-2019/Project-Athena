@@ -649,13 +649,13 @@ describe("Test retrieve student data", function() {
     );
     connection.query(
       `INSERT INTO students (student_id,username) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id=student_id;`,
-      [123321, "testUser"]
+      [123321123, "testUser"]
     );
     connection.query(
       `INSERT INTO student_course_offerings (student_id,offering_id,semester) VALUES (?,?,?);`,
-      [123321, 321123, "winter"]
+      [123321123, 321123, "winter"]
     );
-    return users.getStudentData(123321).then(function(res) {
+    return users.getStudentData(123321123).then(function(res) {
       let found = false;
       let searchingFor = {
         major: [],
