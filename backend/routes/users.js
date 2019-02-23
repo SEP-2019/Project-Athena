@@ -31,7 +31,7 @@ router.post('/addStudentUser',asyncMiddleware(async function (req, res, next) {
 	let email = req.body.email;
 	let id = req.body.student_id;
 	let result = await users.insertStudentUser(username, password, email, id)
-	res.send(customResponse(result, null));
+	res.send(customResponse(result));
 }));
 
 /**
@@ -47,10 +47,10 @@ router.post('/addStudentUser',asyncMiddleware(async function (req, res, next) {
  * @author: Yufei Liu
  *
  */
-router.get("/getCompletedCourses", asyncMiddleware(async (req, res) => {
+router.get("/getCompletedCourses", asyncMiddleware(async (req, res, next) => {
   const student_id = req.query.studentID;
   const courses = await users.getCompletedCourses(student_id);
-  res.status(200).send(customResponse(courses, null));
+  res.status(200).send(customResponse(courses));
 }));
 
 module.exports = router;
