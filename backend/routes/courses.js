@@ -21,38 +21,38 @@ router.get('/getCourseByTag', async function(req, res, next) {
 });
 
 /*
-* @api {post} /addCourses
+* @api {post} /addCompletedCourses
 * @apiDescription This endpoint will add an admin and an associated user
 * @apiParam (body) {string} username, {string} password, {string} email, {int} admin_id
 * @apiExample {curl} Example usage:
 * Http: 
-	POST /courses/addCourses HTTP/1.1
-	Host: localhost:3000
-	Content-Type: application/json
-	    {
-            "courses": {
-                "ECSE 428": [{"semester": "W2017", "section": 1}],
-                "ECSE 356": [{"semester": "S2019", "section": 2}],
-                "ECSE 422": [{"semester": "F2019", "section": 1},
-                             {"semester": "W2018", "section": 3}]
-            },
-            "student_id": 258373829,
-            "section": 1
-        }
+*	POST /courses/addCourses HTTP/1.1
+*	Host: localhost:3001
+*	Content-Type: application/json
+*	    {
+*       "courses": {
+*         "ECSE 428": [{"semester": "W2017", "section": 1}],
+*         "ECSE 356": [{"semester": "S2019", "section": 2}],
+*         "ECSE 422": [{"semester": "F2019", "section": 1},
+*                      {"semester": "W2018", "section": 3}]
+*       },
+*       "student_id": 258373829,
+*       "section": 1
+*     }
 * Curl:
-	curl -X POST \
-	http://localhost:3000/courses/addCourses \
-	-H 'Content-Type: application/json' \
-	-d '{
-            "courses": {
-                "ECSE 428": [{"semester": "W2017", "section": 1}],
-                "ECSE 356": [{"semester": "S2019", "section": 2}],
-                "ECSE 422": [{"semester": "F2019", "section": 1},
-                             {"semester": "W2018", "section": 3}]
-            }
-            "student_id": 258373829,
-            "section": 1
-	    }'
+*	curl -X POST \
+*	http://localhost:3001/courses/addCompletedCourses \
+*	-H 'Content-Type: application/json' \
+*	-d '{
+*       "courses": {
+*         "ECSE 428": [{"semester": "W2017", "section": 1}],
+*         "ECSE 356": [{"semester": "S2019", "section": 2}],
+*         "ECSE 422": [{"semester": "F2019", "section": 1},
+*                      {"semester": "W2018", "section": 3}]
+*       },
+*       "student_id": 258373829,
+*       "section": 1
+*     }'
 *
 * @returns true if courses were added successfully
 *          false if courses were not added
@@ -66,6 +66,7 @@ router.post('/addCompletedCourses', function(req, res, next) {
   let studentId = req.body.student_id;
   let section = req.body.section;
   let coursesJSON;
+
   try {
     coursesJSON = JSON.parse(req.body.courses);
   } catch (error) {

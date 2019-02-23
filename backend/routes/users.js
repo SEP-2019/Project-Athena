@@ -53,25 +53,25 @@ router.post('/addStudentUser', function(req, res, next) {
 * @apiParam (body) {string} username, {string} password, {string} email, {int} admin_id
 * @apiExample {curl} Example usage:
 * Http: 
-	POST /users/addAdminUser HTTP/1.1
-	Host: localhost:3000
-	Content-Type: application/json
-	{
-		"username": "administrator",
-		"password": "passAdmin",
-		"email" : "test.email@email.com",
-		"admin_id" : 43925
-	}
+*	POST /users/addAdminUser HTTP/1.1
+*	Host: localhost:3001
+*	Content-Type: application/json
+*	{
+*		"username": "administrator",
+*		"password": "passAdmin",
+*		"email" : "test.email@email.com",
+*		"admin_id" : 43925
+*	}
 * Curl:
-	curl -X POST \
-	http://localhost:3000/users/addAdminUser \
-	-H 'Content-Type: application/json' \
-	-d '{
-		"username": "administrator",
-		"password": "passAdmin",
-		"email" : "test.email@email.com",
-		"admin_id" : 43925
-	}'
+*	curl -X POST \
+*	http://localhost:3001/users/addAdminUser \
+*	-H 'Content-Type: application/json' \
+*	-d '{
+*		"username": "administrator",
+*		"password": "passAdmin",
+*		"email" : "test.email@email.com",
+*		"admin_id" : 43925
+*	}'
 *
 * @returns true if admin was added successfully or false if not
 *

@@ -31,7 +31,6 @@ var insertStudentUser = async (username, password, email, id) => {
 
   // Hash the password
   let hash = hasher.hashPass(password);
-  let connection = await mysql.getNewConnection()
 
   try {
     await connection.beginTransaction();
