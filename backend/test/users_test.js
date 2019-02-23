@@ -192,6 +192,46 @@ describe('Tests add student user', function() {
 		     	});
 	});
 
+	const expectedInvalidId = 'invalid format id';
+	it('responds with invalid format id 1', function (done) {
+		users.insertStudentUser('username',
+		                        'password',
+		                        'email@email.com',
+		                        '1234')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, expectedInvalidId);
+					resolve();
+				}).then(done);
+		     	});
+	});
+
+	it('responds with invalid format id 2', function (done) {
+		users.insertStudentUser('username',
+		                        'password',
+		                        'email@email.com',
+		                        '1234ABDS2')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, expectedInvalidId);
+					resolve();
+				}).then(done);
+		     	});
+	});
+
+	it('responds with invalid format id 3', function (done) {
+		users.insertStudentUser('username',
+		                        'password',
+		                        'email@email.com',
+		                        'ab#%@a141')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, expectedInvalidId);
+					resolve();
+				}).then(done);
+		     	});
+	});
+
 	it('responds with true 1', function(done) {
 		users.insertStudentUser('username1', 'password', 'email@email.com', '123456789')
 			.then(response => {
@@ -203,7 +243,18 @@ describe('Tests add student user', function() {
 	});
 
 	it('responds with true 2', function (done) {
-		users.insertStudentUser('username', 'passWITHsymbo!@#AOZ;]', 'email@email.com', '2af24gae1')
+		users.insertStudentUser('username2', 'passWITHsymbo!@#AOZ;]', 'email@email.com', '234567890')
+			.then(response => {
+				return new Promise(function (resolve) {
+					assert.equal(response, 'true');
+					resolve();
+				}).then(done);
+		     	});
+	});
+
+	it('responds with true 3', function (done) {
+		users.insertStudentUser('username3', 'ASlightlyLongerPasswordThanNormal',
+		                        'I.Have.A.Really.Long.Email.Address@emailDomainToo.com', '535235231')
 			.then(response => {
 				return new Promise(function (resolve) {
 					assert.equal(response, 'true');

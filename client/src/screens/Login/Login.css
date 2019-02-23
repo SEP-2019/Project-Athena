@@ -1,0 +1,26 @@
+.header {
+  height: 100px;
+  background: #ffffff;
+}
+
+.title {
+  left: 30px;
+  top: 30px;
+
+  font-weight: 500;
+  font-size: 36px;
+  color: #b20007;
+}
+
+.description {
+  max-width: 70%;
+}
+
+body {
+  background: #f9f9f9;
+}
+
+.footer {
+  height: 100px;
+  background: #b20007;
+}
