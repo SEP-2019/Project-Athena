@@ -59,10 +59,28 @@ var verifyAdminId = id => {
   return true;
 }
 
+var verifyCompletedCourses = async (courses) => {
+  for (let course in courses) {
+    if (!(/^[a-z]{4} \d{3}$/i.test(course))) {
+      throw new Error("invalid format courses");
+    }
+
+    courses[course].forEach(semesterSection => {
+      if (!(/^[WSF]{1}\d{4}$/i.test(semesterSection.semester))) {
+        throw new Error("invalid format courses");
+      }
+      if (!isNumeric(semesterSection.section)) {
+        throw new Error("invalid format courses");
+      }
+    });
+  }
+}
+
 module.exports = {
   verifyUsername,
   verifyPassword,
   verifyEmail,
   verifyStudentId,
-  verifyAdminId
+  verifyAdminId,
+  verifyCompletedCourses
 };

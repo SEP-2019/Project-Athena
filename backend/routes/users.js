@@ -4,7 +4,7 @@ const users = require("../logic/users/users");
 const router = express.Router();
 
 /*
-* @api {get} /addStudentUser
+* @api {post} /addStudentUser
 * @apiDescription This endpoint will add a student and an associated user
 * @apiParam (body) {string} username, {string} password, {string} email, {int} student_id
 * @apiExample {curl} Example usage:
@@ -48,8 +48,8 @@ router.post('/addStudentUser', function(req, res, next) {
 });
 
 /*
-* @api {get} /addStudentUser
-* @apiDescription This endpoint will add a student and an associated user
+* @api {post} /addAdminUser
+* @apiDescription This endpoint will add an admin and an associated user
 * @apiParam (body) {string} username, {string} password, {string} email, {int} admin_id
 * @apiExample {curl} Example usage:
 * Http: 
@@ -70,10 +70,10 @@ router.post('/addStudentUser', function(req, res, next) {
 		"username": "administrator",
 		"password": "passAdmin",
 		"email" : "test.email@email.com",
-		"student_id" : 43925
+		"admin_id" : 43925
 	}'
 *
-* @returns true if student was added successfully or false if not
+* @returns true if admin was added successfully or false if not
 *
 * @author: Steven Li
 */
