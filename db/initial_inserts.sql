@@ -43,6 +43,7 @@ VALUES
 
 INSERT INTO `
 students`
+(student_id, username)
 VALUES
     (382730172, 'aegrousT'),
     (240983713, 'ANcRIALm'),
