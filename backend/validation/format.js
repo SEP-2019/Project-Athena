@@ -3,66 +3,72 @@ const MAX_PASSWORD_LENGTH = 64;
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_EMAIL_LENGTH = 384;
 const ID_LENGTH = 9;
-const MAX_ID = 2147483647;
 
 //todo throw error on failure of format methods 
 
 function isAlphanumeric(str) {
-  if (!str) {
-    return false;
-  }
-  return String(str).match(/^[a-z0-9]+$/i);
+	if (!str)
+		return false
+	return String(str).match(/^[a-z0-9]+$/i);
 }
 
 function isNumeric(str) {
-  if (!str) {
-    return false;
-  }
-  return String(str).match(/^[0-9]*$/);
+	if (!str)
+		return false
+	return String(str).match(/^[0-9]*$/);
 }
 
-var verifyUsername = username => {
-  if (!username ||
-    String(username).length > MAX_USERNAME_LENGTH) {
-    return false;
-  }
-  return isAlphanumeric(username);
+exports.verifyUsername = username => {
+	if (!username) {
+		throw invalidInputException("Username cannot be empty")
+	}
+	if (String(username).length > MAX_USERNAME_LENGTH) {
+		throw invalidInputException(`Invalid format username, username must be less than or equal to ${MAX_USERNAME_LENGTH} characters in length`)
+	}
+	if(!isAlphanumeric(username)){
+		throw invalidInputException('Username must be alphanumeric')
+	}
+	return true;
 }
 
-var verifyPassword = password => {
-  if (!password ||
-    String(password).length > MAX_PASSWORD_LENGTH ||
-    String(password).length < MIN_PASSWORD_LENGTH) {
-    return false;
-  }
-  return true;
+exports.verifyPassword = password => {
+	if (!password) {
+		throw invalidInputException('Password cannot be empty')
+	}
+	if (String(password).length > MAX_PASSWORD_LENGTH || String(password).length < MIN_PASSWORD_LENGTH) {
+		throw invalidInputException(`Invalid password format, password must be between ${MIN_PASSWORD_LENGTH} and ${MAX_PASSWORD_LENGTH} characters`)
+	}
+	return true;
 }
 
-var verifyEmail = email => {
-  if (!email || String(email).length > MAX_EMAIL_LENGTH) {
-    return false;
-  }
-  return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email);
+exports.verifyEmail = email => {
+	if (!email)
+		throw invalidInputException('Email cannot be empty')
+	if (String(email).length > MAX_EMAIL_LENGTH) {
+		throw invalidInputException(`Email cannot be more than ${MAX_EMAIL_LENGTH} characters long`)
+	}
+	if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+		throw invalidInputException('Invalid email format')
+	}
+	return true;
 }
 
-var verifyStudentId = id => {
-  if (!id) {
-    return false;
-  }
-  return (isNumeric(id) && (String(id).length == ID_LENGTH));
+exports.verifyId = id => {
+	if (!id)
+		throw invalidInputException('Id cannot be empty')
+	if(!isNumeric(id))
+		throw invalidInputException('Id must be a number')
+	if(String(id).length != ID_LENGTH)
+		throw invalidInputException(`Id must be ${ID_LENGTH} characters long`)
+	return true
 }
 
-var verifyAdminId = id => {
-  if (!id || !isNumeric(id) || id > MAX_ID) {
-    return false;
-  }
-  return true;
+exports.verifyStudentUserInput = (username, password, email, id) => {
+	return(exports.verifyUsername(username) && exports.verifyPassword(password) && exports.verifyEmail(email) && exports.verifyId(id))
 }
 
-module.exports = {
-  verifyUsername,
-  verifyPassword,
-  verifyEmail,
-  verifyStudentId,
-  verifyAdminId
+var invalidInputException = (message) => {
+	let err = new Error(message);
+	err.code = 400
+	return err
 };
