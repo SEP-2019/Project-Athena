@@ -1,12 +1,8 @@
 const mysql = require('../../sql/connection');
 const format = require('../../validation/format');
 const hasher = require('../../validation/hash');
-<<<<<<< HEAD
-=======
-const util = require("util");
-var app = require("../app");
-var bCrypt = require('bcrypt-nodejs');
->>>>>>> Some changes to accessibility of passport from other files
+
+const app = require("../app");
 
 var insertStudentUser = async (username, password, email, id) => {
   // Connect to database
