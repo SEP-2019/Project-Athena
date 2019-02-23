@@ -645,7 +645,7 @@ describe("Test retrieve student data", function() {
     );
     connection.query(
       `INSERT INTO users (username,email, password) VALUES (?,?,?) ON DUPLICATE KEY UPDATE username=username;`,
-      ["testUser", "email@domain.com", 1234]
+      ["testUser", "email@domain.com", 12345678]
     );
     connection.query(
       `INSERT INTO students (student_id,username) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id=student_id;`,

@@ -223,17 +223,18 @@ var getStudentData = async studentID => {
       [studentID]
     );
     conn.release();
+
+    let results = { major: major, minor: minor, courses: courses };
+
+    if (results) {
+      data = JSON.stringify(results);
+    }
+    return data;
   } catch (err) {
     conn.release();
     console.log(err);
+    throw new Error(err);
   }
-
-  let results = { major: major, minor: minor, courses: courses };
-
-  if (results) {
-    data = JSON.stringify(results);
-  }
-  return data;
 };
 
 module.exports = {
