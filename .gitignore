@@ -3,5 +3,8 @@ node_modules
 *.swo
 *.swp
 *~
+
 .vscode
+.jsbeautifyrc
+
 .env

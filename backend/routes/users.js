@@ -33,15 +33,64 @@ const router = express.Router();
 *
 * @author: Steven Li + Alex Lam
 */
-router.post("/addStudentUser", function(req, res, next) {
-  let username = req.body.username;
-  let password = req.body.password;
-  let email = req.body.email;
-  let id = req.body.student_id;
-  users.insertStudentUser(username, password, email, id).then(function(val) {
-    res.send(val);
-  });
+router.post('/addStudentUser', function(req, res, next) {
+  const username = req.body.username;
+  const password = req.body.password;
+  const email = req.body.email;
+  const id = req.body.student_id;
+  users.insertStudentUser(username, password, email, id)
+    .then(val => {
+      res.send(val);
+    })
+    .catch(err => {
+      res.status(500).send(err.message);
+    });
 });
+
+/*
+* @api {get} /addStudentUser
+* @apiDescription This endpoint will add a student and an associated user
+* @apiParam (body) {string} username, {string} password, {string} email, {int} admin_id
+* @apiExample {curl} Example usage:
+* Http: 
+	POST /users/addAdminUser HTTP/1.1
+	Host: localhost:3000
+	Content-Type: application/json
+	{
+		"username": "administrator",
+		"password": "passAdmin",
+		"email" : "test.email@email.com",
+		"admin_id" : 43925
+	}
+* Curl:
+	curl -X POST \
+	http://localhost:3000/users/addAdminUser \
+	-H 'Content-Type: application/json' \
+	-d '{
+		"username": "administrator",
+		"password": "passAdmin",
+		"email" : "test.email@email.com",
+		"student_id" : 43925
+	}'
+*
+* @returns true if student was added successfully or false if not
+*
+* @author: Steven Li
+*/
+router.post('/addAdminUser', function(req, res, next) {
+  const username = req.body.username;
+  const password = req.body.password;
+  const email = req.body.email;
+  const id = req.body.admin_id;
+  users.insertAdminUser(username, password, email, id)
+    .then(val => {
+      res.send(val);
+    })
+    .catch(err => {
+      res.status(500).send(err.message);
+    });
+});
+
 
 /*Receive the User's completed Courses and compare them to curriculum*/
 router.post("/completedCourses/comparison", function(req, res) {
