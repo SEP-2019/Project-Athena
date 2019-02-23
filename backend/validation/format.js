@@ -58,18 +58,6 @@ exports.verifyId = id => {
 	return (isNumeric(id) && (String(id).length == ID_LENGTH));
 }
 
-exports.verifyCourseCode = courseCode => {
-	// Odd example: ISLA 522D2 
-	var department = String(courseCode.substring(0, 4));
-	var space = courseCode.charAt(5);
-	var cousreNumber = courseCode.split(space, 2);
-	courseNumber = String(courseNumber[1]);
-	if(!courseCode)
-		return false
-	return (department.length == DEPARTMENT_LENGTH && isAlphabet(department) && space == " " && isAlphanumeric(courseNumber));
-	
-}
-
 exports.verifyDepartment = department => {
 	if (!department)
 		return false

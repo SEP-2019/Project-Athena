@@ -1,4 +1,5 @@
 const mysql = require('../../sql/connection');
+const format = require('../../validation/format');
 
 async function queryCourseByTag(tag) {
     if (!tag) {
@@ -55,3 +56,6 @@ var addCourse = async (courseCode, title, departement) => {
 };
 
 module.exports.queryCourseByTag = queryCourseByTag;
+module.exports = {
+  addCourse
+};

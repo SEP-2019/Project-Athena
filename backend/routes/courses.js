@@ -25,13 +25,13 @@ router.get('/getCourseByTag', async function (req, res, next) {
 
 
 /*
-* @api {get} /createCourse
+* @api {post} /createCourse
 * @apiDescription This endpoint will add a course and an associated user
 * @apiParam (body) {string} courseCode, {string} title, {string} departement
 * @apiExample {curl} Example usage:
 * Http: 
-	POST /users/createCourse HTTP/1.1
-	Host: localhost:3000
+	POST /courses/createCourse HTTP/1.1
+	Host: localhost:3001
 	Content-Type: application/json
 	{
 		"courseCode": "ECSE 428",
@@ -40,7 +40,7 @@ router.get('/getCourseByTag', async function (req, res, next) {
 	}
 * Curl:
 	curl -X POST \
-	http://localhost:3000/users/createCourse\
+	http://localhost:3001/courses/createCourse\
 	-H 'Content-Type: application/json' \
 	-d '{
 		"courseCode": "ECSE 428",
@@ -56,7 +56,7 @@ router.post('/createCourse', function(req, res, next) {
   const courseCode = req.body.courseCode;
   const title = req.body.title;
   const departement = req.body.departement;
-  users.addCourse(courseCode, title, departement)
+  courses.addCourse(courseCode, title, departement)
     .then(val => {
       res.send(val);
     })
@@ -64,7 +64,6 @@ router.post('/createCourse', function(req, res, next) {
       res.status(500).send(err.message);
     });
 });
-
 
 module.exports = router;
 
