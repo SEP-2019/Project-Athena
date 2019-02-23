@@ -117,7 +117,7 @@ var insertAdminUser = async (username, password, email, id) => {
       email,
       hash
     ]);
-    await connection.query("INSERT INTO staff_members VALUES(?, ?);", [
+    await connection.query("INSERT INTO staff_members (id, username) VALUES(?, ?);", [
       id,
       username
     ]);
