@@ -52,13 +52,11 @@ router.get('/getCourseByTag', async function (req, res, next) {
 *
 * @author: Mathieu Savoie
 */
-
 router.post('/createCourse', function(req, res, next) {
   const courseCode = req.body.courseCode;
   const title = req.body.title;
-  const email = req.body.email;
   const departement = req.body.departement;
-  users.addCourse(title, email, departement)
+  users.addCourse(courseCode, title, departement)
     .then(val => {
       res.send(val);
     })
