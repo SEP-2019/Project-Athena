@@ -34,6 +34,7 @@ VALUES
 
 INSERT INTO `
 staff_members`
+(staff_id, username)
 VALUES
     (75939, 'academicStaff1'),
     (523512, 'academicStaff5'),
