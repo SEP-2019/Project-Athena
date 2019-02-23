@@ -81,7 +81,6 @@ var getStudentData = async studentID => {
 
   let courses, major, minor;
   try {
-    await conn.begintransaction();
     courses = await conn.query(
       `SELECT course_code, semester
     FROM course_offerings
@@ -97,10 +96,8 @@ var getStudentData = async studentID => {
       `SELECT curriculum_name FROM student_minor WHERE student_id = ?;`,
       [studentID]
     );
-    conn.commit();
     conn.release();
   } catch (err) {
-    conn.rollback();
     conn.release();
     console.log(err);
   }
