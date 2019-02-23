@@ -145,9 +145,128 @@ var addCourseOfferings = async courseOfferings => {
   }
 };
 
+/**
+ * Adds a list of coreq into the database
+ * @author Steven Li
+ * @param {JSON} coreq
+ *        {
+ *          "ECSE 428": ["ECSE 321"],
+ *          "MATH 270": ["MATH 140", "MATH 240"]
+ *        }
+ * @returns true if insertion was successful
+ * @throws error if MySQL connection failed
+ *         invalid format coreq if JSON format is wrong
+ *         false if insertion failed
+ */
+var addCoreq = async coreq => {
+  await format.verifyCoreq(coreq);
+  let connection = await mysql.getNewConnection();
+  let query =
+    "INSERT INTO course_coreq (course_code, coreq_course_code) VALUES (?, ?);";
+  try {
+    await connection.beginTransaction();
+    for (let course in coreq) {
+      for (let i = 0; i < coreq[course].length; i++) {
+        await connection.query(query, [course, coreq[course][i]]);
+      }
+    }
+    await connection.commit();
+    connection.release();
+    return true;
+  } catch (error) {
+    console.error(error);
+    await connection.rollback();
+    connection.release();
+    throw new Error(false);
+  }
+};
+
+/**
+ * Adds a list of prereq into the database
+ * @author Steven Li
+ * @param {JSON} prereq
+ *        {
+ *          "ECSE 428": ["ECSE 321"],
+ *          "MATH 270": ["MATH 140", "MATH 240"]
+ *        }
+ * @returns true if insertion was successful
+ * @throws error if MySQL connection failed
+ *         invalid format prereq if JSON format is wrong
+ *         false if insertion failed
+ */
+var addPrereq = async prereq => {
+  await format.verifyPrereq(prereq);
+  let connection = await mysql.getNewConnection();
+  let query =
+    "INSERT INTO course_prereq (course_code, prereq_course_code) VALUES (?, ?);";
+  try {
+    await connection.beginTransaction();
+    for (let course in prereq) {
+      for (let i = 0; i < prereq[course].length; i++) {
+        await connection.query(query, [course, prereq[course][i]]);
+      }
+    }
+    await connection.commit();
+    connection.release();
+    return true;
+  } catch (error) {
+    console.error(error);
+    await connection.rollback();
+    connection.release();
+    throw new Error(false);
+  }
+};
+
+/**
+ * Updates a course title and its tags
+ * @author Steven Li
+ * @param {string} course
+ * @param {string} newTitle
+ * @param {array} newTags
+ * @returns true if insertion was successful
+ * @throws error if MySQL connection failed
+ *         invalid format course code if the course code is invalid
+ *         false if insertion failed
+ */
+var updateCourse = async (course, newTitle, newTags) => {
+  await format.verifyCourseCode(course);
+  let connection = await mysql.getNewConnection();
+
+  try {
+    await connection.beginTransaction();
+    await connection.query(
+      "DELETE FROM course_tag WHERE course_code = ?;",
+      course
+    );
+
+    for (let i = 0; i < newTags.length; i++) {
+      await connection.query(
+        "INSERT INTO course_tag (course_code, tag_name) VALUES (?, ?);",
+        [course, newTags[i]]
+      );
+    }
+
+    await connection.query(
+      "UPDATE courses SET title = ? WHERE course_code = ?;",
+      [newTitle, course]
+    );
+    await connection.commit();
+    connection.release();
+    return true;
+  } catch (error) {
+    console.error(error);
+    await connection.rollback();
+    connection.release();
+    throw new Error(false);
+  }
+};
+
 module.exports = {
   queryCourseByTag,
   addCompletedCourses,
   addCourseOfferings,
-  getAllCourses
+  getAllCourses,
+  addCoreq,
+  addPrereq,
+  updateCourse
 };
