@@ -3,6 +3,7 @@ const MAX_PASSWORD_LENGTH = 64;
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_EMAIL_LENGTH = 384;
 const ID_LENGTH = 9;
+const DEPARTMENT_LENGTH = 4;
 
 //todo throw error on failure of format methods 
 
@@ -59,12 +60,18 @@ exports.verifyId = id => {
 
 exports.verifyCourseCode = courseCode => {
 	// Odd example: ISLA 522D2 
-	var department = courseCode.substring(0, 4);
+	var department = String(courseCode.substring(0, 4));
 	var space = courseCode.charAt(5);
 	var cousreNumber = courseCode.split(space, 2);
-	courseNumber = courseNumber[1];
+	courseNumber = String(courseNumber[1]);
 	if(!courseCode)
 		return false
-	return (isAlphabet(department) && space == " " && isAlphanumeric(courseNumber));
+	return (department.length == DEPARTMENT_LENGTH && isAlphabet(department) && space == " " && isAlphanumeric(courseNumber));
 	
+}
+
+exports.verifyDepartment = department => {
+	if (!department)
+		return false
+	return (String(department).length == DEPARTMENT_LENGTH && isAlphabet(department));
 }
