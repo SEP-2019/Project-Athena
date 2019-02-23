@@ -1,6 +1,14 @@
 const mysql = require("../../sql/connection");
 const format = require("../../validation/format");
 
+/**
+ * Returns a list of courses matching the tag
+ * @author Alex Lam
+ * @param {string} tag
+ * @returns A list of courses in JSON format
+ * @throws Undefined tag if tag is null
+ *         error if MySQL connection failed
+ */
 var queryCourseByTag = async function queryCourseByTag(tag) {
   if (!tag) {
     throw Error("Undefined tag");
@@ -21,21 +29,21 @@ var queryCourseByTag = async function queryCourseByTag(tag) {
   }
 };
 
+/**
+ * Adds a student's completed courses into the database
+ * @author Steven Li
+ * @param {int} studentId
+ * @param {JSON} courses
+ * @returns true if successful
+ * @throws error if MySQL connection failed
+ *         invalid format courses if JSON format is incorrect
+ *         false if insertion failed
+ */
 var addCompletedCourses = async (studentId, courses) => {
-  if (!format.verifyStudentId(studentId)) {
-    throw new Error("invalid format id");
-  }
-  await format.verifyCompletedCourses(courses);
-
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    throw new Error("failed to establish connection with database");
-  }
+  await format.verifyCourse(courses);
+  let connection = await mysql.getNewConnection();
 
   try {
-    await connection.beginTransaction();
     // Obtain all current course offerings and put them into a hashtable for fast lookup
     let results = await connection.query(
       "SELECT course_code, semester, section, id FROM course_offerings;"
@@ -47,6 +55,7 @@ var addCompletedCourses = async (studentId, courses) => {
       ] = results[i].id;
     }
 
+    await connection.beginTransaction();
     // Insert each course of the student into the database. If a course does not exist then
     // throw an error.
     for (let course in courses) {
@@ -73,11 +82,72 @@ var addCompletedCourses = async (studentId, courses) => {
   }
 };
 
-async function populateHashTableCourseOfferings(results) {
-  return hashTable;
-}
+/**
+ * Returns all available courses from the database
+ * @author Steven Li
+ * @returns a list of available courses from the database in JSON format
+ * @throws error if MySQL connection failed
+ */
+var getAllCourses = async () => {
+  let connection = await mysql.getNewConnection();
+  let courses;
+  let result;
+  try {
+    result = await connection.query("SELECT * FROM courses;");
+  } catch (err) {
+    console.error(err);
+  }
+  connection.release();
+
+  if (result) {
+    courses = result;
+  }
+  return courses;
+};
+
+/**
+ * Adds a list of course offerings into the database
+ * @author Steven Li
+ * @param {JSON} courseOfferings
+ * @returns true if successful
+ * @throws error if MySQL connection failed
+ *         invalid format course offerings if JSON format is wrong
+ *         false if insertion failed
+ */
+var addCourseOfferings = async courseOfferings => {
+  await format.verifyCourseOffering(courseOfferings);
+  let connection = await mysql.getNewConnection();
+  let query =
+    "INSERT INTO course_offerings (id, semester, scheduled_time, course_code, section) VALUES (?, ?, ?, ?, ?);";
+  try {
+    await connection.beginTransaction();
+    // Insert each course offering into the database
+    for (let courseCode in courseOfferings) {
+      for (let i = 0; i < courseOfferings[courseCode].length; i++) {
+        await connection.query(query, [
+          courseOfferings[courseCode][i].id,
+          courseOfferings[courseCode][i].semester,
+          courseOfferings[courseCode][i].scheduled_time,
+          courseCode,
+          courseOfferings[courseCode][i].section
+        ]);
+      }
+    }
+
+    await connection.commit();
+    connection.release();
+    return true;
+  } catch (error) {
+    console.error(error);
+    await connection.rollback();
+    connection.release();
+    throw new Error(false);
+  }
+};
 
 module.exports = {
   queryCourseByTag,
-  addCompletedCourses
+  addCompletedCourses,
+  addCourseOfferings,
+  getAllCourses
 };
