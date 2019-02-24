@@ -39,21 +39,29 @@ const router = express.Router();
  * @author: Gareth Peters
  */
 router.post("/createCurriculum", function(req, res) {
-	const name = req.body.name;
-	const type = req.body.type;
-	const department = req.body.department;
-	const numOfElectives = req.body.numOfElectives;
-	const cores = req.body.core;
-    const techComps = req.body.techComps;
-    const comps = req.body.comps;
-	curriculums
-		.createCurriculum(name, type, department, numOfElectives, cores, techComps, comps)
-		.then(val => {
-		res.send(val);
-		})
-		.catch(err => {
-		res.status(500).send(err.message);
-		});
-  });
+  const name = req.body.name;
+  const type = req.body.type;
+  const department = req.body.department;
+  const numOfElectives = req.body.numOfElectives;
+  const cores = req.body.core;
+  const techComps = req.body.techComps;
+  const comps = req.body.comps;
+  curriculums
+    .createCurriculum(
+      name,
+      type,
+      department,
+      numOfElectives,
+      cores,
+      techComps,
+      comps
+    )
+    .then(val => {
+      res.send(val);
+    })
+    .catch(err => {
+      res.status(500).send(err.message);
+    });
+});
 
-  module.exports = router;
+module.exports = router;

@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - "10.15.1"
+
+before_install:
+  - cd backend
+
+install:
+  - npm ci
+
+notifications:
+  slack: ecse428winter2019team:LxZwh2sYIAhYyXDpp5gnTFU2

@@ -19,6 +19,17 @@ function isAlphanumeric(str) {
 }
 
 /**
+ * Verifies that the input only contains either alphanumeric values or - or :
+ * @param {string} str
+ */
+function isAlteredAlphanumeric(str) {
+  if (!str) {
+    return false;
+  }
+  return String(str).match(/^([a-z0-9]|[-]|[:])+$/i);
+}
+
+/**
  * Verifies that the input only contains numeric values
  * @param {string} str
  */
@@ -96,7 +107,7 @@ var verifyCurriculumName = curriculum => {
   if (!curriculum || String(curriculum).length > MAX_CURR_NAME_LENGTH) {
     return false;
   }
-  return isAlphanumeric(username);
+  return isAlteredAlphanumeric(curriculum);
 };
 
 /**
@@ -107,7 +118,7 @@ var verifyCurrType = type => {
   if (!(type.toUpperCase() === "MAJOR") && !(type.toUpperCase() === "MINOR")) {
     return false;
   }
-  return true
+  return true;
 };
 
 /**
@@ -118,7 +129,7 @@ var verifyDepartmentName = department => {
   if (!department || String(department).length > MAX_DEPARTMENT_LENGTH) {
     return false;
   }
-  return isAlphanumeric(username);
+  return isAlphanumeric(department);
 };
 
 /**
@@ -155,7 +166,6 @@ var verifyCourse = async courses => {
     });
   }
 };
-
 
 /**
  * Verifies that the course code is in the following format: XXXX 123

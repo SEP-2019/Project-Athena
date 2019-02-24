@@ -22,7 +22,6 @@
     "mysql": "^2.16.0",
     "nock": "^10.0.6",
     "nodemon": "^1.18.10",
-    "puppeteer": "^1.12.2",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "start-server-and-test": "^1.7.11",
