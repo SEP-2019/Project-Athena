@@ -162,7 +162,7 @@ var addCoreq = async coreq => {
   await format.verifyCoreq(coreq);
   let connection = await mysql.getNewConnection();
   let query =
-    "INSERT INTO course_coreq (course_code, coreq_course_code) VALUES (?, ?);";
+    "INSERT INTO course_coreqs (course_code, coreq_course_code) VALUES (?, ?);";
   try {
     await connection.beginTransaction();
     for (let course in coreq) {
@@ -171,13 +171,13 @@ var addCoreq = async coreq => {
       }
     }
     await connection.commit();
-    connection.release();
     return true;
   } catch (error) {
     console.error(error);
     await connection.rollback();
-    connection.release();
     throw new Error(false);
+  } finally {
+    connection.release();
   }
 };
 
@@ -198,7 +198,7 @@ var addPrereq = async prereq => {
   await format.verifyPrereq(prereq);
   let connection = await mysql.getNewConnection();
   let query =
-    "INSERT INTO course_prereq (course_code, prereq_course_code) VALUES (?, ?);";
+    "INSERT INTO course_prereqs (course_code, prereq_course_code) VALUES (?, ?);";
   try {
     await connection.beginTransaction();
     for (let course in prereq) {
@@ -207,13 +207,13 @@ var addPrereq = async prereq => {
       }
     }
     await connection.commit();
-    connection.release();
     return true;
   } catch (error) {
     console.error(error);
     await connection.rollback();
-    connection.release();
     throw new Error(false);
+  } finally {
+    connection.release();
   }
 };
 
@@ -235,13 +235,13 @@ var updateCourse = async (course, newTitle, newTags) => {
   try {
     await connection.beginTransaction();
     await connection.query(
-      "DELETE FROM course_tag WHERE course_code = ?;",
+      "DELETE FROM course_tags WHERE course_code = ?;",
       course
     );
 
     for (let i = 0; i < newTags.length; i++) {
       await connection.query(
-        "INSERT INTO course_tag (course_code, tag_name) VALUES (?, ?);",
+        "INSERT INTO course_tags (course_code, tag_name) VALUES (?, ?);",
         [course, newTags[i]]
       );
     }
@@ -251,13 +251,13 @@ var updateCourse = async (course, newTitle, newTags) => {
       [newTitle, course]
     );
     await connection.commit();
-    connection.release();
     return true;
   } catch (error) {
     console.error(error);
     await connection.rollback();
-    connection.release();
     throw new Error(false);
+  } finally {
+    connection.release();
   }
 };
 

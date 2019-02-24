@@ -185,7 +185,7 @@ router.post("/addCoreq", async (req, res, next) => {
   try {
     coreqJSON = JSON.parse(req.body.coreq);
   } catch (err) {
-    res.status(500).send("invalid format coreq");
+    res.status(400).send("invalid format coreq");
     return;
   }
 
@@ -234,7 +234,7 @@ router.post("/addPrereq", async (req, res, next) => {
   try {
     prereqJSON = JSON.parse(req.body.prereq);
   } catch (err) {
-    res.status(500).send("invalid format prereq");
+    res.status(400).send("invalid format prereq");
     return;
   }
 
@@ -286,7 +286,7 @@ router.post("/updateCourse", async (req, res, next) => {
     newTagsJSON = JSON.parse(req.body.new_tags);
   } catch (err) {
     console.error(err);
-    res.status(500).send(err.message);
+    res.status(400).send(err.message);
     return;
   }
 
