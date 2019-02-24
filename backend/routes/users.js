@@ -122,8 +122,13 @@ router.post("/completedCourses/comparison", function(req, res) {
  */
 router.get("/getCompletedCourses", async (req, res) => {
   const student_id = req.query.studentID;
-  const courses = await users.getCompletedCourses(student_id);
-  res.status(200).send(courses);
+  const result = await users.getCompletedCourses(student_id);
+  if (result === "No student ID found!") {
+    return res.status(400).send(result);
+  } else if (result === "Interval serever error!") {
+    return res.status(500).send(result);
+  }
+  return res.status(200).send(result);
 });
 
 /**

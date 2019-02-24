@@ -29,14 +29,15 @@ var insertStudentUser = async (username, password, email, id) => {
 
   try {
     await connection.beginTransaction();
-    await connection.query(
-      "INSERT INTO users (username, email, password) VALUES(?, ?, ?);",
-      [username, email, hash]
-    );
-    await connection.query(
-      "INSERT INTO students (student_id, username) VALUES(?, ?);",
-      [id, username]
-    );
+    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [
+      username,
+      email,
+      hash
+    ]);
+    await connection.query("INSERT INTO students VALUES(?, ?);", [
+      id,
+      username
+    ]);
     await connection.commit();
     connection.release();
     return true;
@@ -110,14 +111,15 @@ var insertAdminUser = async (username, password, email, id) => {
   let hash = hasher.hashPass(password);
   try {
     await connection.beginTransaction();
-    await connection.query(
-      "INSERT INTO users (username, email, password) VALUES(?, ?, ?);",
-      [username, email, hash]
-    );
-    await connection.query(
-      "INSERT INTO staff_members (staff_id, username) VALUES(?, ?);",
-      [id, username]
-    );
+    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [
+      username,
+      email,
+      hash
+    ]);
+    await connection.query("INSERT INTO staff_members VALUES(?, ?);", [
+      id,
+      username
+    ]);
     await connection.commit();
     connection.release();
     return true;
@@ -173,20 +175,21 @@ var getCompletedCourses = async studentID => {
   		WHERE (id, semester)
   		IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`;
 
-  let connection = await mysql.getNewConnection();
+  let conn = await mysql.getNewConnection();
   let results;
   try {
-    results = await connection.query(sql_query, [studentID]);
-    connection.release();
-  } catch (err) {
-    connection.release();
-    console.log(err);
-  }
+    results = await conn.query(sql_query, [studentID]);
+    if (results.length !== 0) {
+      courses = JSON.stringify(results);
+    }
 
-  if (results) {
-    courses = JSON.stringify(results);
+    return courses;
+  } catch (err) {
+    console.log(err);
+    return "Interval serever error!";
+  } finally {
+    conn.release();
   }
-  return courses;
 };
 
 var getStudentData = async studentID => {
