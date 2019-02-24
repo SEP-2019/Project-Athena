@@ -1,5 +1,7 @@
 const MAX_USERNAME_LENGTH = 64;
 const MAX_PASSWORD_LENGTH = 64;
+const MAX_CURR_NAME_LENGTH = 128;
+const MAX_DEPARTMENT_LENGTH = 256;
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_EMAIL_LENGTH = 384;
 const ID_LENGTH = 9;
@@ -14,6 +16,17 @@ function isAlphanumeric(str) {
     return false;
   }
   return String(str).match(/^[a-z0-9]+$/i);
+}
+
+/**
+ * Verifies that the input only contains either alphanumeric values or - or :
+ * @param {string} str
+ */
+function isAlteredAlphanumeric(str) {
+  if (!str) {
+    return false;
+  }
+  return String(str).match(/^([a-z0-9]|[-]|[:])+$/i);
 }
 
 /**
@@ -81,6 +94,50 @@ var verifyStudentId = id => {
  */
 var verifyAdminId = id => {
   if (!id || !isNumeric(id) || id > MAX_ID) {
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Verifies that the curriculum name only contains alphanumerical characters
+ * @param {string} curriculum
+ */
+var verifyCurriculumName = curriculum => {
+  if (!curriculum || String(curriculum).length > MAX_CURR_NAME_LENGTH) {
+    return false;
+  }
+  return isAlteredAlphanumeric(curriculum);
+};
+
+/**
+ * Verifies that the curriculum type is major or minor
+ * @param {string} type
+ */
+var verifyCurrType = type => {
+  if (!(type.toUpperCase() === "MAJOR") && !(type.toUpperCase() === "MINOR")) {
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Verifies that the department name only contains alphanumerical characters
+ * @param {string} department
+ */
+var verifyDepartmentName = department => {
+  if (!department || String(department).length > MAX_DEPARTMENT_LENGTH) {
+    return false;
+  }
+  return isAlphanumeric(department);
+};
+
+/**
+ * Verifies that the num of electives is numeric
+ * @param {int} numOfElectives
+ */
+var verifyNumOfElectives = numOfElectives => {
+  if (!id || !isNumeric(id)) {
     return false;
   }
   return true;
@@ -167,5 +224,9 @@ module.exports = {
   verifyStudentId,
   verifyAdminId,
   verifyCourse,
+  verifyCurriculumName,
+  verifyCurrType,
+  verifyDepartmentName,
+  verifyNumOfElectives,
   verifyCourseOffering
 };
