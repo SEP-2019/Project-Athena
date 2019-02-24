@@ -1,14 +1,14 @@
-const mysql = require('../../sql/connection');
-const format = require('../../validation/format');
-const hasher = require('../../validation/hash');
+const mysql = require("../../sql/connection");
+const format = require("../../validation/format");
+const hasher = require("../../validation/hash");
 
 const app = require("../app");
 
 var insertStudentUser = async (username, password, email, id) => {
   // Connect to database
-  let error = false
+  let error = false;
   // Check for invalid formatting
-  //todo, handle errors after formatting configured to throw errors 
+  //todo, handle errors after formatting configured to throw errors
   if (!format.verifyUsername(username)) {
     error = "invalid format username";
   } else if (!format.verifyPassword(password)) {
@@ -31,8 +31,15 @@ var insertStudentUser = async (username, password, email, id) => {
 
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
-    await connection.query("INSERT INTO students VALUES(?, ?);", [id, username]);
+    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [
+      username,
+      email,
+      hash
+    ]);
+    await connection.query("INSERT INTO students VALUES(?, ?);", [
+      id,
+      username
+    ]);
     await connection.commit();
     connection.release();
     return true;
@@ -44,7 +51,7 @@ var insertStudentUser = async (username, password, email, id) => {
   }
 };
 
-var deleteStudentUser = async (username) => {
+var deleteStudentUser = async username => {
   if (!format.verifyUsername(username)) {
     let error = "invalid username";
     console.error(error);
@@ -61,14 +68,19 @@ var deleteStudentUser = async (username) => {
 
   try {
     await connection.beginTransaction();
-    let student_id = await connection.query('SELECT student_id FROM students WHERE username = ?;', username)
-    await connection.query('DELETE FROM students WHERE student_id = ?;', [student_id[0].student_id]);
-    await connection.query('DELETE FROM users WHERE username = ?;', [username]);
+    let student_id = await connection.query(
+      "SELECT student_id FROM students WHERE username = ?;",
+      username
+    );
+    await connection.query("DELETE FROM students WHERE student_id = ?;", [
+      student_id[0].student_id
+    ]);
+    await connection.query("DELETE FROM users WHERE username = ?;", [username]);
     await connection.commit();
     connection.release();
     return true;
   } catch (error) {
-    console.error(error)
+    console.error(error);
     connection.rollback();
     connection.release();
     throw new Error(false);
@@ -77,9 +89,9 @@ var deleteStudentUser = async (username) => {
 
 var insertAdminUser = async (username, password, email, id) => {
   // Connect to database
-  let error = false
+  let error = false;
   // Check for invalid formatting
-  //todo, handle errors after formatting configured to throw errors 
+  //todo, handle errors after formatting configured to throw errors
   if (!format.verifyUsername(username)) {
     error = "invalid format username";
   } else if (!format.verifyPassword(password)) {
@@ -101,8 +113,15 @@ var insertAdminUser = async (username, password, email, id) => {
   let hash = hasher.hashPass(password);
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
-    await connection.query("INSERT INTO staff_members VALUES(?, ?);", [id, username]);
+    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [
+      username,
+      email,
+      hash
+    ]);
+    await connection.query("INSERT INTO staff_members VALUES(?, ?);", [
+      id,
+      username
+    ]);
     await connection.commit();
     connection.release();
     return true;
@@ -114,7 +133,7 @@ var insertAdminUser = async (username, password, email, id) => {
   }
 };
 
-var deleteAdminUser = async (username) => {
+var deleteAdminUser = async username => {
   if (!format.verifyUsername(username)) {
     let error = "invalid username";
     console.error(error);
@@ -131,14 +150,19 @@ var deleteAdminUser = async (username) => {
 
   try {
     await connection.beginTransaction();
-    let staff_id = await connection.query('SELECT staff_id FROM staff_members WHERE username = ?;', username)
-    await connection.query('DELETE FROM staff_members WHERE staff_id = ?;', [staff_id[0].staff_id]);
-    await connection.query('DELETE FROM users WHERE username = ?;', [username]);
+    let staff_id = await connection.query(
+      "SELECT staff_id FROM staff_members WHERE username = ?;",
+      username
+    );
+    await connection.query("DELETE FROM staff_members WHERE staff_id = ?;", [
+      staff_id[0].staff_id
+    ]);
+    await connection.query("DELETE FROM users WHERE username = ?;", [username]);
     await connection.commit();
     connection.release();
     return true;
   } catch (error) {
-    console.error(error)
+    console.error(error);
     connection.rollback();
     connection.release();
     throw new Error(false);
@@ -152,21 +176,67 @@ var getCompletedCourses = async studentID => {
   		FROM course_offerings
   		WHERE (id, semester)
   		IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`;
-  
-  let connection = await mysql.getNewConnection();
+
+  let conn = await mysql.getNewConnection();
   let results;
   try {
-    results = await connection.query(sql_query, [studentID]);
-    connection.release();
+    results = await conn.query(sql_query, [studentID]);
+    if (results.length !== 0) {
+      courses = JSON.stringify(results);
+    }
+
+    return courses;
   } catch (err) {
-    connection.release();
     console.log(err);
+    return "Interval serever error!";
+  } finally {
+    conn.release();
+  }
+};
+
+var getStudentData = async studentID => {
+  let error = false;
+  if (!format.verifyStudentId(studentID)) {
+    error = "invalid format id";
   }
 
-  if (results) {
-    courses = JSON.stringify(results);
+  if (!error == false) {
+    console.error(error);
+    throw new Error(error);
   }
-  return courses;
+
+  let data;
+  let conn = await mysql.getNewConnection();
+  let courses, major, minor;
+  try {
+    courses = await conn.query(
+      `SELECT course_code, semester
+    FROM course_offerings
+    WHERE (id, semester)
+    IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`,
+      [studentID]
+    );
+    major = await conn.query(
+      `SELECT curriculum_name FROM student_majors WHERE student_id = ?;`,
+      [studentID]
+    );
+    minor = await conn.query(
+      `SELECT curriculum_name FROM student_minors WHERE student_id = ?;`,
+      [studentID]
+    );
+    conn.release();
+
+    let results = { major: major, minor: minor, courses: courses };
+
+    if (results) {
+      data = JSON.stringify(results);
+    }
+    return data;
+  } catch (err) {
+    conn.release();
+    console.log(err);
+    throw new Error(err);
+  }
 };
 
 var login = async () => {
@@ -188,16 +258,6 @@ var login = async () => {
 		let isValidPassword = function(userpass, password){
 			return hasher.hashPass(password) === userpass; 
 		}
-		// Check for missing input params
-		if (!username) {
-			error = 'Undefined username';
-		} else if (!password) {
-			error = 'Undefined password';
-		}
-
-		if (error) {
-			return done(error);
-		}
 
 		// Check for invalid formatting
 		if (!format.verifyUsername(username)) {
@@ -214,23 +274,23 @@ var login = async () => {
 		try {
 			let connection = await mysql.getNewConnection()
 			let userInfo = await connection.query('SELECT * FROM users WHERE username = ?;',[username]);
-			connection.release();
 
 			if(!userInfo) {
-				return done(null, false, { message: 'Incorrect username.' });
+				return done('Incorrect username.');
 			}
 
 			if (!isValidPassword(userInfo[0].password, password)) {
-				return done(null, false, { message: 'Incorrect password.' });
+				return done('Incorrect password.');
 			}
 
 			return done(null,userInfo[0]);
 		} 
 		catch (error) {
-			connection.release();
 			console.error(error);
 			return done(error);
-		}
+		} finally {
+      connection.release();
+    }
 	}));
 }
 
@@ -240,5 +300,6 @@ module.exports = {
   insertAdminUser,
   deleteAdminUser,
   getCompletedCourses,
-  login
+  login,
+  getStudentData
 };

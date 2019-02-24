@@ -1,0 +1,10 @@
+.select {
+  background-color: #b20007;
+  text-align: center;
+  border-radius: 5px;
+  font-weight: normal;
+}
+
+.select svg {
+  color: #ffffff;
+}

@@ -2,6 +2,7 @@ const mocha = require("mocha");
 const users = require("../logic/users/users.js");
 const assert = require("assert");
 const nock = require("nock");
+const mysql = require("../sql/connection");
 
 /*
 const host = 'http://localhost:3000';
@@ -234,7 +235,7 @@ describe("Tests add student user", function() {
           assert.equal(response.message, expectedInvalidId);
           resolve();
         }).then(done);
-      })
+      });
   });
 
   it("responds with invalid format id 3", function(done) {
@@ -297,38 +298,31 @@ describe("Tests add student user", function() {
   });
 
   it("responds with true 4", function(done) {
-    users
-      .deleteStudentUser("username1")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, true);
-          resolve();
-        }).then(done);
-      });
+    users.deleteStudentUser("username1").then(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response, true);
+        resolve();
+      }).then(done);
+    });
   });
 
   it("responds with true 5", function(done) {
-    users
-      .deleteStudentUser("username2")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, true);
-          resolve();
-        }).then(done);
-      });
+    users.deleteStudentUser("username2").then(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response, true);
+        resolve();
+      }).then(done);
+    });
   });
 
   it("responds with true 6", function(done) {
-    users
-      .deleteStudentUser("username3")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, true);
-          resolve();
-        }).then(done);
-      });
+    users.deleteStudentUser("username3").then(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response, true);
+        resolve();
+      }).then(done);
+    });
   });
-
 });
 
 describe("Tests add admin user", function() {
@@ -539,7 +533,12 @@ describe("Tests add admin user", function() {
 
   it("responds with invalid format id 4", function(done) {
     users
-      .insertAdminUser("username", "password", "email@email.com", "1523982350342")
+      .insertAdminUser(
+        "username",
+        "password",
+        "email@email.com",
+        "1523982350342"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedInvalidId);
@@ -597,35 +596,67 @@ describe("Tests add admin user", function() {
   });
 
   it("responds with true 4", function(done) {
-    users
-      .deleteAdminUser("adminusername1")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, true);
-          resolve();
-        }).then(done);
-      });
+    users.deleteAdminUser("adminusername1").then(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response, true);
+        resolve();
+      }).then(done);
+    });
   });
 
   it("responds with true 5", function(done) {
-    users
-      .deleteAdminUser("adminusername2")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, true);
-          resolve();
-        }).then(done);
-      });
+    users.deleteAdminUser("adminusername2").then(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response, true);
+        resolve();
+      }).then(done);
+    });
   });
 
   it("responds with true 6", function(done) {
-    users
-      .deleteAdminUser("adminusername3")
-      .then(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, true);
-          resolve();
-        }).then(done);
-      });
+    users.deleteAdminUser("adminusername3").then(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response, true);
+        resolve();
+      }).then(done);
+    });
+  });
+});
+
+describe("Test retrieve student data", function() {
+  it("responds with valid", async function() {
+    connection = await mysql.getNewConnection();
+    await connection.query(
+      `INSERT INTO courses (course_code,title, department) VALUES (?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,
+      ["ECSE 428", "Software engineering in practice", "ECSE"]
+    );
+    await connection.query(
+      `INSERT INTO course_offerings (id, scheduled_time, semester, course_code, section) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE id=id;`,
+      [321123, "MWF", "winter", "ECSE 428", "001"]
+    );
+    await connection.query(
+      `INSERT INTO users (username,email, password) VALUES (?,?,?) ON DUPLICATE KEY UPDATE username=username;`,
+      ["testUser", "email@domain.com", 12345678]
+    );
+    await connection.query(
+      `INSERT INTO students (student_id,username) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id=student_id;`,
+      [123321123, "testUser"]
+    );
+    await connection.query(
+      `INSERT INTO student_course_offerings (student_id,offering_id,semester) VALUES (?,?,?);`,
+      [123321123, 321123, "winter"]
+    );
+    return users.getStudentData(123321123).then(function(res) {
+      let found = false;
+      let searchingFor = {
+        major: [],
+        minor: [],
+        courses: [{ course_code: "ECSE 428", semester: "winter" }]
+      };
+      if (JSON.stringify(res) == JSON.stringify(searchingFor)) {
+        found = true;
+      }
+      assert(true, found);
+    });
   });
 });
