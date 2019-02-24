@@ -9,7 +9,7 @@ describe('Test retrieve course by tag', function() {
         (?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,['ECSE 428','Software engineering in practice', 'ECSE']);
         connection.query(`INSERT INTO tags(name) VALUES
         (?);`,['Engineering'])
-        connection.query(`INSERT INTO course_tag (course_code, tag_name) VALUES
+        connection.query(`INSERT INTO course_tags (course_code, tag_name) VALUES
         (?,?);`,['ECSE 428', 'Engineering'])
         return courses.queryCourseByTag('Engineering').then(function(res){
             let found = false;

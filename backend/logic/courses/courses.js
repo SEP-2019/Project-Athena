@@ -17,7 +17,7 @@ var queryCourseByTag = async function queryCourseByTag(tag) {
   let connection = await mysql.getNewConnection();
   try {
     let courses = await connection.query(
-      "SELECT course_code FROM course_tag WHERE course_tag.tag_name LIKE ?",
+      "SELECT course_code FROM course_tags WHERE course_tag.tag_name LIKE ?",
       tag
     );
     connection.release();
