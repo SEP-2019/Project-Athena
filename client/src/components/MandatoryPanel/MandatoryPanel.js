@@ -21,23 +21,32 @@ class MandatoryPanel extends Component {
     });
   }
 
-  fetchTags() {
+  fetchCourses() {
     axios
       .get('http://localhost:3001/courses/getAllCourses')
-      .then(
-        response => console.log(response)
-        // this.setState({
-        //   courses: this.addCheckedProperty(response.data),
-        //   coursesAreLoading: false,
-        // })
+      .then(response =>
+        this.setState({
+          courses: this.addCheckedProperty(response.data),
+          coursesAreLoading: false,
+        })
       )
       .catch(courseError =>
         this.setState({ courseError, coursesAreLoading: false })
       );
   }
 
+  componentDidMount() {
+    this.fetchCourses();
+  }
+
   componentWillMount = () => {
     this.selectedCourses = new Set();
+  };
+
+  updateCoursesCheckedState = newCourses => {
+    this.setState({
+      courses: newCourses,
+    });
   };
 
   render() {
@@ -51,7 +60,7 @@ class MandatoryPanel extends Component {
             <CompleteCourseList
               courses={courses}
               selectedCourses={this.selectedCourses}
-              // updateTagsCheckedState={this.updateTagsCheckedState}
+              updateCoursesCheckedState={this.updateCoursesCheckedState}
               errorMessage={content =>
                 courseError ? (
                   <p className="Error">{courseError.message}</p>
