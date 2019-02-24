@@ -63,7 +63,6 @@ exports.verifyId = id => {
 	return (isNumeric(id) && (String(id).length == ID_LENGTH));
 }
 
-//exports.verifyCourseCode = courseCode => {
 /**
  * Verifies that the course code is in the following format: XXXX 123
  * @param {String} courseCode
