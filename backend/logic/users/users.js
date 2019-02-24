@@ -1,7 +1,6 @@
 const mysql = require("../../sql/connection");
 const format = require("../../validation/format");
 const hasher = require("../../validation/hash");
-
 const app = require("../app");
 
 var insertStudentUser = async (username, password, email, id) => {
@@ -240,58 +239,58 @@ var getStudentData = async studentID => {
 };
 
 var login = async () => {
-	
-	let LocalStrategy = require('passport-local').Strategy;
-		
-	//LOCAL SIGNIN
-	app.passport.use('local-signin', new LocalStrategy(  
-	{
-		// by default, local strategy uses username and password, we will override with email
-		usernameField : 'username',
-		passwordField : 'password',
-		passReqToCallback : true // allows us to pass back the entire request to the callback
-	},
-	
-	function(req, username, password, done) {
-		let error;
+  
+  let LocalStrategy = require('passport-local').Strategy;
+    
+  //LOCAL SIGNIN
+  app.passport.use('local-signin', new LocalStrategy(  
+  {
+    // by default, local strategy uses username and password, we will override with email
+    usernameField : 'username',
+    passwordField : 'password',
+    passReqToCallback : true // allows us to pass back the entire request to the callback
+  },
+  
+  function(req, username, password, done) {
+    let error;
 
-		let isValidPassword = function(userpass, password){
-			return hasher.hashPass(password) === userpass; 
-		}
+    let isValidPassword = function(userpass, password){
+      return hasher.hashPass(password) === userpass; 
+    }
 
-		// Check for invalid formatting
-		if (!format.verifyUsername(username)) {
-			error = 'Invalid format username';
-		} else if (!format.verifyPassword(password)) {
-			error = 'Invalid format password';
-		}
+    // Check for invalid formatting
+    if (!format.verifyUsername(username)) {
+      error = 'Invalid format username';
+    } else if (!format.verifyPassword(password)) {
+      error = 'Invalid format password';
+    }
 
-		if (error) {
-			return done(error);
-		}
+    if (error) {
+      return done(error);
+    }
 
-		// Begin transaction with database
-		try {
-			let connection = await mysql.getNewConnection()
-			let userInfo = await connection.query('SELECT * FROM users WHERE username = ?;',[username]);
+    // Begin transaction with database
+    try {
+      let connection = await mysql.getNewConnection()
+      let userInfo = await connection.query('SELECT * FROM users WHERE username = ?;',[username]);
 
-			if(!userInfo) {
-				return done('Incorrect username.');
-			}
+      if(!userInfo) {
+        return done('Incorrect username.');
+      }
 
-			if (!isValidPassword(userInfo[0].password, password)) {
-				return done('Incorrect password.');
-			}
+      if (!isValidPassword(userInfo[0].password, password)) {
+        return done('Incorrect password.');
+      }
 
-			return done(null,userInfo[0]);
-		} 
-		catch (error) {
-			console.error(error);
-			return done(error);
-		} finally {
+      return done(null,userInfo[0]);
+    } 
+    catch (error) {
+      console.error(error);
+      return done(error);
+    } finally {
       connection.release();
     }
-	}));
+  }));
 }
 
 module.exports = {
