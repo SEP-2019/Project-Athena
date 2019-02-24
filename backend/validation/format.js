@@ -68,7 +68,7 @@ exports.verifyId = id => {
  * Verifies that the course code is in the following format: XXXX 123
  * @param {String} courseCode
  */
-var verifyCourseCode = async courseCode => {
+var verifyCourseCode = courseCode => {
 	if (!/^[a-z]{4} \d{3}$/i.test(courseCode)) {
 		return false;
 	}
@@ -77,9 +77,9 @@ var verifyCourseCode = async courseCode => {
 
 /**
  * Verifies that the department is in the following format: XXXX
- * @param {String} courseCode
+ * @param {String} department
  */
-var verifyDepartment = async department => {
+var verifyDepartment = department => {
 	if (!department){
 		return false;
 	}
@@ -87,20 +87,30 @@ var verifyDepartment = async department => {
 }
 
 /**
+ * Verifies that the title is not null
+ * @param {String} title
+ */
+var verifyTitle = title => {
+	if (!title){
+		return false;
+	}
+	return true;
+}
+
+/**
  * Verifies that the phased_out is either 0 or 1
  * @param {String} phaseOut
  */
-var verifyPhaseOut = async phaseOut => {
-	if (phaseOut === undefined || phaseOut === null){	
-		console.log('format location FALSE' + phaseOut);
+var verifyPhaseOut = phaseOut => {
+	if (!phaseOut){
 		return false;
 	}
-	console.log('format location TRUE ' + phaseOut);
-	return (phaseOut === 0 || phaseOut === 1);
+	return String(phaseOut).match(/^[01]$/i);
 }
 
 module.exports = {
 	verifyCourseCode,
 	verifyDepartment,
+	verifyTitle,
 	verifyPhaseOut
 };
