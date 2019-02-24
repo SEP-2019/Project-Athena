@@ -14,9 +14,9 @@ let tagsRouter = require("./routes/tags");
 let app = express();
 
 // For Passport
-app.use(session({ secret: "keyboard cat", resave: true, saveUninitialized: true })); // session secret
+/* app.use(session({ secret: "keyboard cat", resave: true, saveUninitialized: true })); // session secret
 app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
+app.use(passport.session()); // persistent login sessions */
 
 app.use(logger("dev"));
 app.use(bodyParser.json());

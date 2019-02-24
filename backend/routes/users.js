@@ -2,7 +2,6 @@ const express = require("express");
 const users = require("../logic/users/users");
 //const curriculum = require("../logic/courses/curriculum");
 const router = express.Router();
-const app = require("../app.js");
 
 /**
  * @api {post} /addStudentUser
@@ -133,12 +132,17 @@ router.get("/getCompletedCourses", async (req, res) => {
 });
 
 /* Retrieve user's username and password and compare to stored values for logging in */
-router.post(
-  "/login",
-  app.passport.authenticate("local-signin", {
-    /*Subject to change later*/
-  })
-);
+router.post("/login", async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  try {
+    if (users.login(username, password)) {
+      res.status(200).send("Authenticated");
+    }
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 /**
  *
