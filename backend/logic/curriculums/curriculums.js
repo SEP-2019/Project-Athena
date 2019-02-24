@@ -89,13 +89,13 @@ var createCurriculum = async (
       }
     }
     await connection.commit();
-    connection.release();
     return true;
   } catch (error) {
     connection.rollback();
-    connection.release();
     console.error(error);
     throw new Error(false);
+  } finally {
+    connection.release();
   }
 };
 
