@@ -8,9 +8,9 @@ describe('Test retrieve course by tag', function() {
         connection.query(`INSERT INTO courses (course_code,title, department) VALUES 
         (?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,['ECSE 428','Software engineering in practice', 'ECSE']);
         connection.query(`INSERT INTO tags(name) VALUES
-        (?);`,['Engineering'])
+        (?) ON DUPLICATE KEY UPDATE name=name;`,['Engineering'])
         connection.query(`INSERT INTO course_tags (course_code, tag_name) VALUES
-        (?,?);`,['ECSE 428', 'Engineering'])
+        (?,?) ON DUPLICATE KEY UPDATE tag_name=tag_name;`,['ECSE 428', 'Engineering'])
         return courses.queryCourseByTag('Engineering').then(function(res){
             let found = false;
             let searchingFor = {course_code: 'ECSE 428'};
