@@ -56,7 +56,8 @@ router.post('/createCourse', function(req, res, next) {
   const courseCode = req.body.courseCode;
   const title = req.body.title;
   const departement = req.body.departement;
-  courses.addCourse(courseCode, title, departement)
+  const phasedOut = req.body.phasedOut
+  courses.addCourse(courseCode, title, departement, phasedOut)
     .then(val => {
       res.send(val);
     })

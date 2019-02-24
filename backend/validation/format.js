@@ -13,9 +13,14 @@ function isAlphanumeric(str) {
 	return String(str).match(/^[a-z0-9]+$/i);
 }
 
+/**
+ * Verifies that the input only contains alphabet values
+ * @param {string} str
+ */
 function isAlphabet(str) {
-	if (!str)
+	if (!str) {
 		return false
+	}
 	return String(str).match(/^[a-z]+$/i);
 }
 
@@ -58,8 +63,44 @@ exports.verifyId = id => {
 	return (isNumeric(id) && (String(id).length == ID_LENGTH));
 }
 
-exports.verifyDepartment = department => {
-	if (!department)
-		return false
+//exports.verifyCourseCode = courseCode => {
+/**
+ * Verifies that the course code is in the following format: XXXX 123
+ * @param {String} courseCode
+ */
+var verifyCourseCode = async courseCode => {
+	if (!/^[a-z]{4} \d{3}$/i.test(courseCode)) {
+		return false;
+	}
+	return true;
+}
+
+/**
+ * Verifies that the department is in the following format: XXXX
+ * @param {String} courseCode
+ */
+var verifyDepartment = async department => {
+	if (!department){
+		return false;
+	}
 	return (String(department).length == DEPARTMENT_LENGTH && isAlphabet(department));
 }
+
+/**
+ * Verifies that the phased_out is either 0 or 1
+ * @param {String} phaseOut
+ */
+var verifyPhaseOut = async phaseOut => {
+	if (phaseOut === undefined || phaseOut === null){	
+		console.log('format location FALSE' + phaseOut);
+		return false;
+	}
+	console.log('format location TRUE ' + phaseOut);
+	return (phaseOut === 0 || phaseOut === 1);
+}
+
+module.exports = {
+	verifyCourseCode,
+	verifyDepartment,
+	verifyPhaseOut
+};

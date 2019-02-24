@@ -18,32 +18,46 @@ async function queryCourseByTag(tag) {
     }
 }
 
-var addCourse = async (courseCode, title, departement) => {
+/**
+ * Adds a course into the database
+ * @author Mathieu Savoie
+ * @param {String} courseCode
+ * @param {String} title
+ * @param {String} departement
+ * @returns true if successful
+ * @throws error if MySQL connection failed
+ *         invalid format courses if JSON format is incorrect
+ *         false if insertion failed
+ */
+var addCourse = async (courseCode, title, departement, phasedOut) => {
   // Connect to database
   let error = false
   // Check for invalid formatting
   // Handle errors related to formatting, throw errors if wrong format
+  console.log(format.verifyPhaseOut(phasedOut));
   if (!format.verifyCourseCode(courseCode)) {
     error = "invalid format courseCode";
+    //console.log(error);
   } else if (!format.verifyDepartment(departement)) {
     error = "invalid format departement";
+    //console.log(error);
+  } else if (!format.verifyPhaseOut(phasedOut)){
+    error = "invalid format phasedOut";
+    console.log('in logic ' + error);
   }
+
+  //console.log(error);
 
   if (!error == false) {
     console.error(error);
     throw new Error(error);
   }
 
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    throw new Error("failed to establish connection with database");
-  }
+  let connection = await mysql.getNewConnection();
   
    try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO courses VALUES(?, ?, ?);", [courseCode, title, departement]);
+    await connection.query("INSERT INTO courses VALUES(?, ?, ?, ?);", [courseCode, title, departement, phasedOut]);
     await connection.commit();
     connection.release();
     return true;
@@ -55,7 +69,7 @@ var addCourse = async (courseCode, title, departement) => {
   }
 };
 
-module.exports.queryCourseByTag = queryCourseByTag;
 module.exports = {
-  addCourse
+  addCourse,
+  queryCourseByTag
 };
