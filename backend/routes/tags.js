@@ -2,7 +2,7 @@ const express = require("express");
 const tags = require("../logic/tags/tags");
 const router = express.Router();
 
-/*
+/**
  * @api {get} /getAllTags
  * @apiDescription gets a list of tags
  * @apiExample {curl} Example usage: GET /tags/getAllTags
