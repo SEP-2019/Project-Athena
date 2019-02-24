@@ -41,7 +41,7 @@ of department-year_start-year_end-type
    */
 
   try {
-    //let connection = await mysql.getNewConnection();
+    let connection = await mysql.getNewConnection();
     let courses = curriculum.courses;
     let tech_comps = curriculum.tech_comps;
     let program = program_map[curriculum.department];
@@ -72,7 +72,7 @@ of department-year_start-year_end-type
 
         await connection.query(
           "INSERT INTO course_prereqs (course_code,prereq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-          [course.course_code, prereq.course_code]
+          [course.course_code, prereq]
         );
       });
 
@@ -82,13 +82,13 @@ of department-year_start-year_end-type
         }
         await connection.query(
           "INSERT INTO course_coreqs (course_code,coreq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-          [course.course_code, coreq.course_code]
+          [course.course_code, coreq]
         );
       });
 
       //needs duplicate handler
       await connection.query(
-        "INSERT INTO curriculums_core_classes (curriculum_name,course_code) VALUES(?,?);",
+        "INSERT INTO curriculum_core_classes (curriculum_name,course_code) VALUES(?,?);",
         [curriculum_name, course.course_code]
       );
     });
@@ -101,8 +101,13 @@ of department-year_start-year_end-type
     //needs duplicate handler
     tech_comps.forEach(async tech_comp => {
       await connection.query(
+        "INSERT INTO courses (course_code,title,department) VALUES(?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
+        [tech_comp.course_code, tech_comp.course_title, tech_comp.department]
+      );
+
+      await connection.query(
         "INSERT INTO curriculum_tech_comps (curriculum_name,course_code) VALUES(?,?);",
-        [curriculum_name, tech_comp.course_title]
+        [curriculum_name, tech_comp.course_code]
       );
 
       tech_comp.prereqs.forEach(async prereq => {
@@ -112,7 +117,7 @@ of department-year_start-year_end-type
 
         await connection.query(
           "INSERT INTO course_prereqs (course_code,prereq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-          [tech_comp.course_code, prereq.course_code]
+          [tech_comp.course_code, prereq]
         );
       });
 
@@ -123,7 +128,7 @@ of department-year_start-year_end-type
 
         await connection.query(
           "INSERT INTO course_coreqs (course_code,coreq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-          [tech_comp.course_code, coreq.course_code]
+          [tech_comp.course_code, coreq]
         );
       });
     });
