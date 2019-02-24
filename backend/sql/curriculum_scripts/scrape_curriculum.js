@@ -25,6 +25,111 @@ let program_map = {
   se: "Software Engineering"
 };
 
+async function store_curriculum(curriculum) {
+  /*
+This curriculum name will be composed
+of department-year_start-year_end-type
+*/
+
+  /**
+   *  You should affect courses, curriculums,
+   * curriculums_complementaries (associate a curriculum with its allowed complementary courses),
+   * curriculums_core_class (associate a curriculum with its required core courses),
+   * curriculums_tech_comp (associate a curriculum with its allowed tech comp courses),
+   * course_prereq (associate a course to its prereq),
+   * course_coreq (associate a course to its coreq)
+   */
+
+  try {
+    let connection = await mysql.getNewConnection();
+    let courses = curriculum.courses;
+    let tech_comps = curriculum.tech_comps;
+    let program = program_map[curriculum.department];
+    let curriculum_name = curriculum.department.concat(program,"-",curriculum.year_start,"-",curriculum.year_end,"-",curriculum.type);
+  
+    //ADD IN THE IGNOREE ON DUPLICATE
+
+    await connection.beginTransaction();
+
+    courses.forEach(
+       (async (course) => {
+        await connection.query("INSERT INTO courses (course_code,title,department) VALUES(?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;", [
+          course.course_code,
+          course.course_title,
+          course.department
+        ]);
+
+        course.prereqs.forEach(
+          (async(prereq) =>{
+            await connection.query("INSERT INTO course_prereqs (course_code,prereq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code;", [
+              course.course_code,
+              prereq.course_code
+            ])
+          })
+        );
+
+        course.coreqs.forEach(
+          (async(coreq) =>{
+            await connection.query("INSERT INTO course_coreqs (course_code,coreq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code;", [
+              course.course_code,
+              coreq.course_code
+            ])
+          })
+        );
+
+        //needs duplicate handler
+        await connection.query("INSERT INTO curriculums_core_classes (curriculum_name,course_code) VALUES(?,?) ;", [
+          curriculum_name,
+          course.course_code
+        ]);
+
+      })
+    );
+
+    await connection.query("INSERT INTO curriculums (curriculum_name,type,department) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE curriculum_name=curriculum_name;", [
+      curriculum_name,
+      curriculum.type,
+      curriculum.department
+    ]);
+
+    //needs duplicate handler
+    tech_comps.forEach(
+      (async (tech_comp) => {
+        await connection.query("INSERT INTO curriculums_tech_comp VALUES(?,?);", [
+          curriculum_name,
+          tech_comp.course_title
+        ]);
+
+        tech_comp.prereqs.forEach(
+          (async(prereq) =>{
+            await connection.query("INSERT INTO course_prereqs (course_code,prereq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code; ;", [
+              tech_comp.course_code,
+              prereq.course_code
+            ])
+          })
+        );
+
+        tech_comp.coreqs.forEach(
+          (async(coreq) =>{
+            await connection.query("INSERT INTO course_coreqs (course_code,coreq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code;;", [
+              tech_comp.course_code,
+              coreq.course_code
+            ])
+          })
+        );
+      })
+    );
+
+    await connection.commit();
+  
+  } catch (error) {
+    console.error(error);
+  }
+  finally{
+    connection.release();
+  }
+  
+}
 
 async function parse_courses(url, property) {
   return new Promise((resolve, reject) => {
@@ -86,5 +191,6 @@ async function parse_courses(url, property) {
 async function test() {
   curriculum = await parse_courses(curriculum_URL, "courses");
   curriculum = await parse_courses(tech_comps_URL, "tech_comps");
+  store_curriculum(curriculum);
 }
 test();
