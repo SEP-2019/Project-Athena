@@ -16,19 +16,14 @@ class CourseSuggestion extends Component {
   }
 
   hydrateStateWithLocalStorage() {
-    // for all items in state
     for (let key in this.state) {
-      // if the key exists in localStorage
       if (localStorage.hasOwnProperty(key)) {
-        // get the key's value from localStorage
         let value = localStorage.getItem(key);
 
-        // parse the localStorage string and setState
         try {
           value = JSON.parse(value);
           this.setState({ [key]: value });
         } catch (e) {
-          // handle empty string
           this.setState({ [key]: value });
         }
       }
@@ -37,7 +32,6 @@ class CourseSuggestion extends Component {
 
   componentDidMount() {
     this.hydrateStateWithLocalStorage();
-
     // add event listener to save state to localStorage
     // when user leaves/refreshes the page
     window.addEventListener(
@@ -51,15 +45,12 @@ class CourseSuggestion extends Component {
       'beforeunload',
       this.saveStateToLocalStorage.bind(this)
     );
-
     // saves if component has a chance to unmount
     this.saveStateToLocalStorage();
   }
 
   saveStateToLocalStorage() {
-    // for every item in React state
     for (let key in this.state) {
-      // save to localStorage
       localStorage.setItem(key, JSON.stringify(this.state[key]));
     }
   }
@@ -69,8 +60,7 @@ class CourseSuggestion extends Component {
       <div>
         <div className="main_page_message">
           Here are your remaining mandatory courses and suggestions for your
-          complementary courses. You can add them to your curriculum.{' '}
-          {this.state.currentTab}
+          complementary courses. You can add them to your curriculum.
         </div>
         <Tabs
           defaultTab={this.state.currentTab}

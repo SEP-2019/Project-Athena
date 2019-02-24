@@ -15,8 +15,6 @@ class TagList extends Component {
 
   componentWillMount = () => {
     this.selectedCheckboxes = this.props.checkedTags;
-    console.log(typeof this.selectedCheckboxes);
-    console.log(this.selectedCheckboxes);
   };
 
   handleChange(index, checked, checkbox) {

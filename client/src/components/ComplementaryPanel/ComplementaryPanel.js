@@ -97,7 +97,6 @@ class ComplementaryPanel extends Component {
     var tagIndex = newSuggestions.findIndex(e => e.name === tagName);
     newSuggestions[tagIndex].courses = newCourses;
     this.setState({ suggestions: newSuggestions });
-    // console.log(newSuggestions);
   };
 
   clearSelection = e => {
@@ -107,12 +106,11 @@ class ComplementaryPanel extends Component {
       obj.courses.map(course => {
         if (course.checked) {
           course.checked = false;
-          console.log('Uncheck ' + course.course_code);
         }
+        return null;
       });
     });
     this.setState({ suggestions: newSuggestions });
-    console.log(this.state.suggestions);
   };
 
   loadSuggestions = (tag, courses) => {

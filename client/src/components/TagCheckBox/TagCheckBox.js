@@ -18,7 +18,7 @@ class TagCheckBox extends Component {
           onChange={this.props.handleChange}
         />
         <label htmlFor={this.props.name} className="checkbox_label">
-          {this.props.name}, {this.props.checked.toString()}
+          {this.props.name}
         </label>
         <label htmlFor={this.props.name} className="custom_checkbox" />
       </div>
