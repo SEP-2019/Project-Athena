@@ -1,6 +1,33 @@
 const mysql = require("../../sql/connection");
 const format = require("../../validation/format");
 
+/**
+ * Returns all available courses from the database
+ * @author Steven Li
+ * @returns a list of available courses from the database in JSON format
+ * @throws error if MySQL connection failed
+ */
+var getCurriculum = async function(name) {
+  let connection = await mysql.getNewConnection();
+  let curriculum;
+  let result;
+  try {
+    result = await connection.query(
+      "SELECT * FROM curriculums WHERE name=?;",
+      name
+    );
+    connection.release();
+  } catch (err) {
+    connection.release();
+    console.error(err);
+  }
+
+  if (result) {
+    courses = result;
+  }
+  return courses;
+};
+
 var createCurriculum = async (
   name,
   type,
@@ -100,5 +127,6 @@ var createCurriculum = async (
 };
 
 module.exports = {
-  createCurriculum
+  createCurriculum,
+  getCurriculum
 };

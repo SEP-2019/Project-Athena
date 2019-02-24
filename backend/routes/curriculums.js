@@ -3,6 +3,22 @@ const curriculums = require("../logic/curriculums/curriculums");
 const router = express.Router();
 
 /**
+ * @api {get} /getCurriculum
+ * @apiDescription gets a curriculum's courses from its name
+ * @apiExample {curl} Example usage: GET /curriculums/getCurriculum
+ * @author: Feras Al Taha
+ */
+router.get("/getCurriculum", async (req, res, next) => {
+  try {
+    const name = req.query.name;
+    let result = await curriculums.getCurriculum(name);
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+/**
  * @api {post} /createCurriculum
  * @apiDescription This endpoint will add a student and an associated user
  * @apiParam (body) {string} username, {string} password, {string} email, {int} student_id
