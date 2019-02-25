@@ -1,0 +1,14 @@
+div.curriculum-selection{
+  padding: 24px 32px 24px 32px ;
+}
+
+div.semester-name{
+  padding: 0px 0px 12px 0px ;
+  font-weight: bold;
+  font-size: 24px;
+  color: black;
+}
+
+div.semester-course-display{
+  padding: 24px 32px 24px 32px ;
+}
