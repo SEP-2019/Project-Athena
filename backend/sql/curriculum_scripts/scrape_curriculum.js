@@ -2,17 +2,48 @@ const mysql = require("../connection");
 const rp = require("request-promise");
 const cheerio = require("cheerio");
 
-const curriculum_URL =
-  "https://mcgill.ca/ece/undergrad/information/ee/2018-2019-electrical-engineering-7-semester-curriculum";
+/*
+User should run the script with with the following format
+when you are cd'd into the backend folder of the project! This is due
+to the .env file that we created!
 
-const tech_comps_URL =
-  "https://www.mcgill.ca/ece/undergrad/information/ee/2018-2019-electrical-eng-technical-complementaries";
+Write:
+cd Project-Athena/backend
+node <pathToScript>/scrape_curriculum.js <curriculum url> <tech_comps_url>
+*/
+if(process.argv.length <4 || process.argv.length >4){
+  console.log(process.argv);
+  console.error("Please enter the following format: node <pathToScript>/scrape_curriculum.js <curriculum url> <tech_comps_url>");
+  process.exit(1);
+}
+
+
+const curriculum_URL = String(process.argv[2]);
+const tech_comps_URL = String(process.argv[3]);
+
+let curriculum_years=curriculum_URL.match(/[0-9]{4}/g);
+let tech_comp_years = tech_comps_URL.match(/[0-9]{4}/g);
+
+if(curriculum_years[0] != tech_comp_years[0] || curriculum_years[1] != tech_comp_years[1]){
+  console.log(process.argv);
+  console.error("Please enter the curriculum and tech comp curriculums with matchings years");
+  process.exit(1);
+}
+
+
+let department = String(curriculum_URL.match(/\information\/[a-z]{2}/g)).replace(/\information\//g,"");
+let curriculum_year_start = curriculum_years[0];
+let curriculum_year_end = curriculum_years[1];
+let type = String(curriculum_URL.match(/[0-9]{1}-semester-curriculum/g));
+
+
+
 
 let curriculum = {
-  year_start: 2018,
-  year_end: 2019,
-  department: "ee",
-  type: "8-semester-curriculum",
+  year_start: curriculum_year_start,
+  year_end: curriculum_year_end,
+  department: department,
+  type: type,
   courses: [],
   tech_comps: [],
   complementary_courses: [],
@@ -40,22 +71,13 @@ of department-year_start-year_end-type
    * course_coreq (associate a course to its coreq)
    */
 
+  let connection = await mysql.getNewConnection(); 
   try {
-    //let connection = await mysql.getNewConnection();
     let courses = curriculum.courses;
     let tech_comps = curriculum.tech_comps;
     let program = program_map[curriculum.department];
-    let curriculum_name = curriculum.department.concat(
-      program,
-      "-",
-      curriculum.year_start,
-      "-",
-      curriculum.year_end,
-      "-",
-      curriculum.type
-    );
+    let curriculum_name = program + "|" + curriculum.year_start + "|" + curriculum.year_end + "|" +curriculum.type;
 
-    //ADD IN THE IGNOREE ON DUPLICATE
 
     await connection.beginTransaction();
 
@@ -72,7 +94,7 @@ of department-year_start-year_end-type
 
         await connection.query(
           "INSERT INTO course_prereqs (course_code,prereq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-          [course.course_code, prereq.course_code]
+          [course.course_code, prereq]
         );
       });
 
@@ -82,13 +104,13 @@ of department-year_start-year_end-type
         }
         await connection.query(
           "INSERT INTO course_coreqs (course_code,coreq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-          [course.course_code, coreq.course_code]
+          [course.course_code, coreq]
         );
       });
 
-      //needs duplicate handler
+
       await connection.query(
-        "INSERT INTO curriculums_core_classes (curriculum_name,course_code) VALUES(?,?);",
+        "INSERT INTO curriculum_core_classes (curriculum_name,course_code) VALUES(?,?);",
         [curriculum_name, course.course_code]
       );
     });
@@ -101,8 +123,13 @@ of department-year_start-year_end-type
     //needs duplicate handler
     tech_comps.forEach(async tech_comp => {
       await connection.query(
+        "INSERT INTO courses (course_code,title,department) VALUES(?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
+        [tech_comp.course_code, tech_comp.course_title, tech_comp.department]
+      );
+
+      await connection.query(
         "INSERT INTO curriculum_tech_comps (curriculum_name,course_code) VALUES(?,?);",
-        [curriculum_name, tech_comp.course_title]
+        [curriculum_name, tech_comp.course_code]
       );
 
       tech_comp.prereqs.forEach(async prereq => {
@@ -112,7 +139,7 @@ of department-year_start-year_end-type
 
         await connection.query(
           "INSERT INTO course_prereqs (course_code,prereq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-          [tech_comp.course_code, prereq.course_code]
+          [tech_comp.course_code, prereq]
         );
       });
 
@@ -123,12 +150,13 @@ of department-year_start-year_end-type
 
         await connection.query(
           "INSERT INTO course_coreqs (course_code,coreq_course_code) VALUES(?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-          [tech_comp.course_code, coreq.course_code]
+          [tech_comp.course_code, coreq]
         );
       });
     });
 
     await connection.commit();
+    console.log("Updated curriculum and courses");
   } catch (error) {
     console.error(error);
   } finally {
@@ -193,9 +221,10 @@ async function parse_courses(url, property) {
   });
 }
 
-async function test() {
+async function scrape_curriculum() {
   curriculum = await parse_courses(curriculum_URL, "courses");
   curriculum = await parse_courses(tech_comps_URL, "tech_comps");
   store_curriculum(curriculum);
 }
-test();
+
+scrape_curriculum();
