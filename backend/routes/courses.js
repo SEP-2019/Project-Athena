@@ -334,4 +334,41 @@ router.post("/phaseOutCourse", async (req, res, next) => {
   }
 });
 
+/**
+ *
+ * @api {post} /assignCourseToCurriculum
+ * @apiDescription assign a course to a courseType (core, techComp, complementaries)
+ * @apiParam (body) {string} courseType, {string} courseCode, {string} curriculum
+ * @apiExample {curl} Example usage:
+ *	curl -X POST \
+ *  -H 'Content-Type: application/json' \
+ *  -d '{"courseType": "core", "courseCode": "ECSE 428", "curriculum": "ee"}' \
+ *  http://localhost:3001/courses/assignCourseToCurriculum
+ *
+ * @returns True on success
+ *          invalid courseType
+ *          curriculum not exists
+ *          course not exists
+ *          course already assigned to selected curriculumn
+ *
+ * @author: Yufei Liu
+ *
+ */
+router.post("/assignCourseToCurriculum", async (req, res) => {
+  const courseType = req.body.courseType;
+  const courseCode = req.body.courseCode;
+  const curriculum = req.body.curriculum;
+
+  try {
+    await courses.assignCourseToCurriculum(courseType, courseCode, curriculum);
+    res.status(200).send(true);
+  } catch (err) {
+    if (err.message === "Internal Server Error!\n") {
+      res.status(500).send(err.message);
+    } else {
+      res.status(400).send(err.message);
+    }
+  }
+});
+
 module.exports = router;
