@@ -292,5 +292,6 @@ module.exports = {
   verifyCourseOffering,
   verifyCoreq,
   verifyPrereq,
-  verifyCourseCode
+  verifyCourseCode,
+  isMcGillCourse
 };
