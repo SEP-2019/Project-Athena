@@ -8,7 +8,6 @@ const MAX_EMAIL_LENGTH = 384;
 const ID_LENGTH = 9;
 const MAX_ID = 2147483647;
 
-
 /**
  * Verifies that the input only contains alphanumeric values
  * @param {string} str
@@ -47,10 +46,10 @@ function isNumeric(str) {
  * @param {string} str
  */
 function isAlphabet(str) {
-	if (!str) {
-		return false
-	}
-	return String(str).match(/^[a-z]+$/i);
+  if (!str) {
+    return false;
+  }
+  return String(str).match(/^[a-z]+$/i);
 }
 
 /**
@@ -293,9 +292,9 @@ var verifyCourseCode = async courseCode => {
  * @param {String} title
  */
 var verifyTitle = async title => {
-  if (!title){
+  if (!title) {
     throw new Error("invalid format title");
-	}
+  }
 };
 
 /**
@@ -303,9 +302,13 @@ var verifyTitle = async title => {
  * @param {String} department
  */
 var verifyDepartmentSubName = async department => {
-	if (!department || (String(department).length !== MAX_DEPARTMENTSUBNAME_LENGTH) || !isAlphabet(department)){
-		throw new Error("invalid format department name");
-	}
+  if (
+    !department ||
+    String(department).length !== MAX_DEPARTMENTSUBNAME_LENGTH ||
+    !isAlphabet(department)
+  ) {
+    throw new Error("invalid format department name");
+  }
 };
 
 /**
@@ -313,9 +316,9 @@ var verifyDepartmentSubName = async department => {
  * @param {String} phaseOut
  */
 var verifyPhaseOut = async phaseOut => {
-	if (!phaseOut || !(String(phaseOut).match(/^[01]$/i)) ){
-		throw new Error("invalid format phased out");
-	}
+  if (!phaseOut || !String(phaseOut).match(/^[01]$/i)) {
+    throw new Error("invalid format phased out");
+  }
 };
 
 module.exports = {

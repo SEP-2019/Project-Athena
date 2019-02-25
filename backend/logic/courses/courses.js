@@ -35,6 +35,7 @@ var queryCourseByTag = async function queryCourseByTag(tag) {
  * @param {String} courseCode
  * @param {String} title
  * @param {String} departement
+ * @param {String} phasedOut
  * @returns true if successful
  * @throws error if MySQL connection failed
  *         invalid format courses if JSON format is incorrect
@@ -42,10 +43,8 @@ var queryCourseByTag = async function queryCourseByTag(tag) {
  */
 var addCourse = async (courseCode, title, departement, phasedOut) => {
   // Verifying proper format
-  console.log("logic1 " + phasedOut);
-  if (phasedOut === undefined){
+  if (phasedOut === undefined) {
     phasedOut = "0";
-    console.log("logic2 " + phasedOut);
   }
   await format.verifyCourseCode(courseCode);
   await format.verifyTitle(title);
