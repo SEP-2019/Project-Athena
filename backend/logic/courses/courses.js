@@ -30,6 +30,48 @@ var queryCourseByTag = async function queryCourseByTag(tag) {
 };
 
 /**
+ * Adds a course into the database
+ * @author Mathieu Savoie
+ * @param {String} courseCode
+ * @param {String} title
+ * @param {String} departement
+ * @param {String} phasedOut
+ * @returns true if successful
+ * @throws error if MySQL connection failed
+ *         invalid format courses if JSON format is incorrect
+ *         false if insertion failed
+ */
+var addCourse = async (courseCode, title, departement, phasedOut) => {
+  // Verifying proper format
+  if (phasedOut === undefined) {
+    phasedOut = "0";
+  }
+  await format.verifyCourseCode(courseCode);
+  await format.verifyTitle(title);
+  await format.verifyDepartmentSubName(departement);
+  await format.verifyPhaseOut(phasedOut);
+
+  // Connect to database
+  let connection = await mysql.getNewConnection();
+
+  try {
+    await connection.query("INSERT INTO courses VALUES(?, ?, ?, ?);", [
+      courseCode,
+      title,
+      departement,
+      phasedOut
+    ]);
+    return true;
+  } catch (error) {
+    connection.rollback();
+    console.error(error);
+    throw new Error(false);
+  } finally {
+    connection.release();
+  }
+};
+
+/**
  * Adds a student's completed courses into the database
  * @author Steven Li
  * @param {int} studentId
@@ -382,6 +424,7 @@ var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
 
 module.exports = {
   queryCourseByTag,
+  addCourse,
   addCompletedCourses,
   addCourseOfferings,
   getAllCourses,
