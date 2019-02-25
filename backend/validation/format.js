@@ -302,7 +302,7 @@ var verifyTitle = async title => {
  * Verifies that the department sub name is in the following format: XXXX
  * @param {String} department
  */
-var verifyDepartmentsubName = async department => {
+var verifyDepartmentSubName = async department => {
 	if (!department || (String(department).length !== MAX_DEPARTMENTSUBNAME_LENGTH) || !isAlphabet(department)){
 		throw new Error("invalid format department name");
 	}
@@ -334,6 +334,6 @@ module.exports = {
   verifyPrereq,
   verifyCourseCode,
   verifyTitle,
-  verifyDepartmentsubName,
+  verifyDepartmentSubName,
   verifyPhaseOut
 };
