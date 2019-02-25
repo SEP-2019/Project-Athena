@@ -136,7 +136,7 @@ router.post("/login", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
   try {
-    if (users.login(username, password)) {
+    if (await users.login(username, password)) {
       res.status(200).send("Authenticated");
     }
   } catch (error) {
