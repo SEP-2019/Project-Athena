@@ -131,6 +131,19 @@ router.get("/getCompletedCourses", async (req, res) => {
   return res.status(200).send(result);
 });
 
+/* Retrieve user's username and password and compare to stored values for logging in */
+router.post("/login", async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  try {
+    if (await users.login(username, password)) {
+      res.status(200).send("Authenticated");
+    }
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
 /**
  *
  * @api {get} /getStudentData
