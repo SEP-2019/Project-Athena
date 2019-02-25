@@ -42,6 +42,11 @@ var queryCourseByTag = async function queryCourseByTag(tag) {
  */
 var addCourse = async (courseCode, title, departement, phasedOut) => {
   // Verifying proper format
+  console.log("logic1 " + phasedOut);
+  if (phasedOut === undefined){
+    phasedOut = "0";
+    console.log("logic2 " + phasedOut);
+  }
   await format.verifyCourseCode(courseCode);
   await format.verifyTitle(title);
   await format.verifyDepartmentSubName(departement);
@@ -51,21 +56,19 @@ var addCourse = async (courseCode, title, departement, phasedOut) => {
   let connection = await mysql.getNewConnection();
 
   try {
-    await connection.beginTransaction();
     await connection.query("INSERT INTO courses VALUES(?, ?, ?, ?);", [
       courseCode,
       title,
       departement,
       phasedOut
     ]);
-    await connection.commit();
     return true;
   } catch (error) {
     connection.rollback();
     console.error(error);
     throw new Error(false);
   } finally {
-  connection.release();
+    connection.release();
   }
 };
 

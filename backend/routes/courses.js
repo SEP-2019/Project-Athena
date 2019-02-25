@@ -22,7 +22,7 @@ router.get("/getCourseByTag", async function(req, res, next) {
 
 /*
 * @api {post} /createCourse
-* @apiDescription This endpoint will add a course and an associated user
+* @apiDescription This endpoint will add a course
 * @apiParam (body) {string} courseCode, {string} title, {string} departement, {string} phasedOut
 * @apiExample {curl} Example usage:
 * Http: 
@@ -50,12 +50,13 @@ router.get("/getCourseByTag", async function(req, res, next) {
 *
 * @author: Mathieu Savoie
 */
-router.post('/createCourse', function(req, res, next) {
+router.post("/createCourse", function(req, res, next) {
   const courseCode = req.body.courseCode;
   const title = req.body.title;
   const departement = req.body.departement;
   const phasedOut = req.body.phasedOut;
-  courses.addCourse(courseCode, title, departement, phasedOut)
+  courses
+    .addCourse(courseCode, title, departement, phasedOut)
     .then(val => {
       res.send(val);
     })
