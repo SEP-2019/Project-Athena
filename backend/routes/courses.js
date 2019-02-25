@@ -20,6 +20,48 @@ router.get("/getCourseByTag", async function(req, res, next) {
   }
 });
 
+/*
+* @api {post} /createCourse
+* @apiDescription This endpoint will add a course and an associated user
+* @apiParam (body) {string} courseCode, {string} title, {string} departement
+* @apiExample {curl} Example usage:
+* Http: 
+	POST /courses/createCourse HTTP/1.1
+	Host: localhost:3001
+	Content-Type: application/json
+	{
+		"courseCode": "ECSE 428",
+		"title": "Software Engineering Practice",
+		"departement" : "ECSE"
+	}
+* Curl:
+	curl -X POST \
+	http://localhost:3001/courses/createCourse\
+	-H 'Content-Type: application/json' \
+	-d '{
+		"courseCode": "ECSE 428",
+		"title": "Software Engineering Practice",
+		"departement" : "ECSE"
+	}'
+*
+* @returns true if course was added successfully or false otherwise
+*
+* @author: Mathieu Savoie
+*/
+router.post('/createCourse', function(req, res, next) {
+  const courseCode = req.body.courseCode;
+  const title = req.body.title;
+  const departement = req.body.departement;
+  const phasedOut = req.body.phasedOut
+  courses.addCourse(courseCode, title, departement, phasedOut)
+    .then(val => {
+      res.send(val);
+    })
+    .catch(err => {
+      res.status(500).send(err.message);
+    });
+});
+
 /**
  * @api {post} /addCompletedCourses
  * @apiDescription This endpoint will add a student's completed courses
