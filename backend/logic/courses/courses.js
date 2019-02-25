@@ -93,7 +93,9 @@ var getAllCourses = async () => {
   let courses;
   let result;
   try {
-    result = await connection.query("SELECT * FROM courses;");
+    result = await connection.query(
+      "SELECT * FROM courses WHERE phased_out = FALSE;"
+    );
   } catch (err) {
     console.error(err);
   }
@@ -261,6 +263,23 @@ var updateCourse = async (course, newTitle, newTags) => {
   }
 };
 
+let phaseOutCourse = async courseCode => {
+  let connection = await mysql.getNewConnection();
+  try {
+    await format.verifyCourse(courseCode);
+    await connection.query(
+      "UPDATE courses SET phased_out = TRUE WHERE course_code = ?",
+      courseCode
+    );
+    return true;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
+
 module.exports = {
   queryCourseByTag,
   addCompletedCourses,
@@ -268,5 +287,6 @@ module.exports = {
   getAllCourses,
   addCoreq,
   addPrereq,
-  updateCourse
+  updateCourse,
+  phaseOutCourse
 };
