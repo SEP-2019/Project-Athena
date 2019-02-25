@@ -341,6 +341,6 @@ module.exports = {
   verifyCourseCode,
   verifyTitle,
   verifyDepartmentSubName,
-  verifyPhaseOut
+  verifyPhaseOut,
   isMcGillCourse
 };
