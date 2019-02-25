@@ -10,6 +10,7 @@ let indexRouter = require("./routes/index");
 let usersRouter = require("./routes/users");
 let coursesRouter = require("./routes/courses");
 let tagsRouter = require("./routes/tags");
+let curriculumRouter = require("./routes/curriculums");
 
 let app = express();
 
@@ -22,5 +23,6 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/courses", coursesRouter);
 app.use("/tags", tagsRouter);
+app.use("/curriculums", curriculumRouter);
 
 module.exports = app;
