@@ -1,13 +1,17 @@
 import React from 'react';
 import './HeaderBar.css';
-// import TemporaryDrawer from "../Drawer/TemporaryDrawer";
+import LeftDrawer from '../LeftDrawer/LeftDrawer';
 
-const HeaderBar = props => (
+const pages = [
+  { label: 'Course Registration', path: '/courseregistration' },
+  { label: 'Course Suggestions', path: '/home' },
+];
+const HeaderBar = () => (
   <header className="HeaderBar">
     <nav className="HeaderBar_navigation">
-      {/* <div>
-        <TemporaryDrawer />
-      </div> */}
+      <div>
+        <LeftDrawer pages={pages} />
+      </div>
       <div />
       <div className="HeaderBar_project_name">
         <a href="/">James McGill</a>

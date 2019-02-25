@@ -1,6 +1,13 @@
 const express = require("express");
 const tags = require("../logic/tags/tags");
 const router = express.Router();
+const cors = require("cors");
+router.use(cors());
+
+var corsOptions = {
+  origin: "http://localhost:3000",
+  optionsSuccessStatus: 200
+};
 
 /**
  * @api {get} /getAllTags
@@ -8,7 +15,7 @@ const router = express.Router();
  * @apiExample {curl} Example usage: GET /tags/getAllTags
  * @author: Steven Li
  */
-router.get("/getAllTags", async function(req, res, next) {
+router.get("/getAllTags", cors(corsOptions), async function(req, res, next) {
   try {
     let result = await tags.getAllTags();
     res.send(result);

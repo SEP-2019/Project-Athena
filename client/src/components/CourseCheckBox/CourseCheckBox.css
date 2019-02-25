@@ -1,0 +1,62 @@
+.course_checkbox {
+  border: 1.2px solid rgb(0, 0, 0, 0.2);
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  height: 100%;
+  position: relative;
+}
+.spacer_label {
+  top: 0;
+  left: 0;
+  width: 100%;
+  position: absolute;
+  min-height: 100%; /* for the latest browsers which support min-height */
+  height: auto !important; /* for newer IE versions */
+  height: 100%;
+  /* border: 1px solid red; */
+}
+.custom_large_checkbox {
+  margin-top: 1.4rem;
+  margin-bottom: 0.5rem;
+  margin-right: 2rem;
+  cursor: pointer;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 0;
+  right: 0;
+  background: transparent;
+  border: 1px solid #b20007;
+}
+.custom_large_checkbox:after {
+  opacity: 1;
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 8px;
+  background: transparent;
+  top: 2px;
+  right: 3px;
+  border: 1px solid white;
+  border-top: none;
+  border-right: none;
+
+  transform: rotate(-48deg);
+}
+
+.custom_large_checkbox:hover::after {
+  opacity: 0.5;
+}
+
+.course_checkbox input[type='checkbox']:checked ~ .custom_large_checkbox {
+  background: #b20007;
+}
+
+.course_checkbox input[type='checkbox']:checked ~ .spacer_label {
+  background: rgb(178, 0, 7, 0.3);
+}
+
+.checkbox_label {
+  padding-left: 1.5rem;
+  font-weight: 500;
+}

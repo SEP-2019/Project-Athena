@@ -3,6 +3,7 @@ let path = require("path");
 let cookieParser = require("cookie-parser");
 let logger = require("morgan");
 let bodyParser = require("body-parser");
+let cors = require("cors");
 require("dotenv").config();
 
 let indexRouter = require("./routes/index");
