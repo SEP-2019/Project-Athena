@@ -1,0 +1,34 @@
+.item {
+  border: 1px solid #8d8d8d;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  font-size: 0.7em;
+  background-color: #ffffff;
+}
+
+.item:last-child {
+  border-bottom: 1px solid #8d8d8d;
+}
+
+.item-divider {
+  display: flex;
+  align-items: center;
+}
+
+.course-title {
+  font-weight: normal;
+  margin-left: 5px;
+}
+
+.cancel {
+  width: 15px;
+  height: 15px;
+  margin-left: 15px;
+}
+
+.cancel:hover {
+  cursor: pointer;
+}

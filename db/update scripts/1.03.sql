@@ -1,0 +1,6 @@
+SET SQL_SAFE_UPDATES
+= 0;
+UPDATE courses SET phased_out=0 WHERE phased_out IS NULL;
+ALTER TABLE courses MODIFY COLUMN phased_out BOOLEAN NOT NULL default '0';
+SET SQL_SAFE_UPDATES
+= 1;

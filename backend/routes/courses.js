@@ -1,6 +1,13 @@
 const express = require("express");
 const courses = require("../logic/courses/courses");
 const router = express.Router();
+const cors = require("cors");
+router.use(cors());
+
+var corsOptions = {
+  origin: "http://localhost:3000",
+  optionsSuccessStatus: 200
+};
 
 /**
  * @api {get} /getCourseByTag
@@ -9,7 +16,11 @@ const router = express.Router();
  * @apiExample {curl} Example usage: GET /courses/getCourseByTag?tag=engineering
  * @author: Alex Lam
  */
-router.get("/getCourseByTag", async function(req, res, next) {
+router.get("/getCourseByTag", cors(corsOptions), async function(
+  req,
+  res,
+  next
+) {
   try {
     let tag = req.query.tag;
     let result = await courses.queryCourseByTag(tag);
@@ -140,12 +151,223 @@ router.post("/addCourseOfferings", async (req, res, next) => {
  * @apiExample {curl} Example usage: GET /courses/getAllCourses
  * @author: Steven Li
  */
-router.get("/getAllCourses", async (req, res, next) => {
+router.get("/getAllCourses", cors(corsOptions), async (req, res, next) => {
   try {
     let result = await courses.getAllCourses();
     res.status(200).send(result);
   } catch (err) {
     res.status(500).send(err.message);
+  }
+});
+
+/**
+ * @api {post} /addCoreq
+ * @apiDescription This endpoint will add coreqs
+ * @apiExample {curl} Example usage:
+ * Http:
+ *	POST /courses/addCoreq HTTP/1.1
+ *	Host: localhost:3001
+ *	Content-Type: application/json
+ *	   {
+ *       "coreq": {
+ *         "ECSE 428": ["ECSE 321"]
+ *         "MATH 270": ["MATH 140", "MATH 200"]
+ *       }
+ *     }
+ * Curl:
+ *	curl -X POST \
+ *	http://localhost:3001/courses/addCoreq
+ *	-H 'Content-Type: application/json' \
+ *	-d '{
+ *       "coreq": {
+ *         "ECSE 428": ["ECSE 321"],
+ *         "MATH 270": ["MATH 140", "MATH 200"]
+ *       }
+ *     }'
+ *
+ * @returns true if courses were added successfully
+ *          false if courses were not added
+ *          invalid format coreq if the coreq format is invalid
+ *          database connection handling
+ *
+ * @author: Steven Li
+ */
+router.post("/addCoreq", async (req, res, next) => {
+  let coreqJSON;
+  try {
+    coreqJSON = JSON.parse(req.body.coreq);
+  } catch (err) {
+    res.status(400).send("invalid format coreq");
+    return;
+  }
+
+  try {
+    let result = await courses.addCoreq(coreqJSON);
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+/**
+ * @api {post} /addPrereq
+ * @apiDescription This endpoint will add prereqs
+ * @apiExample {curl} Example usage:
+ * Http:
+ *	POST /courses/addPrereq HTTP/1.1
+ *	Host: localhost:3001
+ *	Content-Type: application/json
+ *	   {
+ *       "prereq": {
+ *         "ECSE 428": ["ECSE 321"]
+ *         "MATH 270": ["MATH 140", "MATH 200"]
+ *       }
+ *     }
+ * Curl:
+ *	curl -X POST \
+ *	http://localhost:3001/courses/addPrereq
+ *	-H 'Content-Type: application/json' \
+ *	-d '{
+ *       "prereq": {
+ *         "ECSE 428": ["ECSE 321"],
+ *         "MATH 270": ["MATH 140", "MATH 200"]
+ *       }
+ *     }'
+ *
+ * @returns true if courses were added successfully
+ *          false if courses were not added
+ *          invalid format prereq if the prereq format is invalid
+ *          database connection handling
+ *
+ * @author: Steven Li
+ */
+router.post("/addPrereq", async (req, res, next) => {
+  let prereqJSON;
+  try {
+    prereqJSON = JSON.parse(req.body.prereq);
+  } catch (err) {
+    res.status(400).send("invalid format prereq");
+    return;
+  }
+
+  try {
+    let result = await courses.addPrereq(prereqJSON);
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+/**
+ * @api {post} /updateCourse
+ * @apiDescription This endpoint will update a course title and its
+ *                 associate tags
+ * @apiExample {curl} Example usage:
+ * Http:
+ *	POST /courses/updateCourse HTTP/1.1
+ *	Host: localhost:3001
+ *	Content-Type: application/json
+ *	   {
+ *       "course": "ECSE 428",
+ *       "new_title": "Software Engineering in Practice",
+ *       "new_tags": ["Software", "Engineering"]
+ *     }
+ * Curl:
+ *	curl -X POST \
+ *	http://localhost:3001/courses/updateCourse
+ *	-H 'Content-Type: application/json' \
+ *	-d '{
+ *       "course": "ECSE 428",
+ *       "new_title": "Software Engineering in Practice",
+ *       "new_tags": ["Software", "Engineering"]
+ *     }'
+ *
+ * @returns true if courses were added successfully
+ *          false if courses were not added
+ *          invalid format course code if the course code is invalid
+ *          invalid format tags if the list of tags is invalid
+ *          database connection handling
+ *
+ * @author: Steven Li
+ */
+router.post("/updateCourse", async (req, res, next) => {
+  let course = req.body.course;
+  let newTitle = req.body.new_title;
+  let newTagsJSON;
+  try {
+    newTagsJSON = JSON.parse(req.body.new_tags);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+    return;
+  }
+
+  try {
+    let result = await courses.updateCourse(course, newTitle, newTagsJSON);
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+/**
+ * @api {post} /phaseOutCourses
+ * @apiDescription phases out a current course (no longer offered)
+ * @apiExample (http) 
+        POST /courses/phaseOutCourse
+        Host: localhost:3001
+        Content-Type: application/json
+        {
+          "course_code" : "ECSE 428"
+        }
+ * @Returns true if successful
+ * @throws error if MySQL connection failed
+ *         invalid format course code if course code format is incorrect
+ * @author: Alex Lam
+ */
+router.post("/phaseOutCourse", async (req, res, next) => {
+  try {
+    let result = await courses.phaseOutCourse(req.body.course_code);
+    res.send(result);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+/**
+ *
+ * @api {post} /assignCourseToCurriculum
+ * @apiDescription assign a course to a courseType (core, techComp, complementaries)
+ * @apiParam (body) {string} courseType, {string} courseCode, {string} curriculum
+ * @apiExample {curl} Example usage:
+ *	curl -X POST \
+ *  -H 'Content-Type: application/json' \
+ *  -d '{"courseType": "core", "courseCode": "ECSE 428", "curriculum": "ee"}' \
+ *  http://localhost:3001/courses/assignCourseToCurriculum
+ *
+ * @returns True on success
+ *          invalid courseType
+ *          curriculum not exists
+ *          course not exists
+ *          course already assigned to selected curriculumn
+ *
+ * @author: Yufei Liu
+ *
+ */
+router.post("/assignCourseToCurriculum", async (req, res) => {
+  const courseType = req.body.courseType;
+  const courseCode = req.body.courseCode;
+  const curriculum = req.body.curriculum;
+
+  try {
+    await courses.assignCourseToCurriculum(courseType, courseCode, curriculum);
+    res.status(200).send(true);
+  } catch (err) {
+    if (err.message === "Internal Server Error!\n") {
+      res.status(500).send(err.message);
+    } else {
+      res.status(400).send(err.message);
+    }
   }
 });
 

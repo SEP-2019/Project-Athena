@@ -5,3 +5,56 @@
 .instruction {
   margin: 20px 25px;
 }
+
+.content {
+  display: flex;
+}
+
+.selection-side {
+  flex: 1 1 0;
+  margin: 0 25px;
+}
+
+.selection-semester {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.selection-dropdown {
+  background-color: #b20007;
+  color: white;
+  font-weight: normal;
+  font-size: 0.7em;
+  padding: 10px 80px;
+  border-radius: 2px;
+}
+
+.selection-course {
+  display: flex;
+}
+
+.selection-search {
+  flex-grow: 1;
+}
+
+.selection-button {
+  margin-left: 20px;
+  padding: 10px 25px;
+  background-color: #b20007;
+  color: white;
+  border-radius: 5px;
+}
+
+.selected-side {
+  list-style-type: none;
+  padding: 0;
+  flex: 1 1 0;
+  margin: 0 25px;
+}
+
+.select {
+  flex-grow: 1;
+  margin-left: 20px;
+}
