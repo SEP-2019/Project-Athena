@@ -2,10 +2,12 @@ const MAX_USERNAME_LENGTH = 64;
 const MAX_PASSWORD_LENGTH = 64;
 const MAX_CURR_NAME_LENGTH = 128;
 const MAX_DEPARTMENT_LENGTH = 256;
+const MAX_DEPARTMENTSUBNAME_LENGTH = 4;
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_EMAIL_LENGTH = 384;
 const ID_LENGTH = 9;
 const MAX_ID = 2147483647;
+
 
 /**
  * Verifies that the input only contains alphanumeric values
@@ -38,6 +40,17 @@ function isNumeric(str) {
     return false;
   }
   return String(str).match(/^[0-9]*$/);
+}
+
+/**
+ * Verifies that the input only contains alphabet values
+ * @param {string} str
+ */
+function isAlphabet(str) {
+	if (!str) {
+		return false
+	}
+	return String(str).match(/^[a-z]+$/i);
 }
 
 /**
@@ -275,6 +288,36 @@ var verifyCourseCode = async courseCode => {
   }
 };
 
+/**
+ * Verifies that the title is not null
+ * @param {String} title
+ */
+var verifyTitle = async title => {
+  if (!title){
+		throw new Error("invalid format title");
+	}
+};
+
+/**
+ * Verifies that the department sub name is in the following format: XXXX
+ * @param {String} department
+ */
+var verifyDepartmentsubName = async department => {
+	if (!department || (String(department).length !== MAX_DEPARTMENTSUBNAME_LENGTH) || !isAlphabet(department)){
+		throw new Error("invalid format department name");
+	}
+};
+
+/**
+ * Verifies that the phased_out is either 0 or 1
+ * @param {String} phaseOut
+ */
+var verifyPhaseOut = async phaseOut => {
+	if (!phaseOut || !(String(phaseOut).match(/^[01]$/i)) ){
+		throw new Error("invalid format phased out");
+	}
+};
+
 module.exports = {
   verifyUsername,
   verifyPassword,
@@ -289,5 +332,8 @@ module.exports = {
   verifyCourseOffering,
   verifyCoreq,
   verifyPrereq,
-  verifyCourseCode
+  verifyCourseCode,
+  verifyTitle,
+  verifyDepartmentsubName,
+  verifyPhaseOut
 };
