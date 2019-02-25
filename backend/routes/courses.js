@@ -110,6 +110,7 @@ router.post("/addCompletedCourses", async (req, res, next) => {
  *
  * @returns true if courses were added successfully
  *          false if courses were not added
+ *          invalid format id if student_id format is not valid
  *          invalid format courses if the course format is not valid
  *          database connection handling
  *
@@ -295,6 +296,30 @@ router.post("/updateCourse", async (req, res, next) => {
     res.status(200).send(result);
   } catch (err) {
     res.status(500).send(err.message);
+  }
+});
+
+/**
+ * @api {post} /phaseOutCourses
+ * @apiDescription phases out a current course (no longer offered)
+ * @apiExample (http) 
+        POST /courses/phaseOutCourse
+        Host: localhost:3001
+        Content-Type: application/json
+        {
+          "course_code" : "ECSE 428"
+        }
+ * @Returns true if successful
+ * @throws error if MySQL connection failed
+ *         invalid format course code if course code format is incorrect
+ * @author: Alex Lam
+ */
+router.post("/phaseOutCourse", async (req, res, next) => {
+  try {
+    let result = await courses.phaseOutCourse(req.body.course_code);
+    res.send(result);
+  } catch (error) {
+    res.status(500).send(error.message);
   }
 });
 

@@ -154,6 +154,9 @@ var verifyNumOfElectives = numOfElectives => {
  *       }
  */
 var verifyCourse = async courses => {
+  if (!courses) {
+    throw new Error("Courses cannot be empty");
+  }
   let error = "invalid format courses";
   for (let course in courses) {
     if (!isMcGillCourse(course)) {

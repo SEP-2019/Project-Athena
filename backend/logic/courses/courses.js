@@ -93,7 +93,9 @@ var getAllCourses = async () => {
   let courses;
   let result;
   try {
-    result = await connection.query("SELECT * FROM courses;");
+    result = await connection.query(
+      "SELECT * FROM courses WHERE phased_out = FALSE;"
+    );
   } catch (err) {
     console.error(err);
   }
@@ -261,6 +263,32 @@ var updateCourse = async (course, newTitle, newTags) => {
   }
 };
 
+/**
+ * Phases out a course that is no longer offered
+ * @author Alex Lam
+ * @param {string} courseCode
+ * @returns true if successful
+ * @throws error if MySQL connection failed
+ *         invalid format course code if course code format is incorrect
+ */
+let phaseOutCourse = async courseCode => {
+  let connection = await mysql.getNewConnection();
+  await format.verifyCourseCode(courseCode);
+
+  try {
+    await connection.query(
+      "UPDATE courses SET phased_out = TRUE WHERE course_code = ?",
+      courseCode
+    );
+    return true;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Internal server error");
+  } finally {
+    connection.release();
+  }
+};
+
 module.exports = {
   queryCourseByTag,
   addCompletedCourses,
@@ -268,5 +296,6 @@ module.exports = {
   getAllCourses,
   addCoreq,
   addPrereq,
-  updateCourse
+  updateCourse,
+  phaseOutCourse
 };
