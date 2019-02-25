@@ -135,7 +135,9 @@ var getAllCourses = async () => {
   let courses;
   let result;
   try {
-    result = await connection.query("SELECT * FROM courses;");
+    result = await connection.query(
+      "SELECT * FROM courses WHERE phased_out = FALSE;"
+    );
   } catch (err) {
     console.error(err);
   }
@@ -303,6 +305,123 @@ var updateCourse = async (course, newTitle, newTags) => {
   }
 };
 
+/**
+ * Phases out a course that is no longer offered
+ * @author Alex Lam
+ * @param {string} courseCode
+ * @returns true if successful
+ * @throws error if MySQL connection failed
+ *         invalid format course code if course code format is incorrect
+ */
+let phaseOutCourse = async courseCode => {
+  let connection = await mysql.getNewConnection();
+  await format.verifyCourseCode(courseCode);
+
+  try {
+    await connection.query(
+      "UPDATE courses SET phased_out = TRUE WHERE course_code = ?",
+      courseCode
+    );
+    return true;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Internal server error");
+  } finally {
+    connection.release();
+  }
+};
+
+/**
+ * Assign a course to a curriculum
+ * @author Yufei Liu
+ * @param {string} courseType,{string} courseCode,{string} curriculum
+ * @returns true if successful
+ * @throws error if courseType, courseCode or curriculum dose not exist
+ *         course already assigned a curriculum
+ *
+ */
+var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
+  if (!format.isMcGillCourse(courseCode)) {
+    throw Error("Invalid course format!\n");
+  }
+
+  let conn = await mysql.getNewConnection();
+
+  const checkExistQuery = `SELECT COUNT(*) AS count
+  FROM (
+      SELECT course_code, curriculum_name FROM curriculum_tech_comps
+      union all
+      SELECT course_code, curriculum_name FROM curriculum_complementaries
+      union all
+      SELECT course_code, curriculum_name FROM curriculum_core_classes
+  ) a
+  WHERE course_code = ? AND curriculum_name = ?;`;
+
+  // Check if the course has already been assigned, verify if curriculum type, course and curriculum are existed in DB
+  let ifAssigned;
+  let checkCourse;
+  let checkCurriculum;
+
+  try {
+    ifAssigned = await conn.query(checkExistQuery, [courseCode, curriculum]);
+    checkCourse = await conn.query(
+      "SELECT COUNT(*) AS count FROM courses WHERE course_code = ?",
+      [courseCode]
+    );
+    checkCurriculum = await conn.query(
+      "SELECT COUNT(*) AS count FROM curriculums WHERE curriculum_name = ?",
+      [curriculum]
+    );
+  } catch (err) {
+    console.log(err);
+    conn.release();
+    throw Error("Internal Server Error!\n");
+  }
+
+  if (ifAssigned[0].count !== 0) {
+    throw Error(
+      `Course ${courseCode} has already been added to ${curriculum}!\n`
+    );
+  }
+  if (checkCourse[0].count === 0) {
+    throw Error(`Course ${courseCode} does not exist!\n`);
+  }
+  if (checkCurriculum[0].count === 0) {
+    throw Error(`Curriculum ${curriculum} does not exist!\n`);
+  }
+
+  const coreTable = "curriculum_core_classes";
+  const techCompTable = "curriculum_tech_comps";
+  const compTable = "curriculum_complementaries";
+  let tableType = "";
+
+  if (courseType === "core") {
+    tableType = coreTable;
+  } else if (courseType === "techComp") {
+    tableType = techCompTable;
+  } else if (courseType === "complementaries") {
+    tableType = compTable;
+  } else {
+    throw Error("Invalid curriculum type!\n");
+  }
+
+  const query = `INSERT INTO  ${tableType} (curriculum_name, course_code)
+                VALUE (?, ?);`;
+
+  try {
+    await conn.beginTransaction();
+    await conn.query(query, [curriculum, courseCode]);
+
+    await conn.commit();
+  } catch (err) {
+    await conn.rollback();
+    console.log(err);
+    throw Error("Internal Server Error!\n");
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   queryCourseByTag,
   addCourse,
@@ -311,5 +430,7 @@ module.exports = {
   getAllCourses,
   addCoreq,
   addPrereq,
-  updateCourse
+  updateCourse,
+  phaseOutCourse,
+  assignCourseToCurriculum
 };

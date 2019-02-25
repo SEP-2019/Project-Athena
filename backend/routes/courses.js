@@ -1,6 +1,13 @@
 const express = require("express");
 const courses = require("../logic/courses/courses");
 const router = express.Router();
+const cors = require("cors");
+router.use(cors());
+
+var corsOptions = {
+  origin: "http://localhost:3000",
+  optionsSuccessStatus: 200
+};
 
 /**
  * @api {get} /getCourseByTag
@@ -9,7 +16,11 @@ const router = express.Router();
  * @apiExample {curl} Example usage: GET /courses/getCourseByTag?tag=engineering
  * @author: Alex Lam
  */
-router.get("/getCourseByTag", async function(req, res, next) {
+router.get("/getCourseByTag", cors(corsOptions), async function(
+  req,
+  res,
+  next
+) {
   try {
     let tag = req.query.tag;
     let result = await courses.queryCourseByTag(tag);
@@ -155,6 +166,7 @@ router.post("/addCompletedCourses", async (req, res, next) => {
  *
  * @returns true if courses were added successfully
  *          false if courses were not added
+ *          invalid format id if student_id format is not valid
  *          invalid format courses if the course format is not valid
  *          database connection handling
  *
@@ -184,7 +196,7 @@ router.post("/addCourseOfferings", async (req, res, next) => {
  * @apiExample {curl} Example usage: GET /courses/getAllCourses
  * @author: Steven Li
  */
-router.get("/getAllCourses", async (req, res, next) => {
+router.get("/getAllCourses", cors(corsOptions), async (req, res, next) => {
   try {
     let result = await courses.getAllCourses();
     res.status(200).send(result);
@@ -340,6 +352,67 @@ router.post("/updateCourse", async (req, res, next) => {
     res.status(200).send(result);
   } catch (err) {
     res.status(500).send(err.message);
+  }
+});
+
+/**
+ * @api {post} /phaseOutCourses
+ * @apiDescription phases out a current course (no longer offered)
+ * @apiExample (http) 
+        POST /courses/phaseOutCourse
+        Host: localhost:3001
+        Content-Type: application/json
+        {
+          "course_code" : "ECSE 428"
+        }
+ * @Returns true if successful
+ * @throws error if MySQL connection failed
+ *         invalid format course code if course code format is incorrect
+ * @author: Alex Lam
+ */
+router.post("/phaseOutCourse", async (req, res, next) => {
+  try {
+    let result = await courses.phaseOutCourse(req.body.course_code);
+    res.send(result);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+/**
+ *
+ * @api {post} /assignCourseToCurriculum
+ * @apiDescription assign a course to a courseType (core, techComp, complementaries)
+ * @apiParam (body) {string} courseType, {string} courseCode, {string} curriculum
+ * @apiExample {curl} Example usage:
+ *	curl -X POST \
+ *  -H 'Content-Type: application/json' \
+ *  -d '{"courseType": "core", "courseCode": "ECSE 428", "curriculum": "ee"}' \
+ *  http://localhost:3001/courses/assignCourseToCurriculum
+ *
+ * @returns True on success
+ *          invalid courseType
+ *          curriculum not exists
+ *          course not exists
+ *          course already assigned to selected curriculumn
+ *
+ * @author: Yufei Liu
+ *
+ */
+router.post("/assignCourseToCurriculum", async (req, res) => {
+  const courseType = req.body.courseType;
+  const courseCode = req.body.courseCode;
+  const curriculum = req.body.curriculum;
+
+  try {
+    await courses.assignCourseToCurriculum(courseType, courseCode, curriculum);
+    res.status(200).send(true);
+  } catch (err) {
+    if (err.message === "Internal Server Error!\n") {
+      res.status(500).send(err.message);
+    } else {
+      res.status(400).send(err.message);
+    }
   }
 });
 
