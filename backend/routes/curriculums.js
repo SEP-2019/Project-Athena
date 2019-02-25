@@ -6,7 +6,17 @@ const router = express.Router();
  * @api {get} /getCurriculum
  * @apiDescription gets a curriculum's courses from its name
  * @apiExample {curl} Example usage: GET /curriculums/getCurriculum?name=...
- * @author: Feras Al Taha
+ * @author Feras Al Taha and Alex Lam
+ * @Returns :
+ *    {
+ *        "curriculum_name": "eeElectrical Engineering-2018-2019-8-semester-curriculum",
+ *        "type": "8-semester-curriculum",
+ *        "department": "ee",
+ *        "numOfElectives": 0,
+ *        "core_classes": [{course_code: "exm 123"}, {"course_code": "exm 456"}, ..],
+ *        "tech_comps": [...],
+ *        "complementaries": [...]
+ *    }
  */
 router.get("/getCurriculum", async (req, res, next) => {
   try {

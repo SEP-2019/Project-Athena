@@ -2,38 +2,52 @@ const mysql = require("../../sql/connection");
 const format = require("../../validation/format");
 
 /**
- * Returns a curriculum and its associated courses from the database
- * @author Feras Al Taha
+ * @Returns a curriculum and its associated courses from the database
+ * @author Feras Al Taha and Alex Lam
  * @returns a curriculum and its core classes & tech comps from the database in JSON format
  * @throws error if MySQL connection failed
  */
 var getCurriculum = async function(name) {
+  if (!name) {
+    throw Error("Name cannot be empty");
+  }
+
   let connection = await mysql.getNewConnection();
-  let curriculum, core_classes, tech_comps;
+
   try {
-    curriculum = await connection.query(
-      "SELECT * FROM curriculums WHERE name=?;",
+    let curriculum = await connection.query(
+      "SELECT * FROM curriculums WHERE curriculum_name=?;",
       name
     );
 
-    core_classes = await connection.query(
+    let core_classes = await connection.query(
       "SELECT course_code FROM curriculum_core_classes WHERE curriculum_name=?;",
       name
     );
 
-    tech_comps = await connection.query(
+    let tech_comps = await connection.query(
       "SELECT course_code FROM curriculum_tech_comps WHERE curriculum_name=?;",
       name
     );
 
-    //TODO: In addition to curriculum object, 
-    // need to add attribute for having list of core classes and list of tech compes
-    // {name: "EE ...", type: "Major", ..., core_classes: [{course_code:"ECSE 362"},{...}], tech_comps: [...]}
-    // Can use same format that Tyrone used in his script
+    let complementaries = await connection.query(
+      "SELECT course_code FROM curriculum_complementaries WHERE curriculum_name=?;",
+      name
+    );
+
+    curriculum = JSON.parse(JSON.stringify(curriculum[0]));
+    core_classes = JSON.parse(JSON.stringify(core_classes));
+    tech_comps = JSON.parse(JSON.stringify(tech_comps));
+    complementaries = JSON.parse(JSON.stringify(complementaries));
+
+    curriculum.core_classes = core_classes;
+    curriculum.tech_comps = tech_comps;
+    curriculum.complementaries = complementaries;
 
     return curriculum;
   } catch (err) {
     console.error(err);
+    throw Error("Internal server error");
   } finally {
     connection.release();
   }
