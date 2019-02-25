@@ -24,14 +24,9 @@ class CourseTable extends Component {
 
     constructor(props) {
         super(props);
-
-        console.log(props.children);
-
         this.state = {
             courses: props.children,
         }
-
-        console.log(this.state)
     }
 
 
