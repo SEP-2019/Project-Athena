@@ -5,6 +5,7 @@ import LeftDrawer from '../LeftDrawer/LeftDrawer';
 const pages = [
   { label: 'Course Registration', path: '/courseregistration' },
   { label: 'Course Suggestions', path: '/home' },
+  { label: 'Curriculum', path: '/curriculumdisplay' },
 ];
 const HeaderBar = () => (
   <header className="HeaderBar">
