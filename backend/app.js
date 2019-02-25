@@ -2,7 +2,7 @@ let express = require("express");
 let path = require("path");
 let cookieParser = require("cookie-parser");
 let logger = require("morgan");
-let passport = require("passport");
+//let passport = require("passport");
 let bodyParser = require("body-parser");
 let cors = require("cors");
 require("dotenv").config();
@@ -35,7 +35,4 @@ app.use("/tags", tagsRouter);
 app.use("/curriculums", curriculumRouter);
 
 
-module.exports = {
-  app,
-  passport
-};
+module.exports = app;
