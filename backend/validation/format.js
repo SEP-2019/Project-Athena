@@ -294,7 +294,7 @@ var verifyCourseCode = async courseCode => {
  */
 var verifyTitle = async title => {
   if (!title){
-		throw new Error("invalid format title");
+    throw new Error("invalid format title");
 	}
 };
 
