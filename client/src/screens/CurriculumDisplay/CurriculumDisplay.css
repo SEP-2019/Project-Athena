@@ -1,0 +1,32 @@
+div.curriculum-display{
+  padding: 24px 32px 24px 32px ;
+}
+
+div.page-header{
+  font-weight: bold;
+  font-size: 36px;
+}
+
+div.curriculum-selection-menu{
+  padding: 12px 0px 24px 0px ;
+}
+
+div.dropdown-section{
+  padding: 0px 16px 0px 0px;
+  float: left;
+}
+
+div.curriculum-content{
+  float: none;
+}
+
+div.semester-course-display{
+  padding: 12px 0px 12px 0px ;
+}
+
+div.semester-name{
+  padding: 0px 0px 12px 0px ;
+  font-weight: bold;
+  font-size: 24px;
+  color: black;
+}
