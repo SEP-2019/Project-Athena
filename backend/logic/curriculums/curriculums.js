@@ -2,30 +2,41 @@ const mysql = require("../../sql/connection");
 const format = require("../../validation/format");
 
 /**
- * Returns all available courses from the database
- * @author Steven Li
- * @returns a list of available courses from the database in JSON format
+ * Returns a curriculum and its associated courses from the database
+ * @author Feras Al Taha
+ * @returns a curriculum and its core classes & tech comps from the database in JSON format
  * @throws error if MySQL connection failed
  */
 var getCurriculum = async function(name) {
   let connection = await mysql.getNewConnection();
-  let curriculum;
-  let result;
+  let curriculum, core_classes, tech_comps;
   try {
-    result = await connection.query(
+    curriculum = await connection.query(
       "SELECT * FROM curriculums WHERE name=?;",
       name
     );
-    connection.release();
-  } catch (err) {
-    connection.release();
-    console.error(err);
-  }
 
-  if (result) {
-    courses = result;
+    core_classes = await connection.query(
+      "SELECT course_code FROM curriculum_core_classes WHERE curriculum_name=?;",
+      name
+    );
+
+    tech_comps = await connection.query(
+      "SELECT course_code FROM curriculum_tech_comps WHERE curriculum_name=?;",
+      name
+    );
+
+    //TODO: In addition to curriculum object, 
+    // need to add attribute for having list of core classes and list of tech compes
+    // {name: "EE ...", type: "Major", ..., core_classes: [{course_code:"ECSE 362"},{...}], tech_comps: [...]}
+    // Can use same format that Tyrone used in his script
+
+    return curriculum;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    connection.release();
   }
-  return courses;
 };
 
 var createCurriculum = async (

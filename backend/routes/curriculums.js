@@ -5,7 +5,7 @@ const router = express.Router();
 /**
  * @api {get} /getCurriculum
  * @apiDescription gets a curriculum's courses from its name
- * @apiExample {curl} Example usage: GET /curriculums/getCurriculum
+ * @apiExample {curl} Example usage: GET /curriculums/getCurriculum?name=...
  * @author: Feras Al Taha
  */
 router.get("/getCurriculum", async (req, res, next) => {
