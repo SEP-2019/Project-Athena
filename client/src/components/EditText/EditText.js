@@ -1,20 +1,49 @@
-import React, { Component } from 'react';
+import React from 'react';
 import TextField from '@material-ui/core/TextField';
 
-class EditText extends Component {
-  render() {
-    return (
+import PropTypes from 'prop-types';
+import {
+  withStyles,
+  MuiThemeProvider,
+  createMuiTheme,
+} from '@material-ui/core/styles';
+
+const styles = theme => ({
+  root: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+});
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#000',
+    },
+  },
+  typography: { useNextVariants: true },
+});
+
+function CustomizedInputs(props) {
+  const { classes } = props;
+  return (
+    <MuiThemeProvider theme={theme}>
       <TextField
-        id={this.props.id}
-        label={this.props.label}
-        type={this.props.type}
-        name={this.props.type}
-        autoComplete={this.props.type}
+        className={classes.margin}
+        id={props.id}
+        label={props.label}
+        type={props.type}
+        name={props.type}
+        autoComplete={props.type}
         margin="normal"
         variant="outlined"
       />
-    );
-  }
+    </MuiThemeProvider>
+  );
 }
 
-export default EditText;
+CustomizedInputs.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(CustomizedInputs);
