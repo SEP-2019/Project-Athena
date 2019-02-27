@@ -12,6 +12,7 @@ const styles = theme => ({
   root: {
     display: 'flex',
     flexWrap: 'wrap',
+    background: 'white',
   },
 });
 
@@ -29,7 +30,7 @@ function CustomizedInputs(props) {
   return (
     <MuiThemeProvider theme={theme}>
       <TextField
-        className={classes.margin}
+        className={classes.root}
         id={props.id}
         label={props.label}
         type={props.type}
