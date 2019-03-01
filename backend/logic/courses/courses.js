@@ -315,7 +315,7 @@ var updateCourse = async (course, newTitle, newTags) => {
  */
 let phaseOutCourse = async courseCode => {
   let connection = await mysql.getNewConnection();
-  await format.verifyCourseCode(courseCode);
+  format.verifyCourseCode(courseCode);
 
   try {
     await connection.query(
@@ -341,9 +341,7 @@ let phaseOutCourse = async courseCode => {
  *
  */
 var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
-  if (!format.isMcGillCourse(courseCode)) {
-    throw Error("Invalid course format!\n");
-  }
+  format.verifyCourseCode(courseCode);
 
   let conn = await mysql.getNewConnection();
 

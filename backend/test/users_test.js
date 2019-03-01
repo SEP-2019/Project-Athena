@@ -1,8 +1,10 @@
 const mocha = require("mocha");
 const users = require("../logic/users/users.js");
+const courses = require("../logic/courses/courses");
 const assert = require("assert");
 const nock = require("nock");
 const mysql = require("../sql/connection");
+const expect = require("chai").expect;
 
 /*
 const host = 'http://localhost:3000';
@@ -623,8 +625,8 @@ describe("Tests add admin user", function() {
   });
 });
 
-describe("Test retrieve student data", function() {
-  it("responds with valid", async function() {
+describe("Test retrieve student data", () => {
+  it("responds with valid", async () => {
     connection = await mysql.getNewConnection();
     await connection.query(
       `INSERT INTO courses (course_code,title, department) VALUES (?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,
@@ -646,6 +648,7 @@ describe("Test retrieve student data", function() {
       `INSERT INTO student_course_offerings (student_id,offering_id,semester) VALUES (?,?,?);`,
       [123321123, 321123, "winter"]
     );
+    await connection.release();
     return users.getStudentData(123321123).then(function(res) {
       let found = false;
       let searchingFor = {
@@ -658,5 +661,68 @@ describe("Test retrieve student data", function() {
       }
       assert(true, found);
     });
+  });
+});
+
+describe("Test get student completed courses", () => {
+  // initialize test data
+  before(async () => {
+    await courses.addCourse(
+      "TEST 001",
+      "Get completed Course Test",
+      "TEST",
+      "0"
+    );
+
+    const courseOffering = {
+      "TEST 001": [
+        {
+          id: 940915,
+          semester: "W2017",
+          section: 1,
+          scheduled_time: "M 10:05-13:35 T 10:35-11:35 F 14:05-16:05"
+        }
+      ]
+    };
+    await courses.addCourseOfferings(courseOffering);
+
+    await users.insertStudentUser(
+      "getCompletedCourseTest",
+      "getCompletedCourseTest",
+      "getCompletedCourseTest@email.com",
+      260561054
+    );
+
+    const conn = await mysql.getNewConnection();
+    await conn.query(
+      `INSERT INTO student_course_offerings (student_id, offering_id, semester)
+    VALUES(?, ?, ?);`,
+      [260561054, 940915, "W2017"]
+    );
+
+    await conn.release();
+  });
+
+  // clean up test data
+  after(async () => {
+    const conn = await mysql.getNewConnection();
+    await conn.query(
+      `DELETE FROM student_course_offerings WHERE student_id = ?;`,
+      [260561054]
+    );
+    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [940915]);
+    await conn.query(`DELETE FROM courses WHERE course_code = ?;`, [
+      "TEST 001"
+    ]);
+    await users.deleteStudentUser("getCompletedCourseTest");
+
+    await conn.release();
+  });
+
+  it("returns student completed course as JSON", async () => {
+    const expected = [{ course_code: "TEST 001", semester: "W2017" }];
+    const res = await users.getCompletedCourses(260561054);
+
+    assert.equal(JSON.stringify(expected), res);
   });
 });

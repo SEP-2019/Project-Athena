@@ -165,7 +165,7 @@ var verifyNumOfElectives = numOfElectives => {
  *                      {"semester": "W2018", "section": 3}]
  *       }
  */
-var verifyCourse = async courses => {
+var verifyCourse = courses => {
   if (!courses) {
     throw new Error("Courses cannot be empty");
   }
@@ -215,7 +215,7 @@ function isMcGillSemester(semester) {
  *                      {"id": 25993, "semester": "W2018", "section": 3, "scheduled_time": "M 10:05-11:05 W 10:05-11:05 T 10:05-11:05"}]
  *       }
  */
-var verifyCourseOffering = async courseOfferings => {
+var verifyCourseOffering = courseOfferings => {
   let error = "invalid format course offerings";
   for (let course in courseOfferings) {
     if (!isMcGillCourse(course)) {
@@ -242,7 +242,7 @@ var verifyCourseOffering = async courseOfferings => {
  *          "MATH 270": ["MATH 140", "MATH 240"]
  *        }
  */
-var verifyCoreq = async coreqs => {
+var verifyCoreq = coreqs => {
   let error = "invalid format coreq";
   for (let course in coreqs) {
     if (!isMcGillCourse(course)) {
@@ -265,7 +265,7 @@ var verifyCoreq = async coreqs => {
  *          "MATH 270": ["MATH 140", "MATH 240"]
  *        }
  */
-var verifyPrereq = async prereqs => {
+var verifyPrereq = prereqs => {
   let error = "invalid format prereq";
   for (let course in prereqs) {
     if (!isMcGillCourse(course)) {
@@ -284,7 +284,7 @@ var verifyPrereq = async prereqs => {
  * Verifies if the course code is valid
  * @param {string} courseCode
  */
-var verifyCourseCode = async courseCode => {
+var verifyCourseCode = courseCode => {
   if (!isMcGillCourse(courseCode)) {
     throw new Error("invalid format course code");
   }
@@ -294,7 +294,7 @@ var verifyCourseCode = async courseCode => {
  * Verifies that the title is not null
  * @param {String} title
  */
-var verifyTitle = async title => {
+var verifyTitle = title => {
   if (!title) {
     throw new Error("invalid format title");
   }
@@ -304,7 +304,7 @@ var verifyTitle = async title => {
  * Verifies that the department sub name is in the following format: XXXX
  * @param {String} department
  */
-var verifyDepartmentSubName = async department => {
+var verifyDepartmentSubName = department => {
   if (
     !department ||
     String(department).length !== MAX_DEPARTMENTSUBNAME_LENGTH ||
@@ -318,7 +318,7 @@ var verifyDepartmentSubName = async department => {
  * Verifies that the phased_out is either 0 or 1
  * @param {String} phaseOut
  */
-var verifyPhaseOut = async phaseOut => {
+var verifyPhaseOut = phaseOut => {
   if (!phaseOut || !String(phaseOut).match(/^[01]$/i)) {
     throw new Error("invalid format phased out");
   }
@@ -341,6 +341,5 @@ module.exports = {
   verifyCourseCode,
   verifyTitle,
   verifyDepartmentSubName,
-  verifyPhaseOut,
-  isMcGillCourse
+  verifyPhaseOut
 };
