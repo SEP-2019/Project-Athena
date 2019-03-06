@@ -1,3 +1,4 @@
+let FormatError = require("./FormatError");
 const MAX_USERNAME_LENGTH = 64;
 const MAX_PASSWORD_LENGTH = 64;
 const MAX_CURR_NAME_LENGTH = 128;
@@ -27,7 +28,7 @@ function isAlteredAlphanumeric(str) {
   if (!str) {
     return false;
   }
-  return String(str).match(/^([a-z0-9]|[-]|[:])+$/i);
+  return String(str).match(/^([a-z0-9 ]|[-]|[:]|[|])+$/i);
 }
 
 /**
@@ -55,25 +56,41 @@ function isAlphabet(str) {
 /**
  * Verifies that the username only contains alphanumerical characters
  * @param {string} username
+ * @throws {FormatError}
  */
 var verifyUsername = username => {
-  if (!username || String(username).length > MAX_USERNAME_LENGTH) {
-    return false;
+  if (!username) {
+    throw new FormatError("Username cannot be empty");
   }
-  return isAlphanumeric(username);
+
+  if (String(username).length > MAX_USERNAME_LENGTH) {
+    throw new FormatError(
+      `Username length must be less than ${MAX_USERNAME_LENGTH}`
+    );
+  }
+
+  if (!isAlphanumeric(username)) {
+    throw new FormatError("Username must be alphanumeric");
+  }
+  return true;
 };
 
 /**
  * Verifies that the password is at least 8 characters and 64 characters in length
  * @param {string} password
+ * @throws {FormatError}
  */
 var verifyPassword = password => {
+  if (!password) {
+    throw new FormatError("Password cannot be empty");
+  }
   if (
-    !password ||
     String(password).length > MAX_PASSWORD_LENGTH ||
     String(password).length < MIN_PASSWORD_LENGTH
   ) {
-    return false;
+    throw new FormatError(
+      `Password length must be between ${MIN_PASSWORD_LENGTH} and ${MAX_PASSWORD_LENGTH}`
+    );
   }
   return true;
 };
@@ -81,32 +98,48 @@ var verifyPassword = password => {
 /**
  * Verifies if an email is valid or not.
  * @param {string} email
+ * @throws {FormatError}
  */
 var verifyEmail = email => {
-  if (!email || String(email).length > MAX_EMAIL_LENGTH) {
-    return false;
+  if (!email) {
+    throw new FormatError("Email cannot be empty");
   }
-  return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email);
+  if (String(email).length > MAX_EMAIL_LENGTH) {
+    throw new FormatError(`Email length must be less than ${MAX_EMAIL_LENGTH}`);
+  }
+
+  if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+    throw new FormatError("Invalid email format");
+  }
+  return true;
+};
+
+/**
+ * Verify if id exists, is numeric and less than bounds for an int
+ * @param {int} id
+ * @throws {FormatError}
+ */
+var verifyId = id => {
+  if (!id) {
+    throw new FormatError("Id cannot be empty");
+  }
+  if (!isNumeric(id)) {
+    throw new FormatError("Id must be numeric");
+  }
+  if (id > MAX_ID) {
+    throw new FormatError("Id too large");
+  }
 };
 
 /**
  * Verifies that the student id is 9 digits long
  * @param {int} id
+ * @throws {FormatError}
  */
 var verifyStudentId = id => {
-  if (!id) {
-    return false;
-  }
-  return isNumeric(id) && String(id).length == ID_LENGTH;
-};
-
-/**
- * Verifies that the administrator id is smaller than 2^31 - 1 and is a number
- * @param {int} id
- */
-var verifyAdminId = id => {
-  if (!id || !isNumeric(id) || id > MAX_ID) {
-    return false;
+  verifyId(id);
+  if (!String(id).length == ID_LENGTH) {
+    throw new FormatError(`Id length must be ${ID_LENGTH}`);
   }
   return true;
 };
@@ -114,43 +147,68 @@ var verifyAdminId = id => {
 /**
  * Verifies that the curriculum name only contains alphanumerical characters
  * @param {string} curriculum
+ * @throws {FormatError}
  */
 var verifyCurriculumName = curriculum => {
-  if (!curriculum || String(curriculum).length > MAX_CURR_NAME_LENGTH) {
-    return false;
+  if (!curriculum) {
+    throw new FormatError("Curriculum name cannot be empty");
   }
-  return isAlteredAlphanumeric(curriculum);
-};
-
-/**
- * Verifies that the curriculum type is major or minor
- * @param {string} type
- */
-var verifyCurrType = type => {
-  if (!(type.toUpperCase() === "MAJOR") && !(type.toUpperCase() === "MINOR")) {
-    return false;
+  if (String(curriculum).length > MAX_CURR_NAME_LENGTH) {
+    throw new FormatError(
+      `Curriculum name length must be less than ${MAX_CURR_NAME_LENGTH}`
+    );
+  }
+  if (!isAlteredAlphanumeric(curriculum)) {
+    throw new FormatError("Curriculum name must be alphanumeric");
   }
   return true;
 };
 
 /**
+ * Verifies that the curriculum type is major or minor
+ * @param {string} type
+ * @throws {FormatError}
+ */
+var verifyCurrType = type => {
+  if (!type) {
+    throw new FormatError("Curriculum type cannot be empty");
+  }
+  if (!(type.toUpperCase() === "MAJOR") && !(type.toUpperCase() === "MINOR")) {
+    throw new FormatError('Curriculum type must be "MAJOR" or "MINOR"');
+  }
+  return true;
+};
+/**
  * Verifies that the department name only contains alphanumerical characters
  * @param {string} department
+ * @throws {FormatError}
  */
 var verifyDepartmentName = department => {
-  if (!department || String(department).length > MAX_DEPARTMENT_LENGTH) {
-    return false;
+  if (!department) {
+    throw new FormatError("Department name cannot be empty");
   }
-  return isAlphanumeric(department);
+  if (String(department).length > MAX_DEPARTMENT_LENGTH) {
+    throw new FormatError(
+      `Department name length must be less than ${MAX_DEPARTMENT_LENGTH}`
+    );
+  }
+  if (!isAlteredAlphanumeric(department)) {
+    throw new FormatError("Department name must be alphanumeric");
+  }
+  return true;
 };
 
 /**
  * Verifies that the num of electives is numeric
  * @param {int} numOfElectives
+ * @throws {FormatError}
  */
 var verifyNumOfElectives = numOfElectives => {
-  if (!id || !isNumeric(id)) {
-    return false;
+  if (!numOfElectives) {
+    throw new FormatError("Number of electives cannot be empty");
+  }
+  if (!isNumeric(numOfElectives)) {
+    throw new FormatError("Number of electives must be numeric");
   }
   return true;
 };
@@ -164,20 +222,23 @@ var verifyNumOfElectives = numOfElectives => {
  *         "ECSE 422": [{"semester": "F2019", "section": 1},
  *                      {"semester": "W2018", "section": 3}]
  *       }
+ * @throws {FormatError}
  */
-var verifyCourse = async courses => {
+var verifyCourses = async courses => {
   if (!courses) {
-    throw new Error("Courses cannot be empty");
+    throw new FormatError("Courses cannot be empty");
   }
-  let error = "invalid format courses";
   for (let course in courses) {
     if (!isMcGillCourse(course)) {
-      throw new Error(error);
+      throw new FormatError(`Invalid course format for course ${course}`);
     }
-
     courses[course].forEach(row => {
       if (!isMcGillSemester(row.semester) || !isNumeric(row.section)) {
-        throw new Error(error);
+        throw new FormatError(
+          `Invalid semester format for semester ${
+            row.semester
+          } for course ${course}`
+        );
       }
     });
   }
@@ -214,12 +275,12 @@ function isMcGillSemester(semester) {
  *         "ECSE 422": [{"id": 25993, "semester": "F2019", "section": 1, "scheduled_time": "M 8:35-10:05 W 8:35-10:05"},
  *                      {"id": 25993, "semester": "W2018", "section": 3, "scheduled_time": "M 10:05-11:05 W 10:05-11:05 T 10:05-11:05"}]
  *       }
+ * @throws {FormatError}
  */
 var verifyCourseOffering = async courseOfferings => {
-  let error = "invalid format course offerings";
   for (let course in courseOfferings) {
     if (!isMcGillCourse(course)) {
-      throw new Error(error);
+      throw new FormatError(`Invalid course format for course ${course}`);
     }
 
     courseOfferings[course].forEach(row => {
@@ -228,7 +289,11 @@ var verifyCourseOffering = async courseOfferings => {
         !isMcGillSemester(row.semester) ||
         !isNumeric(row.section)
       ) {
-        throw new Error(error);
+        throw new FormatError(
+          `Invalid offering format for semester ${
+            row.semester
+          } for course ${course}`
+        );
       }
     });
   }
@@ -241,17 +306,19 @@ var verifyCourseOffering = async courseOfferings => {
  *          "ECSE 428": ["ECSE 321"],
  *          "MATH 270": ["MATH 140", "MATH 240"]
  *        }
+ * @throws {FormatError}
  */
 var verifyCoreq = async coreqs => {
-  let error = "invalid format coreq";
   for (let course in coreqs) {
     if (!isMcGillCourse(course)) {
-      throw new Error(error);
+      throw new FormatError(`Invalid course format for course ${course}`);
     }
 
     coreqs[course].forEach(coreqCourse => {
       if (!isMcGillCourse(coreqCourse)) {
-        throw new Error(error);
+        throw new FormatError(
+          `Invalid coreq course format for coreq course ${coreqCourse}`
+        );
       }
     });
   }
@@ -264,17 +331,19 @@ var verifyCoreq = async coreqs => {
  *          "ECSE 428": ["ECSE 321"],
  *          "MATH 270": ["MATH 140", "MATH 240"]
  *        }
+ * @throws {FormatError}
  */
 var verifyPrereq = async prereqs => {
-  let error = "invalid format prereq";
   for (let course in prereqs) {
     if (!isMcGillCourse(course)) {
-      throw new Error(error);
+      throw new FormatError(`Invalid course format for course ${course}`);
     }
 
     prereqs[course].forEach(prereqCourse => {
       if (!isMcGillCourse(prereqCourse)) {
-        throw new Error(error);
+        throw new FormatError(
+          `Invalid prereq course format for prereq course ${prereqCourse}`
+        );
       }
     });
   }
@@ -283,64 +352,86 @@ var verifyPrereq = async prereqs => {
 /**
  * Verifies if the course code is valid
  * @param {string} courseCode
+ * @throws {FormatError}
  */
-var verifyCourseCode = async courseCode => {
+var verifyCourseCode = courseCode => {
   if (!isMcGillCourse(courseCode)) {
-    throw new Error("invalid format course code");
+    throw new FormatError(
+      `Invalid format course code for course ${courseCode}`
+    );
   }
 };
 
 /**
  * Verifies that the title is not null
  * @param {String} title
+ * @throws {FormatError}
  */
-var verifyTitle = async title => {
+var verifyTitle = title => {
   if (!title) {
-    throw new Error("invalid format title");
+    throw new FormatError(`Invalid format title for title ${title}`);
   }
 };
 
 /**
  * Verifies that the department sub name is in the following format: XXXX
  * @param {String} department
+ * @throws {FormatError}
  */
-var verifyDepartmentSubName = async department => {
-  if (
-    !department ||
-    String(department).length !== MAX_DEPARTMENTSUBNAME_LENGTH ||
-    !isAlphabet(department)
-  ) {
-    throw new Error("invalid format department name");
+var verifyDepartmentSubName = department => {
+  if (!department) {
+    throw new FormatError("Department name cannot be empty");
+  }
+  if (!isAlphabet(department)) {
+    throw new FormatError("Department name must be alphabetical");
+  }
+  if (String(department).length !== MAX_DEPARTMENTSUBNAME_LENGTH) {
+    throw new FormatError(
+      `Department name length must be ${MAX_DEPARTMENTSUBNAME_LENGTH}`
+    );
   }
 };
 
 /**
  * Verifies that the phased_out is either 0 or 1
  * @param {String} phaseOut
+ * @throws {FormatError}
  */
-var verifyPhaseOut = async phaseOut => {
+var verifyPhaseOut = phaseOut => {
   if (!phaseOut || !String(phaseOut).match(/^[01]$/i)) {
-    throw new Error("invalid format phased out");
+    throw new FormatError("Invalid format phased out");
+  }
+};
+
+/**
+ * Verifies all the course codes in the list are valid
+ * @param {[string]} courseCodeList:
+ * ["ECSE 200", "COMP 202", "MATH 262", "MATH 263"]
+ * @throws {FormatError}
+ */
+var verifyCourseCodeList = courseCodeList => {
+  for (let course in courseCodeList) {
+    verifyCourseCode(courseCodeList[course]);
   }
 };
 
 module.exports = {
-  verifyUsername,
-  verifyPassword,
-  verifyEmail,
-  verifyStudentId,
-  verifyAdminId,
-  verifyCourse,
-  verifyCurriculumName,
-  verifyCurrType,
-  verifyDepartmentName,
-  verifyNumOfElectives,
-  verifyCourseOffering,
-  verifyCoreq,
-  verifyPrereq,
-  verifyCourseCode,
-  verifyTitle,
-  verifyDepartmentSubName,
-  verifyPhaseOut,
-  isMcGillCourse
+  verifyUsername: verifyUsername,
+  verifyPassword: verifyPassword,
+  verifyEmail: verifyEmail,
+  verifyStudentId: verifyStudentId,
+  verifyId: verifyId,
+  verifyCourses: verifyCourses,
+  verifyCurriculumName: verifyCurriculumName,
+  verifyCurrType: verifyCurrType,
+  verifyDepartmentName: verifyDepartmentName,
+  verifyNumOfElectives: verifyNumOfElectives,
+  verifyCourseOffering: verifyCourseOffering,
+  verifyCoreq: verifyCoreq,
+  verifyPrereq: verifyPrereq,
+  verifyCourseCode: verifyCourseCode,
+  verifyTitle: verifyTitle,
+  verifyDepartmentSubName: verifyDepartmentSubName,
+  verifyPhaseOut: verifyPhaseOut,
+  verifyCourseCodeList: verifyCourseCodeList
 };

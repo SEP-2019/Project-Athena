@@ -1,6 +1,8 @@
 const express = require("express");
 const tags = require("../logic/tags/tags");
 const router = express.Router();
+let customResponse = require("../validation/customResponse");
+let asyncMiddleware = require("./errorHandlingMiddleware");
 
 /**
  * @api {get} /getAllTags
@@ -8,14 +10,12 @@ const router = express.Router();
  * @apiExample {curl} Example usage: GET /tags/getAllTags
  * @author: Steven Li
  */
-router.get("/getAllTags", async function(req, res, next) {
-  try {
+router.get(
+  "/getAllTags",
+  asyncMiddleware(async function(req, res, next) {
     let result = await tags.getAllTags();
-    res.send(result);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error.message);
-  }
-});
+    res.send(customResponse(result));
+  })
+);
 
 module.exports = router;

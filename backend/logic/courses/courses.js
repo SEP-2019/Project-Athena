@@ -13,19 +13,15 @@ var queryCourseByTag = async function queryCourseByTag(tag) {
   if (!tag) {
     throw Error("Undefined tag");
   }
-
   let connection = await mysql.getNewConnection();
   try {
     let courses = await connection.query(
       "SELECT course_code FROM course_tags WHERE tag_name LIKE ?",
       tag
     );
-    connection.release();
     return JSON.parse(JSON.stringify(courses));
-  } catch (error) {
+  } finally {
     connection.release();
-    console.error(error);
-    throw Error(error.message);
   }
 };
 
@@ -38,7 +34,7 @@ var queryCourseByTag = async function queryCourseByTag(tag) {
  * @param {String} phasedOut
  * @returns true if successful
  * @throws error if MySQL connection failed
- *         invalid format courses if JSON format is incorrect
+ *         Invalid course format if JSON format is incorrect
  *         false if insertion failed
  */
 var addCourse = async (courseCode, title, departement, phasedOut) => {
@@ -46,29 +42,22 @@ var addCourse = async (courseCode, title, departement, phasedOut) => {
   if (phasedOut === undefined) {
     phasedOut = "0";
   }
-  await format.verifyCourseCode(courseCode);
-  await format.verifyTitle(title);
-  await format.verifyDepartmentSubName(departement);
-  await format.verifyPhaseOut(phasedOut);
+  format.verifyCourseCode(courseCode);
+  format.verifyTitle(title);
+  format.verifyDepartmentSubName(departement);
+  format.verifyPhaseOut(phasedOut);
 
   // Connect to database
   let connection = await mysql.getNewConnection();
 
-  try {
-    await connection.query("INSERT INTO courses VALUES(?, ?, ?, ?);", [
-      courseCode,
-      title,
-      departement,
-      phasedOut
-    ]);
-    return true;
-  } catch (error) {
-    connection.rollback();
-    console.error(error);
-    throw new Error(false);
-  } finally {
-    connection.release();
-  }
+  await connection.query("INSERT INTO courses VALUES(?, ?, ?, ?);", [
+    courseCode,
+    title,
+    departement,
+    phasedOut
+  ]);
+  connection.release();
+  return true;
 };
 
 /**
@@ -78,11 +67,11 @@ var addCourse = async (courseCode, title, departement, phasedOut) => {
  * @param {JSON} courses
  * @returns true if successful
  * @throws error if MySQL connection failed
- *         invalid format courses if JSON format is incorrect
+ *         Invalid course format if JSON format is incorrect
  *         false if insertion failed
  */
 var addCompletedCourses = async (studentId, courses) => {
-  await format.verifyCourse(courses);
+  await format.verifyCourses(courses);
   let connection = await mysql.getNewConnection();
 
   try {
@@ -114,13 +103,12 @@ var addCompletedCourses = async (studentId, courses) => {
     }
 
     await connection.commit();
-    connection.release();
     return true;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
+    throw error;
+  } finally {
     connection.release();
-    throw new Error(false);
   }
 };
 
@@ -132,21 +120,12 @@ var addCompletedCourses = async (studentId, courses) => {
  */
 var getAllCourses = async () => {
   let connection = await mysql.getNewConnection();
-  let courses;
   let result;
-  try {
-    result = await connection.query(
-      "SELECT * FROM courses WHERE phased_out = FALSE;"
-    );
-  } catch (err) {
-    console.error(err);
-  }
+  result = await connection.query(
+    "SELECT * FROM courses WHERE phased_out = FALSE;"
+  );
   connection.release();
-
-  if (result) {
-    courses = result;
-  }
-  return courses;
+  return result;
 };
 
 /**
@@ -177,15 +156,13 @@ var addCourseOfferings = async courseOfferings => {
         ]);
       }
     }
-
     await connection.commit();
-    connection.release();
     return true;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
+    throw error;
+  } finally {
     connection.release();
-    throw new Error(false);
   }
 };
 
@@ -217,9 +194,8 @@ var addCoreq = async coreq => {
     await connection.commit();
     return true;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
-    throw new Error(false);
+    throw error;
   } finally {
     connection.release();
   }
@@ -253,9 +229,8 @@ var addPrereq = async prereq => {
     await connection.commit();
     return true;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
-    throw new Error(false);
+    throw error;
   } finally {
     connection.release();
   }
@@ -273,7 +248,7 @@ var addPrereq = async prereq => {
  *         false if insertion failed
  */
 var updateCourse = async (course, newTitle, newTags) => {
-  await format.verifyCourseCode(course);
+  format.verifyCourseCode(course);
   let connection = await mysql.getNewConnection();
 
   try {
@@ -297,9 +272,8 @@ var updateCourse = async (course, newTitle, newTags) => {
     await connection.commit();
     return true;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
-    throw new Error(false);
+    throw error;
   } finally {
     connection.release();
   }
@@ -315,7 +289,7 @@ var updateCourse = async (course, newTitle, newTags) => {
  */
 let phaseOutCourse = async courseCode => {
   let connection = await mysql.getNewConnection();
-  await format.verifyCourseCode(courseCode);
+  format.verifyCourseCode(courseCode);
 
   try {
     await connection.query(
@@ -324,8 +298,7 @@ let phaseOutCourse = async courseCode => {
     );
     return true;
   } catch (error) {
-    console.error(error);
-    throw new Error("Internal server error");
+    throw error;
   } finally {
     connection.release();
   }
@@ -341,9 +314,7 @@ let phaseOutCourse = async courseCode => {
  *
  */
 var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
-  if (!format.isMcGillCourse(courseCode)) {
-    throw Error("Invalid course format!\n");
-  }
+  format.verifyCourseCode(courseCode);
 
   let conn = await mysql.getNewConnection();
 
@@ -373,9 +344,8 @@ var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
       [curriculum]
     );
   } catch (err) {
-    console.log(err);
     conn.release();
-    throw Error("Internal Server Error!\n");
+    throw err;
   }
 
   if (ifAssigned[0].count !== 0) {
@@ -411,15 +381,14 @@ var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
   try {
     await conn.beginTransaction();
     await conn.query(query, [curriculum, courseCode]);
-
     await conn.commit();
   } catch (err) {
     await conn.rollback();
-    console.log(err);
-    throw Error("Internal Server Error!\n");
+    throw err;
   } finally {
     conn.release();
   }
+  return true;
 };
 
 module.exports = {
