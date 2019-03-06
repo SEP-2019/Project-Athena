@@ -8,9 +8,7 @@ const format = require("../../validation/format");
  * @throws error if MySQL connection failed
  */
 var getCurriculum = async function(name) {
-  if (!name) {
-    throw Error("Name cannot be empty");
-  }
+  format.verifyCurriculumName(name);
 
   let connection = await mysql.getNewConnection();
 
@@ -35,7 +33,7 @@ var getCurriculum = async function(name) {
       name
     );
 
-    curriculum = JSON.parse(JSON.stringify(curriculum[0]));
+    curriculum = JSON.parse(JSON.stringify(curriculum));
     core_classes = JSON.parse(JSON.stringify(core_classes));
     tech_comps = JSON.parse(JSON.stringify(tech_comps));
     complementaries = JSON.parse(JSON.stringify(complementaries));
@@ -46,8 +44,7 @@ var getCurriculum = async function(name) {
 
     return curriculum;
   } catch (err) {
-    console.error(err);
-    throw Error("Internal server error");
+    throw err;
   } finally {
     connection.release();
   }
@@ -62,31 +59,13 @@ var createCurriculum = async (
   techComps,
   comps
 ) => {
-  let error = false;
-
-  if (!format.verifyCurriculumName(name)) {
-    error = "Invalid curriculum name";
-  } else if (!format.verifyCurrType(type)) {
-    error = "Invalid curriculum type";
-  } else if (!format.verifyDepartment(department)) {
-    error = "Invalid department";
-  } else if (!format.verifyNumOfElectives(numOfElectives)) {
-    error = "Invalid number of electives";
-  }
-
-  if (!error == false) {
-    console.error(error);
-    throw new Error(error.message);
-  }
-
-  try {
-    format.verifyCourse(cores);
-    format.verifyCourse(techComps);
-    format.verifyCourse(comps);
-  } catch (error) {
-    console.error(error);
-    throw new Error(error.message);
-  }
+  format.verifyCurriculumName(name);
+  format.verifyCurrType(type);
+  format.verifyDepartmentName(department);
+  format.verifyNumOfElectives(numOfElectives);
+  await format.verifyCourseCodeList(cores);
+  await format.verifyCourseCodeList(techComps);
+  await format.verifyCourseCodeList(comps);
 
   let connection = await mysql.getNewConnection();
 
@@ -96,7 +75,8 @@ var createCurriculum = async (
       "INSERT INTO curriculums (curriculum_name, type, department, numOfElectives) VALUES(?, ?, ?, ?);",
       [name, type, department, numOfElectives]
     );
-    for (let core in cores) {
+    for (let i = 0, len = cores.length; i < len; i++) {
+      let core = cores[i];
       let course_count = await connection.query(
         "SELECT COUNT(*) FROM courses WHERE course_code = ?;",
         [core]
@@ -104,14 +84,15 @@ var createCurriculum = async (
 
       if (course_count) {
         await connection.query(
-          "INSERT INTO curriculum_core_class (curriculum_name, course_code) VALUES(?, ?);",
+          "INSERT INTO curriculum_core_classes (curriculum_name, course_code) VALUES(?, ?);",
           [name, core]
         );
       } else {
         throw new Error("Course ${core} does not exist");
       }
     }
-    for (let techComp in techComps) {
+    for (let i = 0, len = techComps.length; i < len; i++) {
+      techComp = techComps[i];
       let course_count = await connection.query(
         "SELECT COUNT(*) FROM courses WHERE course_code = ?;",
         [techComp]
@@ -119,14 +100,15 @@ var createCurriculum = async (
 
       if (course_count) {
         await connection.query(
-          "INSERT INTO curriculum_tech_comp (curriculum_name, course_code) VALUES(?, ?);",
+          "INSERT INTO curriculum_tech_comps (curriculum_name, course_code) VALUES(?, ?);",
           [name, techComp]
         );
       } else {
         throw new Error("Course ${techComp} does not exist");
       }
     }
-    for (let comp in comps) {
+    for (let i = 0, len = comps.length; i < len; i++) {
+      let comp = comps[i];
       let course_count = await connection.query(
         "SELECT COUNT(*) FROM courses WHERE course_code = ?;",
         [comp]
@@ -144,8 +126,7 @@ var createCurriculum = async (
     return true;
   } catch (error) {
     connection.rollback();
-    console.error(error);
-    throw new Error(false);
+    throw error;
   } finally {
     connection.release();
   }

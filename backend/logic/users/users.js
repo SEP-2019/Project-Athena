@@ -4,23 +4,11 @@ const hasher = require("../../validation/hash");
 
 var insertStudentUser = async (username, password, email, id) => {
   // Connect to database
-  let error = false;
   // Check for invalid formatting
-  //todo, handle errors after formatting configured to throw errors
-  if (!format.verifyUsername(username)) {
-    error = "invalid format username";
-  } else if (!format.verifyPassword(password)) {
-    error = "invalid format password";
-  } else if (!format.verifyEmail(email)) {
-    error = "invalid format email";
-  } else if (!format.verifyStudentId(id)) {
-    error = "invalid format id";
-  }
-
-  if (!error == false) {
-    console.error(error);
-    throw new Error(error);
-  }
+  format.verifyUsername(username);
+  format.verifyPassword(password);
+  format.verifyEmail(email);
+  format.verifyStudentId(id);
 
   let connection = await mysql.getNewConnection();
 
@@ -44,26 +32,13 @@ var insertStudentUser = async (username, password, email, id) => {
   } catch (error) {
     connection.rollback();
     connection.release();
-    console.error(error);
-    throw new Error(false);
+    throw error;
   }
 };
 
 var deleteStudentUser = async username => {
-  if (!format.verifyUsername(username)) {
-    let error = "invalid username";
-    console.error(error);
-    throw new Error(error);
-  }
-
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    console.error(error);
-    throw new Error("failed to establish connection with database");
-  }
-
+  format.verifyUsername(username);
+  let connection = await mysql.getNewConnection();
   try {
     await connection.beginTransaction();
     let student_id = await connection.query(
@@ -78,32 +53,19 @@ var deleteStudentUser = async username => {
     connection.release();
     return true;
   } catch (error) {
-    console.error(error);
     connection.rollback();
     connection.release();
-    throw new Error(false);
+    throw error;
   }
 };
 
 var insertAdminUser = async (username, password, email, id) => {
   // Connect to database
-  let error = false;
   // Check for invalid formatting
-  //todo, handle errors after formatting configured to throw errors
-  if (!format.verifyUsername(username)) {
-    error = "invalid format username";
-  } else if (!format.verifyPassword(password)) {
-    error = "invalid format password";
-  } else if (!format.verifyEmail(email)) {
-    error = "invalid format email";
-  } else if (!format.verifyAdminId(id)) {
-    error = "invalid format id";
-  }
-
-  if (!error == false) {
-    console.error(error);
-    throw new Error(error);
-  }
+  format.verifyUsername(username);
+  format.verifyPassword(password);
+  format.verifyEmail(email);
+  format.verifyId(id);
 
   let connection = await mysql.getNewConnection();
 
@@ -126,25 +88,14 @@ var insertAdminUser = async (username, password, email, id) => {
   } catch (error) {
     connection.rollback();
     connection.release();
-    console.error(error);
-    throw new Error(false);
+    throw error;
   }
 };
 
 var deleteAdminUser = async username => {
-  if (!format.verifyUsername(username)) {
-    let error = "invalid username";
-    console.error(error);
-    throw new Error(error);
-  }
+  format.verifyUsername(username);
 
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    console.error(error);
-    throw new Error("failed to establish connection with database");
-  }
+  let connection = await mysql.getNewConnection();
 
   try {
     await connection.beginTransaction();
@@ -157,18 +108,17 @@ var deleteAdminUser = async username => {
     ]);
     await connection.query("DELETE FROM users WHERE username = ?;", [username]);
     await connection.commit();
-    connection.release();
     return true;
   } catch (error) {
-    console.error(error);
     connection.rollback();
+    throw error;
+  } finally {
     connection.release();
-    throw new Error(false);
   }
 };
 
 var getCompletedCourses = async studentID => {
-  let courses = [];
+  format.verifyStudentId(studentID);
 
   const sql_query = `SELECT course_code, semester
   		FROM course_offerings
@@ -176,32 +126,18 @@ var getCompletedCourses = async studentID => {
   		IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`;
 
   let conn = await mysql.getNewConnection();
-  let results;
   try {
-    results = await conn.query(sql_query, [studentID]);
-    if (results.length !== 0) {
-      courses = JSON.stringify(results);
-    }
-
-    return courses;
+    let results = await conn.query(sql_query, [studentID]);
+    return results;
   } catch (err) {
-    console.log(err);
-    return "Interval serever error!";
+    throw err;
   } finally {
     conn.release();
   }
 };
 
 var getStudentData = async studentID => {
-  let error;
-  if (!format.verifyStudentId(studentID)) {
-    error = "invalid format id";
-  }
-
-  if (error) {
-    console.error(error);
-    throw new Error(error);
-  }
+  format.verifyStudentId(studentID);
 
   let data;
   let conn = await mysql.getNewConnection();
@@ -331,46 +267,32 @@ var getStudentData = async studentID => {
     return data;
   } catch (err) {
     conn.release();
-    console.log(err);
-    throw new Error(err);
+    throw err;
   }
 };
 
 var login = async (username, password) => {
-  let error = false;
-
   let isValidPassword = function(userpass, password) {
     return hasher.hashPass(password) === userpass;
   };
 
   // Check for invalid formatting
-  if (!format.verifyUsername(username)) {
-    error = "Invalid format username";
-  } else if (!format.verifyPassword(password)) {
-    error = "Invalid format password";
-  }
-
-  if (!error == false) {
-    console.error(error);
-    throw new Error(error);
-  }
+  format.verifyUsername(username);
+  format.verifyPassword(password);
+  let connection = await mysql.getNewConnection();
 
   // Begin transaction with database
   try {
-    let connection = await mysql.getNewConnection();
     let userInfo = await connection.query(
       "SELECT * FROM users WHERE username = ?;",
       [username]
     );
-
     if (!userInfo || !isValidPassword(userInfo[0].password, password)) {
       throw new Error("Incorrect username or password.");
     }
-
     return true;
   } catch (error) {
-    console.error(error);
-    throw new Error(error.message);
+    throw error;
   } finally {
     connection.release();
   }
