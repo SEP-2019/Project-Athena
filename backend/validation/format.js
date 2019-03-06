@@ -138,7 +138,7 @@ var verifyId = id => {
  */
 var verifyStudentId = id => {
   verifyId(id);
-  if (!String(id).length == ID_LENGTH) {
+  if (String(id).length != ID_LENGTH) {
     throw new FormatError(`Id length must be ${ID_LENGTH}`);
   }
   return true;
