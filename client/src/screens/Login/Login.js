@@ -26,7 +26,6 @@ class Login extends Component {
           alignItems="center"
         >
           <Section className="description">{this.state.text}</Section>
-
           <Section className="form">
             <LoginForm />
           </Section>
