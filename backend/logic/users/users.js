@@ -29,8 +29,15 @@ var insertStudentUser = async (username, password, email, id) => {
 
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
-    await connection.query("INSERT INTO students VALUES(?, ?);", [id, username]);
+    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [
+      username,
+      email,
+      hash
+    ]);
+    await connection.query("INSERT INTO students VALUES(?, ?);", [
+      id,
+      username
+    ]);
     await connection.commit();
     connection.release();
     return true;
@@ -59,8 +66,13 @@ var deleteStudentUser = async username => {
 
   try {
     await connection.beginTransaction();
-    let student_id = await connection.query("SELECT student_id FROM students WHERE username = ?;", username);
-    await connection.query("DELETE FROM students WHERE student_id = ?;", [student_id[0].student_id]);
+    let student_id = await connection.query(
+      "SELECT student_id FROM students WHERE username = ?;",
+      username
+    );
+    await connection.query("DELETE FROM students WHERE student_id = ?;", [
+      student_id[0].student_id
+    ]);
     await connection.query("DELETE FROM users WHERE username = ?;", [username]);
     await connection.commit();
     connection.release();
@@ -99,8 +111,15 @@ var insertAdminUser = async (username, password, email, id) => {
   let hash = hasher.hashPass(password);
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
-    await connection.query("INSERT INTO staff_members VALUES(?, ?);", [id, username]);
+    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [
+      username,
+      email,
+      hash
+    ]);
+    await connection.query("INSERT INTO staff_members VALUES(?, ?);", [
+      id,
+      username
+    ]);
     await connection.commit();
     connection.release();
     return true;
@@ -129,8 +148,13 @@ var deleteAdminUser = async username => {
 
   try {
     await connection.beginTransaction();
-    let staff_id = await connection.query("SELECT staff_id FROM staff_members WHERE username = ?;", username);
-    await connection.query("DELETE FROM staff_members WHERE staff_id = ?;", [staff_id[0].staff_id]);
+    let staff_id = await connection.query(
+      "SELECT staff_id FROM staff_members WHERE username = ?;",
+      username
+    );
+    await connection.query("DELETE FROM staff_members WHERE staff_id = ?;", [
+      staff_id[0].staff_id
+    ]);
     await connection.query("DELETE FROM users WHERE username = ?;", [username]);
     await connection.commit();
     connection.release();
@@ -190,8 +214,14 @@ var getStudentData = async studentID => {
     IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`,
       [studentID]
     );
-    major = await conn.query(`SELECT curriculum_name FROM student_majors WHERE student_id = ?;`, [studentID]);
-    minor = await conn.query(`SELECT curriculum_name FROM student_minors WHERE student_id = ?;`, [studentID]);
+    major = await conn.query(
+      `SELECT curriculum_name FROM student_majors WHERE student_id = ?;`,
+      [studentID]
+    );
+    minor = await conn.query(
+      `SELECT curriculum_name FROM student_minors WHERE student_id = ?;`,
+      [studentID]
+    );
     conn.release();
 
     let results = { major: major, minor: minor, courses: courses };
@@ -229,7 +259,10 @@ var login = async (username, password) => {
   // Begin transaction with database
   try {
     let connection = await mysql.getNewConnection();
-    let userInfo = await connection.query("SELECT * FROM users WHERE username = ?;", [username]);
+    let userInfo = await connection.query(
+      "SELECT * FROM users WHERE username = ?;",
+      [username]
+    );
 
     if (!userInfo || !isValidPassword(userInfo[0].password, password)) {
       throw new Error("Incorrect username or password.");
@@ -243,7 +276,6 @@ var login = async (username, password) => {
     connection.release();
   }
 };
-
 
 module.exports = {
   insertStudentUser,

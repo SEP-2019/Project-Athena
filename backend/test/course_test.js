@@ -5,20 +5,21 @@ const mysql = require("../sql/connection");
 describe("Test retrieve course by tag", function() {
   it("responds with valid", async function() {
     connection = await mysql.getNewConnection();
-    connection.query(
-      `INSERT INTO courses (course_code,title, department) VALUES 
+    await connection.query(
+      `INSERT INTO courses (course_code,title, department) VALUES
         (?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,
       ["ECSE 428", "Software engineering in practice", "ECSE"]
     );
-    connection.query(
+    await connection.query(
       `INSERT INTO tags(name) VALUES (?) ON DUPLICATE KEY UPDATE name=name;`,
       ["Engineering"]
     );
-    connection.query(
+    await connection.query(
       `INSERT INTO course_tags (course_code, tag_name) VALUES
         (?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,
       ["ECSE 428", "Engineering"]
     );
+    await connection.release();
     return courses.queryCourseByTag("Engineering").then(function(res) {
       let found = false;
       let searchingFor = { course_code: "ECSE 428" };
