@@ -1,0 +1,17 @@
+.primary-button {
+  margin-block-start: 1vh;
+  background-color: #b20007;
+  color: white;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.secondary-button {
+  margin-block-start: 1.5vh;
+  background-color: white;
+  color: #b20007;
+
+  font-weight: 400;
+}

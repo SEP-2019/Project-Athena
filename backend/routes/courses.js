@@ -1,13 +1,6 @@
 const express = require("express");
 const courses = require("../logic/courses/courses");
 const router = express.Router();
-const cors = require("cors");
-router.use(cors());
-
-var corsOptions = {
-  origin: "http://localhost:3000",
-  optionsSuccessStatus: 200
-};
 
 /**
  * @api {get} /getCourseByTag
@@ -16,11 +9,7 @@ var corsOptions = {
  * @apiExample {curl} Example usage: GET /courses/getCourseByTag?tag=engineering
  * @author: Alex Lam
  */
-router.get("/getCourseByTag", cors(corsOptions), async function(
-  req,
-  res,
-  next
-) {
+router.get("/getCourseByTag", async function(req, res, next) {
   try {
     let tag = req.query.tag;
     let result = await courses.queryCourseByTag(tag);
@@ -196,7 +185,7 @@ router.post("/addCourseOfferings", async (req, res, next) => {
  * @apiExample {curl} Example usage: GET /courses/getAllCourses
  * @author: Steven Li
  */
-router.get("/getAllCourses", cors(corsOptions), async (req, res, next) => {
+router.get("/getAllCourses", async (req, res, next) => {
   try {
     let result = await courses.getAllCourses();
     res.status(200).send(result);
