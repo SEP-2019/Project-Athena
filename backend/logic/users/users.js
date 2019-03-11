@@ -29,8 +29,15 @@ var insertStudentUser = async (username, password, email, id) => {
 
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
-    await connection.query("INSERT INTO students VALUES(?, ?);", [id, username]);
+    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [
+      username,
+      email,
+      hash
+    ]);
+    await connection.query("INSERT INTO students VALUES(?, ?);", [
+      id,
+      username
+    ]);
     await connection.commit();
     connection.release();
     return true;
@@ -59,8 +66,13 @@ var deleteStudentUser = async username => {
 
   try {
     await connection.beginTransaction();
-    let student_id = await connection.query("SELECT student_id FROM students WHERE username = ?;", username);
-    await connection.query("DELETE FROM students WHERE student_id = ?;", [student_id[0].student_id]);
+    let student_id = await connection.query(
+      "SELECT student_id FROM students WHERE username = ?;",
+      username
+    );
+    await connection.query("DELETE FROM students WHERE student_id = ?;", [
+      student_id[0].student_id
+    ]);
     await connection.query("DELETE FROM users WHERE username = ?;", [username]);
     await connection.commit();
     connection.release();
@@ -99,8 +111,15 @@ var insertAdminUser = async (username, password, email, id) => {
   let hash = hasher.hashPass(password);
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
-    await connection.query("INSERT INTO staff_members VALUES(?, ?);", [id, username]);
+    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [
+      username,
+      email,
+      hash
+    ]);
+    await connection.query("INSERT INTO staff_members VALUES(?, ?);", [
+      id,
+      username
+    ]);
     await connection.commit();
     connection.release();
     return true;
@@ -129,8 +148,13 @@ var deleteAdminUser = async username => {
 
   try {
     await connection.beginTransaction();
-    let staff_id = await connection.query("SELECT staff_id FROM staff_members WHERE username = ?;", username);
-    await connection.query("DELETE FROM staff_members WHERE staff_id = ?;", [staff_id[0].staff_id]);
+    let staff_id = await connection.query(
+      "SELECT staff_id FROM staff_members WHERE username = ?;",
+      username
+    );
+    await connection.query("DELETE FROM staff_members WHERE staff_id = ?;", [
+      staff_id[0].staff_id
+    ]);
     await connection.query("DELETE FROM users WHERE username = ?;", [username]);
     await connection.commit();
     connection.release();
@@ -170,9 +194,9 @@ var getCompletedCourses = async studentID => {
 
 var getStudentData = async studentID => {
   let error = false;
-  if (!format.verifyStudentId(studentID)) {
-    error = "invalid format id";
-  }
+  // if (!format.verifyStudentId(studentID)) {
+  //   error = "invalid format id";
+  // }
 
   if (!error == false) {
     console.error(error);
@@ -190,24 +214,30 @@ var getStudentData = async studentID => {
     IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`,
       [studentID]
     );
-    major = await conn.query(`SELECT curriculum_name FROM student_majors WHERE student_id = ?;`, [studentID]);
-    minors = await conn.query(`SELECT curriculum_name FROM student_minors WHERE student_id = ?;`, [studentID]);
-    
-    let currYear = (new Date()).getFullYear();
-    let currMonth = (new Date()).getMonth();
-    let fallSem, winterSem;
-    let curriculumName = major[0];
+    major = await conn.query(
+      `SELECT curriculum_name FROM student_majors WHERE student_id = ?;`,
+      [studentID]
+    );
+    minors = await conn.query(
+      `SELECT curriculum_name FROM student_minors WHERE student_id = ?;`,
+      [studentID]
+    );
 
-    if(currMonth < 3){
-      fallSem = '';
-      winterSem = 'W' + currYear;
-    }else{
-      fallSem = 'F' + currYear;
-      winterSem = 'W' + (currYear + 1);
+    let currYear = new Date().getFullYear();
+    let currMonth = new Date().getMonth();
+    let fallSem, winterSem;
+    let curriculumName = major[0].curriculum_name;
+
+    if (currMonth < 3) {
+      fallSem = "";
+      winterSem = "W" + currYear;
+    } else {
+      fallSem = "F" + currYear;
+      winterSem = "W" + (currYear + 1);
     }
 
     let incompleteCore = await conn.query(
-      `SELECT course_code 
+      `SELECT course_code, semester 
       FROM course_offerings 
       WHERE (course_code 
               NOT IN (SELECT course_code 
@@ -221,9 +251,10 @@ var getStudentData = async studentID => {
           IN (SELECT course_code 
               FROM curriculum_core_classes 
               WHERE curriculum_name = ?));`,
-      [studentID, fallSem, winterSem, curriculumName]);
+      [studentID, fallSem, winterSem, curriculumName]
+    );
     let desiredTC = await conn.query(
-      `SELECT course_code 
+      `SELECT course_code, semester 
       FROM course_offerings 
       WHERE (course_code 
             NOT IN (SELECT course_code 
@@ -237,55 +268,54 @@ var getStudentData = async studentID => {
           IN (SELECT course_code 
               FROM curriculum_tech_comps 
               WHERE curriculum_name = ?)) 
-      AND (SELECT course_code 
-          FROM student_desired_courses 
-          WHERE (student_id = ?, desired = TRUE));`,
-      [studentID, fallSem, winterSem, curriculumName, studentID]);
-    
-    // For each incomplete course, get prereqs and coreqs
-    // for(course c in courses){
-    //   c[prereqs] = [];
-    //   c[coreqs] = [];
-    //   semester = [];
-    //   incompleteCourses += c;
-    // }
+      AND (course_code
+          IN (SELECT course_code 
+              FROM student_desired_courses 
+              WHERE student_id = ?));`,
+      [studentID, fallSem, winterSem, curriculumName, studentID]
+    );
 
     for (let i = 0; i < incompleteCore.length; i++) {
       let c = incompleteCore[i];
-      c[prereqs] = await conn.query(
+      c.prereqs = await conn.query(
         `SELECT prereq_course_code 
         FROM course_prereqs 
-        WHERE course_code = ?;`, 
-        [c]);
-      c[coreqs] = await conn.query(
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      c.coreqs = await conn.query(
         `SELECT coreq_course_code 
         FROM course_coreqs 
-        WHERE course_code = ?;`, 
-        [c]);
-      c[semester] = ''; //TODO 
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
     }
 
     for (let i = 0; i < desiredTC.length; i++) {
       let c = desiredTC[i];
-      c[prereqs] = await conn.query(
+      c.prereqs = await conn.query(
         `SELECT prereq_course_code 
         FROM course_prereqs 
-        WHERE course_code = ?;`, 
-        [c]);
-      c[coreqs] = await conn.query(
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      c.coreqs = await conn.query(
         `SELECT coreq_course_code 
         FROM course_coreqs 
-        WHERE course_code = ?;`, 
-        [c]);
-      c[semester] = ''; //TODO 
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
     }
 
     conn.release();
 
-    let results = { major: major, minor: minors, 
-      completedCourses: completedCourses, 
+    let results = {
+      major: major,
+      minor: minors,
+      completedCourses: completedCourses,
       incompletedCore: incompleteCore,
-      desiredTC: desiredTC };
+      desiredTC: desiredTC
+    };
 
     if (results) {
       data = JSON.stringify(results);
@@ -320,7 +350,10 @@ var login = async (username, password) => {
   // Begin transaction with database
   try {
     let connection = await mysql.getNewConnection();
-    let userInfo = await connection.query("SELECT * FROM users WHERE username = ?;", [username]);
+    let userInfo = await connection.query(
+      "SELECT * FROM users WHERE username = ?;",
+      [username]
+    );
 
     if (!userInfo || !isValidPassword(userInfo[0].password, password)) {
       throw new Error("Incorrect username or password.");
@@ -334,7 +367,6 @@ var login = async (username, password) => {
     connection.release();
   }
 };
-
 
 module.exports = {
   insertStudentUser,
