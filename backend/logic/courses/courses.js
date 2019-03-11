@@ -418,6 +418,8 @@ var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
   } finally {
     conn.release();
   }
+
+  return true;
 };
 
 module.exports = {
