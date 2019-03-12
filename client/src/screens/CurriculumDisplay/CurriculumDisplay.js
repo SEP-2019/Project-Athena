@@ -91,6 +91,7 @@ class CurriculumDisplay extends Component {
     .then(response => {
       console.log(response.data)
       this.setState({
+        selectedCurriculum: selected,
         selectedCurriculumDetials: response.data,
       })
     })
@@ -119,7 +120,7 @@ class CurriculumDisplay extends Component {
             <div className="dropdown-section">
               <DropDown
                 menuList={this.state.curriculumNames}
-                defaultValue="Select Department"
+                defaultValue={this.state.selectedCurriculum}
                 getValue={this.updateSelectedCurriculum}
               />
             </div>
