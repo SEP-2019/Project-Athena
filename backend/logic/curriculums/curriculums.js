@@ -2,6 +2,30 @@ const mysql = require("../../sql/connection");
 const format = require("../../validation/format");
 
 /**
+ * @Returns a list containing the names of all curriculums from the database
+ * @author Patrick Lai
+ * @throws error if MySQL connection failed
+ */
+var getAllCurriculumNames = async function() {
+  let connection = await mysql.getNewConnection();
+
+  try {
+    let curriculumNames = await connection.query(
+      "SELECT curriculum_name FROM curriculums;"
+    );
+    
+    // strip all the properties and just return the names
+    return curriculumNames.map(c => c["curriculum_name"]);
+  }
+  catch (err){
+    console.error(err);
+    throw Error("Internal server error");
+  } finally {
+    connection.release();
+  }
+}
+
+/**
  * @Returns a curriculum and its associated courses from the database
  * @author Feras Al Taha and Alex Lam
  * @returns a curriculum and its core classes & tech comps from the database in JSON format
@@ -152,6 +176,7 @@ var createCurriculum = async (
 };
 
 module.exports = {
+  getAllCurriculumNames,
   createCurriculum,
   getCurriculum
 };

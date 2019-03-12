@@ -5,6 +5,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import CourseTable from '../../components/CourseTable'
 import DropDown from '../../components/DropDown/DropDown';
+import axios from 'axios';
 
 function createCourse(courseName, numCredits) {
   return { courseName, numCredits };
@@ -59,6 +60,41 @@ function dummyData() {
 class CurriculumDisplay extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      curriculumNames: [],
+      selectedCurriculum: "",
+      selectedCurriculumDetials: {},
+      curriculumError: null,
+    };
+    this.fetchCurriculum()
+  }
+
+  fetchCurriculum() {
+    // first get the list of the curriculum names, then fetch each curriculum
+    axios
+      .get('http://localhost:3001/curriculums/getAllCurriculumNames')
+      .then(response => 
+        this.setState({
+          curriculumNames: response.data,
+        })
+      )
+      .catch(curriculumError =>
+        this.setState({ curriculumError })
+      );
+  }
+
+  updateSelectedCurriculum(selected){
+    axios
+    .get('http://localhost:3001/curriculums/getCurriculum?name=' + selected)
+    .then(response => {
+      console.log(response.data)
+      // this.setState({
+      //   selectedCurriculumDetials: response.data,
+      // })
+    })
+    .catch(curriculumError =>
+      this.setState({curriculumError})
+    )
   }
 
   render() {
@@ -69,12 +105,12 @@ class CurriculumDisplay extends Component {
           <div className="curriculum-selection-menu">
             <div className="dropdown-section">
               <DropDown
-                menuList={["Software", "Electrical", "Computer"]}
+                menuList={this.state.curriculumNames}
                 defaultValue="Select Department"
-                getValue={() => console.log("testing")}
+                getValue={this.updateSelectedCurriculum}
               />
             </div>
-            <div className="dropdown-section">
+            {/* <div className="dropdown-section">
               <DropDown
                 menuList={["Fall 2015", "Winter 2016"]}
                 defaultValue="Select Start Semester"
@@ -87,7 +123,7 @@ class CurriculumDisplay extends Component {
                 defaultValue="Select Origin"
                 getValue={() => console.log("testing")}
               />
-            </div>
+            </div> */}
           </div>
 
           <div className="curriculum-content">
