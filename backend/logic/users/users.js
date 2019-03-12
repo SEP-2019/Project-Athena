@@ -111,12 +111,12 @@ var insertAdminUser = async (username, password, email, id) => {
   let hash = hasher.hashPass(password);
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [
+    await connection.query("INSERT INTO users (username, email, password) VALUES(?, ?, ?);", [
       username,
       email,
       hash
     ]);
-    await connection.query("INSERT INTO staff_members VALUES(?, ?);", [
+    await connection.query("INSERT INTO staff_members (staff_id, username) VALUES(?, ?);", [
       id,
       username
     ]);

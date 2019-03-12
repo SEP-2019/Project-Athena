@@ -55,7 +55,7 @@ var addCourse = async (courseCode, title, departement, phasedOut) => {
   let connection = await mysql.getNewConnection();
 
   try {
-    await connection.query("INSERT INTO courses VALUES(?, ?, ?, ?);", [
+    await connection.query("INSERT INTO courses (course_code, title, department, phased_out) VALUES(?, ?, ?, ?);", [
       courseCode,
       title,
       departement,
@@ -107,7 +107,7 @@ var addCompletedCourses = async (studentId, courses) => {
             course + courses[course][i].semester + courses[course][i].section
           ];
         await connection.query(
-          "INSERT INTO student_course_offerings VALUES(?, ?, ?);",
+          "INSERT INTO student_course_offerings (student_id, offering_id, semester) VALUES(?, ?, ?);",
           [studentId, id, courses[course][i].semester]
         );
       }
