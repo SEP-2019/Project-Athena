@@ -194,9 +194,9 @@ var getCompletedCourses = async studentID => {
 
 var getStudentData = async studentID => {
   let error = false;
-  // if (!format.verifyStudentId(studentID)) {
-  //   error = "invalid format id";
-  // }
+  if (!format.verifyStudentId(studentID)) {
+    error = "invalid format id";
+  }
 
   if (!error == false) {
     console.error(error);
@@ -237,15 +237,12 @@ var getStudentData = async studentID => {
     }
 
     let incompleteCore = await conn.query(
-      `SELECT course_code, semester 
+       `SELECT course_code, semester 
       FROM course_offerings 
-      WHERE (course_code 
-              NOT IN (SELECT course_code 
-                      FROM course_offerings 
-                      WHERE (id, semester) 
-                      IN (SELECT offering_id, semester 
-                          FROM student_course_offerings 
-                          WHERE student_id = ?))) 
+      WHERE (id 
+              NOT IN (SELECT offering_id 
+                      FROM student_course_offerings 
+                      WHERE student_id = ?)) 
       AND (semester = ? OR semester = ?) 
       AND (course_code 
           IN (SELECT course_code 
@@ -256,13 +253,10 @@ var getStudentData = async studentID => {
     let desiredTC = await conn.query(
       `SELECT course_code, semester 
       FROM course_offerings 
-      WHERE (course_code 
-            NOT IN (SELECT course_code 
-                    FROM course_offerings 
-                    WHERE (id, semester) 
-                    IN (SELECT offering_id, semester 
-                        FROM student_course_offerings 
-                        WHERE student_id = ?))) 
+      WHERE (id 
+            NOT IN (SELECT offering_id 
+                    FROM student_course_offerings 
+                    WHERE student_id = ?))
       AND (semester = ? OR semester = ?) 
       AND (course_code 
           IN (SELECT course_code 
