@@ -60,10 +60,12 @@ function dummyData() {
 class CurriculumDisplay extends Component {
   constructor(props) {
     super(props);
+    this.updateSelectedCurriculum = this.updateSelectedCurriculum.bind(this);
+    this.fetchCurriculum = this.fetchCurriculum.bind(this);
     this.state = {
       curriculumNames: [],
       selectedCurriculum: "",
-      selectedCurriculumDetials: {},
+      selectedCurriculumDetials: null,
       curriculumError: null,
     };
     this.fetchCurriculum()
@@ -88,13 +90,24 @@ class CurriculumDisplay extends Component {
     .get('http://localhost:3001/curriculums/getCurriculum?name=' + selected)
     .then(response => {
       console.log(response.data)
-      // this.setState({
-      //   selectedCurriculumDetials: response.data,
-      // })
+      this.setState({
+        selectedCurriculumDetials: response.data,
+      })
     })
     .catch(curriculumError =>
       this.setState({curriculumError})
     )
+  }
+
+  getCourseTable(props){
+    // typeOfCourses is either core or complimentary, depending on what gets passed from render()
+    if (!props.details || !props.details[props.typeOfCourses]) return <div>Please select a curriculum from the dropdown menu</div> ;
+
+    return <CourseTable courses={
+      // get unique courses by code since ther ecan by duplicates
+      [...new Set(props.details[props.typeOfCourses].map(c => c.course_code))]
+      .map(code => createCourse(code, 3))
+    } />;
   }
 
   render() {
@@ -127,14 +140,20 @@ class CurriculumDisplay extends Component {
           </div>
 
           <div className="curriculum-content">
-            {dummyData().map((semester) => (
-              <div className="semester-course-display" key={semester.name}>
-                <div className="semester-name">{semester.name}</div>
+           
+              <div className="semester-course-display" key="Mandatory Courses">
+                <div className="semester-name">Mandatory Courses</div>
                 <div className="semester-course-table" style={{ width: 512 }}>
-                  <CourseTable courses={semester.courses} />
+                  <this.getCourseTable details={this.state.selectedCurriculumDetials} typeOfCourses={"core_classes"}/>
                 </div>
               </div>
-            ))}
+              <div className="semester-course-display" key="Technical Complimentary Courses">
+                <div className="semester-name">Technical Complimentary Courses</div>
+                <div className="semester-course-table" style={{ width: 512 }}>
+                  <this.getCourseTable details={this.state.selectedCurriculumDetials} typeOfCourses={"tech_comps"}/>
+                </div>
+              </div>
+           
           </div>
         </div>
       </div >
