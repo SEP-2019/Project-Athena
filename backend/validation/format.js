@@ -324,6 +324,16 @@ var verifyPhaseOut = phaseOut => {
   }
 };
 
+/**
+ * Verifies that the tag is not null
+ * @param {String} tag
+ */
+var verifyTag = async tag => {
+  if (!tag) {
+    throw new Error("invalid format tag");
+  }
+};
+
 module.exports = {
   verifyUsername,
   verifyPassword,
@@ -341,5 +351,6 @@ module.exports = {
   verifyCourseCode,
   verifyTitle,
   verifyDepartmentSubName,
-  verifyPhaseOut
+  verifyPhaseOut,
+  verifyTag
 };
