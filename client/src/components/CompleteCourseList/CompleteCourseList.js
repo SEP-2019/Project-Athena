@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import ExpendableCourse from '../ExpendableCourse/ExpendableCourse';
+import ExpandableCourse from '../ExpandableCourse/ExpandableCourse';
 import './CompleteCourseList.css';
 
 class CompleteCourseList extends Component {
@@ -17,7 +17,7 @@ class CompleteCourseList extends Component {
         <div>
           {this.props.errorMessage(
             this.props.courses.map((course, index) => (
-              <ExpendableCourse
+              <ExpandableCourse
                 key={index}
                 index={index}
                 course_code={course.course_code + ' ー ' + course.title}
