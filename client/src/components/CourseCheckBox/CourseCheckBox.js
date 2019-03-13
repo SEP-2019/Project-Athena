@@ -1,33 +1,79 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { withStyles } from '@material-ui/core/styles';
+import MuiExpansionPanel from '@material-ui/core/ExpansionPanel';
+import MuiExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import MuiExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 import './CourseCheckBox.css';
 
-class CourseCheckBox extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+const ExpansionPanel = withStyles({
+  root: {
+    border: '1px solid rgba(0,0,0,.15)',
+    boxShadow: 'none',
+    '&:not(:last-child)': {
+      borderBottom: 0,
+    },
+    '&:before': {
+      display: 'none',
+    },
+  },
+  expanded: {
+    margin: 'auto',
+  },
+})(MuiExpansionPanel);
 
-  render() {
-    return (
-      <div>
-        <div htmlFor={this.props.course_code} className="course_checkbox">
-          <label className="checkbox_label">{this.props.course_code}</label>
+const ExpansionPanelSummary = withStyles({
+  root: {
+    backgroundColor: 'rgba(0,0,0,.03)',
+    minHeight: 56,
+    '&$expanded': {
+      minHeight: 56,
+      background: 'rgba(178, 0, 7, 0.3)',
+    },
+  },
+  content: {
+    '&$expanded': {
+      margin: '1rem 0',
+    },
+  },
+  expanded: {
+    marginBottom: -1,
+  },
+})(MuiExpansionPanelSummary);
+
+const ExpansionPanelDetails = withStyles({
+  root: {
+    padding: '24px 24px 24px',
+  },
+})(MuiExpansionPanelDetails);
+
+function CourseCheckBox(props) {
+  return (
+    <ExpansionPanel>
+      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+        <div htmlFor={props.index} className="course_checkbox">
+          <label className="checkbox_label">{props.course_code}</label>
           <input
-            id={this.props.course_code}
+            id={props.index}
             type="checkbox"
-            name={this.props.course_code}
-            checked={this.props.checked}
-            onChange={this.props.handleChange}
+            name={props.course_code}
+            checked={props.checked}
+            onChange={props.handleChange}
           />
-          <label className="spacer_label" />
-          <label
-            htmlFor={this.props.course_code}
-            className="custom_large_checkbox"
-          />
+          <label htmlFor={props.index} className="custom_large_checkbox" />
         </div>
-      </div>
-    );
-  }
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <Typography>
+          {/* TODO: Backend Team needs to add Description to Courses and then Add props.description */}
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+          malesuada lacus ex, sit amet blandit leo lobortis eget.
+        </Typography>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  );
 }
 
 export default CourseCheckBox;
