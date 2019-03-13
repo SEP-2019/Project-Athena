@@ -11,9 +11,7 @@ class CourseCheckBox extends Component {
     return (
       <div>
         <div htmlFor={this.props.course_code} className="course_checkbox">
-          <label htmlFor={this.props.course_code} className="checkbox_label">
-            {this.props.course_code}
-          </label>
+          <label className="checkbox_label">{this.props.course_code}</label>
           <input
             id={this.props.course_code}
             type="checkbox"
@@ -21,7 +19,7 @@ class CourseCheckBox extends Component {
             checked={this.props.checked}
             onChange={this.props.handleChange}
           />
-          <label htmlFor={this.props.course_code} className="spacer_label" />
+          <label className="spacer_label" />
           <label
             htmlFor={this.props.course_code}
             className="custom_large_checkbox"
