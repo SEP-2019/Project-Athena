@@ -102,10 +102,16 @@ class CurriculumDisplay extends Component {
 
   getCourseTable(props){
     // typeOfCourses is either core or complimentary, depending on what gets passed from render()
-    if (!props.details || !props.details[props.typeOfCourses]) return <div>Please select a curriculum from the dropdown menu</div> ;
+
+    // nothing is selected
+    if (!props.details) return <div>Please select a curriculum from the dropdown menu</div> ;
+
+    // something is selcted but has no courses of the selected type available
+    if (!props.details[props.typeOfCourses]) return <div>The selected curriculum has no valid courses at this time.</div>
 
     return <CourseTable courses={
-      // get unique courses by code since ther ecan by duplicates
+      // get unique courses by code since there can by duplicates
+      // TODO: get number of credits per course
       [...new Set(props.details[props.typeOfCourses].map(c => c.course_code))]
       .map(code => createCourse(code, 3))
     } />;
