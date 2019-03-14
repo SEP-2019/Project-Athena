@@ -1,8 +1,10 @@
 const mocha = require("mocha");
 const users = require("../logic/users/users.js");
+const courses = require("../logic/courses/courses");
 const assert = require("assert");
 const nock = require("nock");
 const mysql = require("../sql/connection");
+const expect = require("chai").expect;
 
 /*
 const host = 'http://localhost:3000';
@@ -661,3 +663,67 @@ describe("Tests add admin user", function() {
 //     });
 //   });
 // });
+
+describe("Test get student completed courses", () => {
+  // initialize test data
+  before(async () => {
+    await courses.addCourse(
+      "TEST 001",
+      "Get completed Course Test",
+      "TEST",
+      "0"
+    );
+
+    const courseOffering = {
+      "TEST 001": [
+        {
+          id: 940915,
+          semester: "W2017",
+          section: 1,
+          scheduled_time: "M 10:05-13:35 T 10:35-11:35 F 14:05-16:05"
+        }
+      ]
+    };
+    await courses.addCourseOfferings(courseOffering);
+
+    await users.insertStudentUser(
+      "getCompletedCourseTest",
+      "getCompletedCourseTest",
+      "getCompletedCourseTest@email.com",
+      260561054
+    );
+
+    const conn = await mysql.getNewConnection();
+    await conn.query(
+      `INSERT INTO student_course_offerings (student_id, offering_id, semester)
+    VALUES(?, ?, ?);`,
+      [260561054, 940915, "W2017"]
+    );
+
+    await conn.release();
+  });
+
+  // clean up test data
+  after(async () => {
+    const conn = await mysql.getNewConnection();
+    await conn.query(
+      `DELETE FROM student_course_offerings WHERE student_id = ?;`,
+      [260561054]
+    );
+    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [940915]);
+    await conn.query(`DELETE FROM courses WHERE course_code = ?;`, [
+      "TEST 001"
+    ]);
+    await users.deleteStudentUser("getCompletedCourseTest");
+
+    await conn.release();
+  });
+
+  it("returns student completed course as JSON", async () => {
+    const expected = [{ course_code: "TEST 001", semester: "W2017" }];
+    const res = await users.getCompletedCourses(260561054);
+
+    assert.equal(JSON.stringify(expected), res);
+  });
+});
+

@@ -376,7 +376,7 @@ router.post("/phaseOutCourse", async (req, res, next) => {
  * @apiExample {curl} Example usage:
  *	curl -X POST \
  *  -H 'Content-Type: application/json' \
- *  -d '{"courseType": "core", "courseCode": "ECSE 428", "curriculum": "ee"}' \
+ *  -d '{"courseType": "core", "courseCode": "ECSE 428", "curriculum": "eeElectrical Engineering-2018-2019-8-semester-curriculum"}' \
  *  http://localhost:3001/courses/assignCourseToCurriculum
  *
  * @returns True on success

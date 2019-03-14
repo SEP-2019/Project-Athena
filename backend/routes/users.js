@@ -115,7 +115,7 @@ router.post("/completedCourses/comparison", function(req, res) {
  * @apiExample {curl} Example usage:
  * 		curl -X GET -H "Content-Type: application/json" 'http://localhost:3001/users/getCompletedCourses?studentID=12345'
  *
- * @returns An json of completed course code, e.g [{"course_code":"ECSE422","semester":"W2019"},{"course_code":"ECSE428","semester":"F2019"}]
+ * @returns An json of completed course code, e.g [{"course_code":"ECSE 422","semester":"W2019"},{"course_code":"ECSE 428","semester":"F2019"}]
  *
  * @author: Yufei Liu
  *

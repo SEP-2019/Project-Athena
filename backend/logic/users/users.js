@@ -193,19 +193,19 @@ var getCompletedCourses = async studentID => {
 };
 
 var getStudentData = async studentID => {
-  let error = false;
+  let error;
   if (!format.verifyStudentId(studentID)) {
     error = "invalid format id";
   }
 
-  if (!error == false) {
+  if (error) {
     console.error(error);
     throw new Error(error);
   }
 
   let data;
   let conn = await mysql.getNewConnection();
-  let completedCourses, incompletedCourses, major, minors;
+  let completedCourses, major, minors;
   try {
     completedCourses = await conn.query(
       `SELECT course_code, semester
@@ -218,6 +218,7 @@ var getStudentData = async studentID => {
       `SELECT curriculum_name FROM student_majors WHERE student_id = ?;`,
       [studentID]
     );
+
     minors = await conn.query(
       `SELECT curriculum_name FROM student_minors WHERE student_id = ?;`,
       [studentID]
@@ -300,6 +301,7 @@ var getStudentData = async studentID => {
         [c.course_code]
       );
     }
+
 
     conn.release();
 
