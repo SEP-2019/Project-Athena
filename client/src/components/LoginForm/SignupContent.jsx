@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Section from '../Section';
 import EditText from '../EditText';
-import DropDown from '../DropDownOutlined';
 
 class SignupContent extends Component {
   render() {
@@ -32,6 +31,7 @@ class SignupContent extends Component {
             type="password"
           />
         </Section>
+
         <button className="primary-button">Sign up</button>
         <Section flexDirection="row" style={{ margin: '1vh' }}>
           <text>Have an account? </text>
