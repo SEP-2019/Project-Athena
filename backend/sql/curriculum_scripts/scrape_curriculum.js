@@ -21,7 +21,6 @@ if (process.argv.length < 4 || process.argv.length > 4) {
   process.exit(1);
 }
 
-
 const curriculum_URL = String(process.argv[2]);
 const tech_comps_URL = String(process.argv[3]);
 
@@ -100,10 +99,16 @@ async function store_curriculum(curriculum) {
     courses.forEach(async course => {
       //Stores the courses
       await connection.query(
-        "INSERT INTO courses (course_code,title,department) VALUES(?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-        [course.course_code, course.course_title, course.department]
+        "INSERT INTO courses (course_code,title,department,description,credits) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
+        [
+          course.course_code,
+          course.course_title,
+          course.department,
+          course.course_description,
+          course.credits
+        ]
       );
-
+      
       //Links the courses to the current curriculum
       await connection.query(
         "INSERT INTO curriculum_core_classes (curriculum_name,course_code) VALUES(?,?);",
@@ -178,6 +183,7 @@ async function store_curriculum(curriculum) {
   } catch (error) {
     console.error(error);
   } finally {
+    console.log("release");
     connection.release();
   }
 }
@@ -189,9 +195,11 @@ async function store_curriculum(curriculum) {
  *
  * courses will take the following format:
  * {
- *  course_code: ecse 
- * 
- *
+ *  course_code: ecse 427,
+ *  course_title: Operating Systems,
+ *  department:ECSE
+ *  course_description:Study of operating systems...etc,
+ *  credits: 3
  * }
  */
 async function parse_courses(url, property) {
@@ -216,7 +224,15 @@ async function parse_courses(url, property) {
             department: $(course_element)
               .find(".course_number")
               .text()
-              .replace(/\s\d*/g, "")
+              .replace(/\s\d*/g, ""),
+              credits: $(course_element).find(".course_credits")
+              ? parseInt(
+                  $(course_element)
+                    .find(".course_credits")
+                    .text()
+                    .match(/[0-9]{1}/g)
+                )
+              : 0
           };
 
           let coreqs = [];
@@ -257,7 +273,7 @@ async function parse_courses(url, property) {
 async function scrape_curriculum() {
   curriculum = await parse_courses(curriculum_URL, "courses");
   curriculum = await parse_courses(tech_comps_URL, "tech_comps");
-  //store_curriculum(curriculum);
+  store_curriculum(curriculum);
 }
 
 scrape_curriculum();
