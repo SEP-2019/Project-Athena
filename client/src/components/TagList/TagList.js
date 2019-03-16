@@ -29,7 +29,6 @@ class TagList extends Component {
       this.selectedCheckboxes.add(checkbox);
       console.log(checkbox, 'is selected');
     }
-    //TODO: Store in cookie
     this.props.updateTagsCheckedState(tags);
   }
 
@@ -82,6 +81,7 @@ class TagList extends Component {
               ))}
             </div>
             <div className="btn_container">
+              {/* TODO: Add an Apply button and Post request to store info */}
               <button className="btn" onClick={this.onClearAll}>
                 CLEAR ALL
               </button>
