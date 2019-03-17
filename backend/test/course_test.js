@@ -174,7 +174,7 @@ describe("Tests add student future desired courses", function() {
       .saveUserPreferences(null, ["ECSE 307", "ECSE 251", "ECSE 325"])
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, "invalid format student id");
+          assert.equal(response.message, "Id cannot be empty");
           resolve();
         }).then(done);
       });
@@ -197,7 +197,7 @@ describe("Tests add student future desired courses", function() {
       .saveUserPreferences(invalid_id_2, ["ECSE 307", "ECSE 251", "ECSE 325"])
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, "invalid format student id");
+          assert.equal(response.message, "Id must be numeric");
           resolve();
         }).then(done);
       });
@@ -213,14 +213,13 @@ describe("Tests add student future desired courses", function() {
         }).then(done);
       });
   });
-  
 
   it("responds with invalid format course code 2", function(done) {
     courses
       .saveUserPreferences(id, ["Z1Z2 L21", "ECSE 251", "ECSE 325"])
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, "invalid format course code");
+          assert.equal(response.message, "Invalid format course code for course Z1Z2 L21");
           resolve();
         }).then(done);
       });
@@ -237,12 +236,10 @@ describe("Tests add student future desired courses", function() {
   });
 
   after(async () => {
-
     await conn.query(
       `DELETE FROM student_desired_courses WHERE student_id = ?;`,
       [id]
     );
-
     await users.deleteStudentUser(username);
   });
 });
