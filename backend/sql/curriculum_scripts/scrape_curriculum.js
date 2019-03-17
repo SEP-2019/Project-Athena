@@ -225,14 +225,18 @@ async function parse_courses(url, property) {
               .find(".course_number")
               .text()
               .replace(/\s\d*/g, ""),
-              credits: $(course_element).find(".course_credits")
+            credits: $(course_element).find(".course_credits")
               ? parseInt(
                   $(course_element)
                     .find(".course_credits")
                     .text()
                     .match(/[0-9]{1}/g)
                 )
-              : 0
+              : 0,
+           semester: Array.from($(course_element).find(".course_terms").getElementsByTagName("li")).forEach(function(course){
+              console.log(course.innerText);
+              // semester: Array.from($(course_element).find(".course_terms").find("li")).forEach( element => {console.log(element.text());
+          })
           };
 
           let coreqs = [];
