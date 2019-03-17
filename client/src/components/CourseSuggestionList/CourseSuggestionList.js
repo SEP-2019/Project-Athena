@@ -16,8 +16,10 @@ class CourseSuggestionList extends Component {
     this.selectedCheckboxes = this.props.loadedCourses;
   };
 
-  //TODO: to be changed
   handleChange(index, checked, checkbox) {
+    if (typeof checkbox === 'undefined') {
+      return;
+    }
     const { tag, courses } = this.state;
     courses[index].checked = checked;
     this.setState({ courses });
@@ -29,27 +31,8 @@ class CourseSuggestionList extends Component {
       this.selectedCheckboxes.add(checkbox);
       console.log(checkbox, 'is selected');
     }
-    //TODO: Store in cookie
     this.props.updateCoursesCheckedState(tag, checkbox, courses);
   }
-
-  createSuggestionList = (tag, index) => (
-    <div className="tag" key={index}>
-      <h4>{tag.name}</h4>
-      {tag.courses.map(this.createCourseList)}
-      {/* {tag.courses.map((course, index) => (
-        <CourseCheckBox
-          key={index}
-          index={index}
-          name={course.course_code}
-          checked={course.checked}
-          handleChange={e =>
-            this.handleChange(index, e.target.checked, e.target.course_code)
-          }
-        />
-      ))} */}
-    </div>
-  );
 
   createCourseList = (course_label, index) => (
     <div className="suggestion-course" key={index}>
@@ -66,7 +49,7 @@ class CourseSuggestionList extends Component {
             this.props.courses.map((course, index) => (
               <CourseCheckBox
                 key={index}
-                index={index}
+                index={course.course_code + index}
                 course_code={course.course_code}
                 checked={
                   this.selectedCheckboxes.has(course.course_code) ? true : false

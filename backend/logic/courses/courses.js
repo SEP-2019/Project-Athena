@@ -9,7 +9,7 @@ const format = require("../../validation/format");
  * @throws Undefined tag if tag is null
  *         error if MySQL connection failed
  */
-var queryCourseByTag = async function queryCourseByTag(tag) {
+var getCourseByTag = async function getCourseByTag(tag) {
   if (!tag) {
     throw Error("Undefined tag");
   }
@@ -17,7 +17,8 @@ var queryCourseByTag = async function queryCourseByTag(tag) {
   let connection = await mysql.getNewConnection();
   try {
     let courses = await connection.query(
-      "SELECT course_code FROM course_tags WHERE tag_name LIKE ?",
+      `SELECT course_code,description FROM courses WHERE course_code IN 
+      (SELECT course_code FROM course_tags WHERE tag_name = ?);`,
       tag
     );
     connection.release();
@@ -116,7 +117,7 @@ var addCompletedCourses = async (studentId, courses) => {
             course + courses[course][i].semester + courses[course][i].section
           ];
         await connection.query(
-          "INSERT INTO student_course_offerings VALUES(?, ?, ?);",
+          "INSERT INTO student_course_offerings (student_id, offering_id, semester) VALUES(?, ?, ?);",
           [studentId, id, courses[course][i].semester]
         );
       }
@@ -432,7 +433,7 @@ var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
 };
 
 module.exports = {
-  queryCourseByTag,
+  getCourseByTag,
   addCourse,
   addCompletedCourses,
   addCourseOfferings,

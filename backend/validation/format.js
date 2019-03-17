@@ -341,6 +341,16 @@ var verifyDescription = description => {
   }
 };
 
+ /**
+ * Verifies that the tag is not null
+ * @param {String} tag
+ */
+var verifyTag = tag => {
+  if (!tag) {
+    throw new Error("invalid format tag");
+  }
+};
+
 module.exports = {
   verifyUsername,
   verifyPassword,
@@ -360,5 +370,6 @@ module.exports = {
   verifyDepartmentSubName,
   verifyPhaseOut,
   verifyCredits,
-  verifyDescription
+  verifyDescription,
+  verifyTag
 };

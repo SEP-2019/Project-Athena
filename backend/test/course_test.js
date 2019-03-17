@@ -20,7 +20,7 @@ describe("Test retrieve course by tag", function() {
       ["ECSE 428", "Engineering"]
     );
     await connection.release();
-    return courses.queryCourseByTag("Engineering").then(function(res) {
+    return courses.getCourseByTag("Engineering").then(function(res) {
       let found = false;
       let searchingFor = { course_code: "ECSE 428" };
       for (course in res) {
