@@ -152,7 +152,8 @@ router.post("/login", async (req, res) => {
  * @apiExample {curl} Example usage:
  * 		curl -X GET -H "Content-Type: application/json" 'http://localhost:3000/users/getStudentData?studentID=12345'
  *
- * @returns An json of current major & minors, and completed course code, e.g {"major":"Electrical Major","minor":"Software Minor","courses":[{"course_code":"ECSE422","semester":"W2019"},{"course_code":"ECSE428","semester":"F2019"}]}
+ * @returns An json of major, minors, completed courses, incompleted core classes and desired tech comps offered next semester,
+ *  e.g {"major":[{"curriculum_name":"eeElectrical Engineering-2018-2019-8-semester-curriculum"}],"minor":[],"completedCourses":[{"course_code":"ECSE 428","semester":"winter"}],"incompletedCore":[{"course_code":"ECSE 202","prereqs":[],"coreqs":[],"semester":""}],"desiredTC":[{"course_code":"ECSE 403","prereqs":[{"prereq_course_code":"ECSE 307"}],"coreqs":[],"semester":""}]}
  *
  * @author: Feras Al Taha
  *

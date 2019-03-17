@@ -37,12 +37,21 @@ var getCourseByTag = async function getCourseByTag(tag) {
  * @param {String} title
  * @param {String} departement
  * @param {String} phasedOut
+ * @param {String} description
+ * @param {int} credits
  * @returns true if successful
  * @throws error if MySQL connection failed
  *         invalid format courses if JSON format is incorrect
  *         false if insertion failed
  */
-var addCourse = async (courseCode, title, departement, phasedOut) => {
+var addCourse = async (
+  courseCode,
+  title,
+  departement,
+  phasedOut,
+  description,
+  credits
+) => {
   // Verifying proper format
   if (phasedOut === undefined) {
     phasedOut = "0";
@@ -51,14 +60,16 @@ var addCourse = async (courseCode, title, departement, phasedOut) => {
   await format.verifyTitle(title);
   await format.verifyDepartmentSubName(departement);
   await format.verifyPhaseOut(phasedOut);
+  await format.verifyDescription(description);
+  await format.verifyCredits(credits);
 
   // Connect to database
   let connection = await mysql.getNewConnection();
 
   try {
     await connection.query(
-      "INSERT INTO courses (course_code, title, department, phased_out) VALUES(?, ?, ?, ?);",
-      [courseCode, title, departement, phasedOut]
+      "INSERT INTO courses (course_code, title, department, phased_out, description, credits) VALUES(?, ?, ?, ?, ?, ?);",
+      [courseCode, title, departement, phasedOut, description, credits]
     );
     return true;
   } catch (error) {

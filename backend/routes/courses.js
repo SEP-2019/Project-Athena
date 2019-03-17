@@ -33,8 +33,10 @@ router.get("/getCourseByTag", async function(req, res) {
 	{
     "courseCode": "ECSE 428",
     "title": "Software Engineering Practice",
-    "departement" : "ECSE"
-    "phasedOut" : "0"
+    "departement": "ECSE",
+    "phasedOut": "0",
+    "description": "Practice in software",
+    "credits": 3
   }
 * Curl:
 	curl -X POST \
@@ -43,8 +45,10 @@ router.get("/getCourseByTag", async function(req, res) {
 	-d '{
     "courseCode": "ECSE 428",
     "title": "Software Engineering Practice",
-    "departement" : "ECSE"
-    "phasedOut" : "0"
+    "departement" : "ECSE",
+    "phasedOut" : "0",
+    "description" : "Practice in software",
+    "credits": 3
   }'
 *
 * @returns true if course was added successfully or false otherwise
@@ -56,8 +60,10 @@ router.post("/createCourse", function(req, res) {
   const title = req.body.title;
   const departement = req.body.departement;
   const phasedOut = req.body.phasedOut;
+  const description = req.body.description;
+  const credits = req.body.credits;
   courses
-    .addCourse(courseCode, title, departement, phasedOut)
+    .addCourse(courseCode, title, departement, phasedOut, description, credits)
     .then(val => {
       res.send(val);
     })

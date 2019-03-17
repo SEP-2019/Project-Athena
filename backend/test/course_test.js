@@ -45,14 +45,18 @@ describe("Test assign course to curriculumn", () => {
       "TEST 001",
       "Assign Course to Curriculumn Test 001",
       "TEST",
-      "0"
+      "0",
+      "TEST",
+      3
     );
 
     await courses.addCourse(
       "TEST 002",
       "Assign Course to Curriculumn Test 002",
       "TEST",
-      "0"
+      "0",
+      "TEST",
+      3
     );
 
     await courses.assignCourseToCurriculum(
