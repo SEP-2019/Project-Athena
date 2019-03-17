@@ -2,6 +2,8 @@ const express = require("express");
 const users = require("../logic/users/users");
 //const curriculum = require("../logic/courses/curriculum");
 const router = express.Router();
+let asyncMiddleware = require("./errorHandlingMiddleware");
+let customResponse = require("../validation/customResponse");
 
 /**
  * @api {post} /addStudentUser
@@ -33,20 +35,17 @@ const router = express.Router();
  *
  * @author: Steven Li + Alex Lam
  */
-router.post("/addStudentUser", function(req, res, next) {
-  const username = req.body.username;
-  const password = req.body.password;
-  const email = req.body.email;
-  const id = req.body.student_id;
-  users
-    .insertStudentUser(username, password, email, id)
-    .then(val => {
-      res.send(val);
-    })
-    .catch(err => {
-      res.status(500).send(err.message);
-    });
-});
+router.post(
+  "/addStudentUser",
+  asyncMiddleware(async function(req, res, next) {
+    const username = req.body.username;
+    const password = req.body.password;
+    const email = req.body.email;
+    const id = req.body.student_id;
+    let result = await users.insertStudentUser(username, password, email, id);
+    res.send(customResponse(result));
+  })
+);
 
 /**
  * @api {post} /addAdminUser
@@ -78,34 +77,17 @@ router.post("/addStudentUser", function(req, res, next) {
  *
  * @author: Steven Li
  */
-router.post("/addAdminUser", function(req, res, next) {
-  const username = req.body.username;
-  const password = req.body.password;
-  const email = req.body.email;
-  const id = req.body.admin_id;
-  users
-    .insertAdminUser(username, password, email, id)
-    .then(val => {
-      res.send(val);
-    })
-    .catch(err => {
-      res.status(500).send(err.message);
-    });
-});
-
-/*Receive the User's completed Courses and compare them to curriculum*/
-router.post("/completedCourses/comparison", function(req, res) {
-  let completedCourses = req.body;
-  curriculum
-    .courseComparison(completedCourses)
-    .then(function(remainingCourses) {
-      res.send(remainingCourses);
-    })
-    .catch(function(err) {
-      console.error(err);
-      res.status(500).send("Error comparing completed courses and curriculum");
-    });
-});
+router.post(
+  "/addAdminUser",
+  asyncMiddleware(async function(req, res, next) {
+    const username = req.body.username;
+    const password = req.body.password;
+    const email = req.body.email;
+    const id = req.body.admin_id;
+    let result = await users.insertAdminUser(username, password, email, id);
+    res.send(customResponse(result));
+  })
+);
 
 /**
  *
@@ -120,29 +102,26 @@ router.post("/completedCourses/comparison", function(req, res) {
  * @author: Yufei Liu
  *
  */
-router.get("/getCompletedCourses", async (req, res) => {
-  const student_id = req.query.studentID;
-  const result = await users.getCompletedCourses(student_id);
-  if (result === "No student ID found!") {
-    return res.status(400).send(result);
-  } else if (result === "Interval serever error!") {
-    return res.status(500).send(result);
-  }
-  return res.status(200).send(result);
-});
+router.get(
+  "/getCompletedCourses",
+  asyncMiddleware(async (req, res, next) => {
+    const student_id = req.query.studentID;
+    const result = await users.getCompletedCourses(student_id);
+    return res.send(customResponse(result));
+  })
+);
 
 /* Retrieve user's username and password and compare to stored values for logging in */
-router.post("/login", async (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
-  try {
+router.post(
+  "/login",
+  asyncMiddleware(async (req, res, next) => {
+    const username = req.body.username;
+    const password = req.body.password;
     if (await users.login(username, password)) {
-      res.status(200).send("Authenticated");
+      res.send(customResponse("Authenticated"));
     }
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
+  })
+);
 
 /**
  *
@@ -152,20 +131,19 @@ router.post("/login", async (req, res) => {
  * @apiExample {curl} Example usage:
  * 		curl -X GET -H "Content-Type: application/json" 'http://localhost:3000/users/getStudentData?studentID=12345'
  *
- * @returns An json of current major & minors, and completed course code, e.g {"major":"Electrical Major","minor":"Software Minor","courses":[{"course_code":"ECSE422","semester":"W2019"},{"course_code":"ECSE428","semester":"F2019"}]}
+ * @returns An json of major, minors, completed courses, incompleted core classes and desired tech comps offered next semester,
+ *  e.g {"major":[{"curriculum_name":"eeElectrical Engineering-2018-2019-8-semester-curriculum"}],"minor":[],"completedCourses":[{"course_code":"ECSE 428","semester":"winter"}],"incompletedCore":[{"course_code":"ECSE 202","prereqs":[],"coreqs":[],"semester":""}],"desiredTC":[{"course_code":"ECSE 403","prereqs":[{"prereq_course_code":"ECSE 307"}],"coreqs":[],"semester":""}]}
  *
  * @author: Feras Al Taha
  *
  */
-router.get("/getStudentData", async (req, res) => {
-  const student_id = req.query.studentID;
-  try {
-    const data = await users.getStudentData(student_id);
-    res.status(200).send(data);
-  } catch (error) {
-    //for now just send back generic 500, will have to edit later on to return specific error codes based on what happened
-    res.status(500).send(error.message);
-  }
-});
+router.get(
+  "/getStudentData",
+  asyncMiddleware(async (req, res, next) => {
+    const student_id = req.query.studentID;
+    const result = await users.getStudentData(student_id);
+    res.send(customResponse(result));
+  })
+);
 
 module.exports = router;

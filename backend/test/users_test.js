@@ -45,53 +45,65 @@ describe('POST /users/addStudentUser', function() {
 });
 */
 
+const expectedUsernameNotEmpty = "Username cannot be empty";
+const expectedPasswordNotEmpty = "Password cannot be empty";
+const expectedEmailNotEmpty = "Email cannot be empty";
+const expectedIdNotEmpty = "Id cannot be empty";
+const expectedInvalidUsername = "Username must be alphanumeric";
+const expectedUsernameLessThan64 = "Username length must be less than 64";
+const expectedPassword8To64 = "Password length must be between 8 and 64";
+const expectedInvalidEmail = "Invalid email format";
+const expectedInvalidIdLength = "Id length must be 9";
+const expectedIdNumeric = "Id must be numeric";
+const expectedIdSmallerThanMax = "Id too large";
+const expectedTrue = true;
+
 describe("Tests add student user", function() {
-  it("responds with invalid format username", function(done) {
+  it(`responds with ${expectedUsernameNotEmpty}`, function(done) {
     users
       .insertStudentUser(null, "password", "email@email.com", "123456789")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, "invalid format username");
+          assert.equal(response.message, expectedUsernameNotEmpty);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format password", function(done) {
+  it(`responds with ${expectedPasswordNotEmpty}`, function(done) {
     users
       .insertStudentUser("username", null, "email@email.com", "123456789")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, "invalid format password");
+          assert.equal(response.message, "Password cannot be empty");
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format email", function(done) {
+  it(`responds with ${expectedEmailNotEmpty}`, function(done) {
     users
       .insertStudentUser("username", "password", null, "123456789")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, "invalid format email");
+          assert.equal(response.message, expectedEmailNotEmpty);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format id", function(done) {
+  it(`responds with ${expectedIdNotEmpty}`, function(done) {
     users
       .insertStudentUser("username", "password", "email@email.com", null)
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, "invalid format id");
+          assert.equal(response.message, expectedIdNotEmpty);
           resolve();
         }).then(done);
       });
   });
 
-  const expectedInvalidUsername = "invalid format username";
-  it("responds with invalid format username 1", function(done) {
+  it(`responds with ${expectedInvalidUsername} 1`, function(done) {
     users
       .insertStudentUser(
         "usernameWithSymbols123%@^",
@@ -107,7 +119,7 @@ describe("Tests add student user", function() {
       });
   });
 
-  it("responds with invalid format username 2", function(done) {
+  it(`responds with ${expectedInvalidUsername} 2`, function(done) {
     users
       .insertStudentUser(
         "username123%@^",
@@ -123,7 +135,7 @@ describe("Tests add student user", function() {
       });
   });
 
-  it("responds with invalid format username 3", function(done) {
+  it(`responds with ${expectedUsernameLessThan64}`, function(done) {
     users
       .insertStudentUser(
         "RidiculouslyLongUsernameThatHasZeroPurposeToBeMadeAndAddedIntoTheDatabase",
@@ -133,25 +145,24 @@ describe("Tests add student user", function() {
       )
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidUsername);
+          assert.equal(response.message, expectedUsernameLessThan64);
           resolve();
         }).then(done);
       });
   });
 
-  const expectedInvalidPass = "invalid format password";
-  it("responds with invalid format password 1", function(done) {
+  it(`responds with ${expectedPassword8To64} 1`, function(done) {
     users
       .insertStudentUser("username", "short", "email@email.com", "123456789")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidPass);
+          assert.equal(response.message, expectedPassword8To64);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format password 2", function(done) {
+  it(`responds with ${expectedPassword8To64} 2`, function(done) {
     users
       .insertStudentUser(
         "username",
@@ -161,14 +172,13 @@ describe("Tests add student user", function() {
       )
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidPass);
+          assert.equal(response.message, expectedPassword8To64);
           resolve();
         }).then(done);
       });
   });
 
-  const expectedInvalidEmail = "invalid format email";
-  it("responds with invalid format email 1", function(done) {
+  it(`responds with ${expectedInvalidEmail} 1`, function(done) {
     users
       .insertStudentUser("username", "password", "email", "123456789")
       .catch(response => {
@@ -179,7 +189,7 @@ describe("Tests add student user", function() {
       });
   });
 
-  it("responds with invalid format email 2", function(done) {
+  it(`responds with ${expectedInvalidEmail} 2`, function(done) {
     users
       .insertStudentUser("username", "password", "email#@gma.com", "123456789")
       .catch(response => {
@@ -190,7 +200,7 @@ describe("Tests add student user", function() {
       });
   });
 
-  it("responds with invalid format email 3", function(done) {
+  it(`responds with ${expectedInvalidEmail} 3`, function(done) {
     users
       .insertStudentUser("username", "password", "email@g.c", "123456789")
       .catch(response => {
@@ -201,7 +211,7 @@ describe("Tests add student user", function() {
       });
   });
 
-  it("responds with invalid format email 4", function(done) {
+  it(`responds with ${expectedInvalidEmail} 4`, function(done) {
     users
       .insertStudentUser(
         "username",
@@ -217,41 +227,40 @@ describe("Tests add student user", function() {
       });
   });
 
-  const expectedInvalidId = "invalid format id";
-  it("responds with invalid format id 1", function(done) {
+  it(`responds with ${expectedInvalidIdLength}`, function(done) {
     users
       .insertStudentUser("username", "password", "email@email.com", "1234")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidId);
+          assert.equal(response.message, expectedInvalidIdLength);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format id 2", function(done) {
+  it(`responds with ${expectedIdNumeric} 1`, function(done) {
     users
       .insertStudentUser("username", "password", "email@email.com", "1234ABDS2")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidId);
+          assert.equal(response.message, expectedIdNumeric);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format id 3", function(done) {
+  it(`responds with ${expectedIdNumeric} 2`, function(done) {
     users
       .insertStudentUser("username", "password", "email@email.com", "ab#%@a141")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidId);
+          assert.equal(response.message, expectedIdNumeric);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with true 1", function(done) {
+  it(`responds with ${expectedTrue} 1`, function(done) {
     users
       .insertStudentUser(
         "username1",
@@ -261,13 +270,13 @@ describe("Tests add student user", function() {
       )
       .then(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, true);
+          assert.equal(response, expectedTrue);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with true 2", function(done) {
+  it(`responds with ${expectedTrue} 2`, function(done) {
     users
       .insertStudentUser(
         "username2",
@@ -277,13 +286,13 @@ describe("Tests add student user", function() {
       )
       .then(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, true);
+          assert.equal(response, expectedTrue);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with true 3", function(done) {
+  it(`responds with ${expectedTrue} 3`, function(done) {
     users
       .insertStudentUser(
         "username3",
@@ -293,34 +302,34 @@ describe("Tests add student user", function() {
       )
       .then(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, true);
+          assert.equal(response, expectedTrue);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with true 4", function(done) {
+  it(`responds with ${expectedTrue} 4`, function(done) {
     users.deleteStudentUser("username1").then(response => {
       return new Promise(function(resolve) {
-        assert.equal(response, true);
+        assert.equal(response, expectedTrue);
         resolve();
       }).then(done);
     });
   });
 
-  it("responds with true 5", function(done) {
+  it(`responds with ${expectedTrue} 5`, function(done) {
     users.deleteStudentUser("username2").then(response => {
       return new Promise(function(resolve) {
-        assert.equal(response, true);
+        assert.equal(response, expectedTrue);
         resolve();
       }).then(done);
     });
   });
 
-  it("responds with true 6", function(done) {
+  it(`responds with ${expectedTrue} 6`, function(done) {
     users.deleteStudentUser("username3").then(response => {
       return new Promise(function(resolve) {
-        assert.equal(response, true);
+        assert.equal(response, expectedTrue);
         resolve();
       }).then(done);
     });
@@ -328,52 +337,51 @@ describe("Tests add student user", function() {
 });
 
 describe("Tests add admin user", function() {
-  it("responds with invalid format username", function(done) {
+  it(`responds with ${expectedUsernameNotEmpty}`, function(done) {
     users
       .insertAdminUser(null, "password", "email@email.com", "1235219")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, "invalid format username");
+          assert.equal(response.message, expectedUsernameNotEmpty);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format password", function(done) {
+  it(`responds with ${expectedPasswordNotEmpty}`, function(done) {
     users
       .insertAdminUser("username", null, "email@email.com", "123456789")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, "invalid format password");
+          assert.equal(response.message, expectedPasswordNotEmpty);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format email", function(done) {
+  it(`responds with ${expectedEmailNotEmpty}`, function(done) {
     users
       .insertAdminUser("username", "password", null, "123456789")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, "invalid format email");
+          assert.equal(response.message, expectedEmailNotEmpty);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format id", function(done) {
+  it(`responds with ${expectedIdNotEmpty}`, function(done) {
     users
       .insertAdminUser("username", "password", "email@email.com", null)
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, "invalid format id");
+          assert.equal(response.message, expectedIdNotEmpty);
           resolve();
         }).then(done);
       });
   });
 
-  const expectedInvalidUsername = "invalid format username";
-  it("responds with invalid format username 1", function(done) {
+  it(`responds with ${expectedInvalidUsername} 1`, function(done) {
     users
       .insertAdminUser(
         "usernameWithSymbols123%@^",
@@ -389,7 +397,7 @@ describe("Tests add admin user", function() {
       });
   });
 
-  it("responds with invalid format username 2", function(done) {
+  it(`responds with ${expectedInvalidUsername} 2`, function(done) {
     users
       .insertAdminUser(
         "username123%@^",
@@ -405,7 +413,7 @@ describe("Tests add admin user", function() {
       });
   });
 
-  it("responds with invalid format username 3", function(done) {
+  it(`responds with ${expectedUsernameLessThan64}`, function(done) {
     users
       .insertAdminUser(
         "RidiculouslyLongUsernameThatHasZeroPurposeToBeMadeAndAddedIntoTheDatabase",
@@ -415,25 +423,24 @@ describe("Tests add admin user", function() {
       )
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidUsername);
+          assert.equal(response.message, expectedUsernameLessThan64);
           resolve();
         }).then(done);
       });
   });
 
-  const expectedInvalidPass = "invalid format password";
-  it("responds with invalid format password 1", function(done) {
+  it(`responds with ${expectedPassword8To64} 1`, function(done) {
     users
       .insertAdminUser("username", "short", "email@email.com", "123456789")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidPass);
+          assert.equal(response.message, expectedPassword8To64);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format password 2", function(done) {
+  it(`responds with ${expectedPassword8To64} 2`, function(done) {
     users
       .insertAdminUser(
         "username",
@@ -443,14 +450,13 @@ describe("Tests add admin user", function() {
       )
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidPass);
+          assert.equal(response.message, expectedPassword8To64);
           resolve();
         }).then(done);
       });
   });
 
-  const expectedInvalidEmail = "invalid format email";
-  it("responds with invalid format email 1", function(done) {
+  it(`responds with ${expectedInvalidEmail} 1`, function(done) {
     users
       .insertAdminUser("username", "password", "email", "123456789")
       .catch(response => {
@@ -461,7 +467,7 @@ describe("Tests add admin user", function() {
       });
   });
 
-  it("responds with invalid format email 2", function(done) {
+  it(`responds with ${expectedInvalidEmail} 2`, function(done) {
     users
       .insertAdminUser("username", "password", "email#@gma.com", "123456789")
       .catch(response => {
@@ -472,7 +478,7 @@ describe("Tests add admin user", function() {
       });
   });
 
-  it("responds with invalid format email 3", function(done) {
+  it(`responds with ${expectedInvalidEmail} 3`, function(done) {
     users
       .insertAdminUser("username", "password", "email@g.c", "123456789")
       .catch(response => {
@@ -483,7 +489,7 @@ describe("Tests add admin user", function() {
       });
   });
 
-  it("responds with invalid format email 4", function(done) {
+  it(`responds with ${expectedInvalidEmail} 4`, function(done) {
     users
       .insertAdminUser(
         "username",
@@ -499,41 +505,40 @@ describe("Tests add admin user", function() {
       });
   });
 
-  const expectedInvalidId = "invalid format id";
-  it("responds with invalid format id 1", function(done) {
+  it(`responds with ${expectedIdNumeric} 1`, function(done) {
     users
       .insertAdminUser("username", "password", "email@email.com", "12 3 4")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidId);
+          assert.equal(response.message, expectedIdNumeric);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format id 2", function(done) {
+  it(`responds with ${expectedIdNumeric} 2`, function(done) {
     users
       .insertAdminUser("username", "password", "email@email.com", "1234ABDS2")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidId);
+          assert.equal(response.message, expectedIdNumeric);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format id 3", function(done) {
+  it(`responds with ${expectedIdNumeric} 3`, function(done) {
     users
       .insertAdminUser("username", "password", "email@email.com", "ab#%@a141")
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidId);
+          assert.equal(response.message, expectedIdNumeric);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with invalid format id 4", function(done) {
+  it(`responds with ${expectedIdSmallerThanMax}`, function(done) {
     users
       .insertAdminUser(
         "username",
@@ -543,13 +548,13 @@ describe("Tests add admin user", function() {
       )
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, expectedInvalidId);
+          assert.equal(response.message, expectedIdSmallerThanMax);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with true 1", function(done) {
+  it(`responds with ${expectedTrue} 1`, function(done) {
     users
       .insertAdminUser(
         "adminusername1",
@@ -559,13 +564,13 @@ describe("Tests add admin user", function() {
       )
       .then(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, true);
+          assert.equal(response, expectedTrue);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with true 2", function(done) {
+  it(`responds with ${expectedTrue} 2`, function(done) {
     users
       .insertAdminUser(
         "adminusername2",
@@ -575,13 +580,13 @@ describe("Tests add admin user", function() {
       )
       .then(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, true);
+          assert.equal(response, expectedTrue);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with true 3", function(done) {
+  it(`responds with ${expectedTrue} 3`, function(done) {
     users
       .insertAdminUser(
         "adminusername3",
@@ -591,78 +596,78 @@ describe("Tests add admin user", function() {
       )
       .then(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, true);
+          assert.equal(response, expectedTrue);
           resolve();
         }).then(done);
       });
   });
 
-  it("responds with true 4", function(done) {
+  it(`responds with ${expectedTrue} 4`, function(done) {
     users.deleteAdminUser("adminusername1").then(response => {
       return new Promise(function(resolve) {
-        assert.equal(response, true);
+        assert.equal(response, expectedTrue);
         resolve();
       }).then(done);
     });
   });
 
-  it("responds with true 5", function(done) {
+  it(`responds with ${expectedTrue} 5`, function(done) {
     users.deleteAdminUser("adminusername2").then(response => {
       return new Promise(function(resolve) {
-        assert.equal(response, true);
+        assert.equal(response, expectedTrue);
         resolve();
       }).then(done);
     });
   });
 
-  it("responds with true 6", function(done) {
+  it(`responds with ${expectedTrue} 6`, function(done) {
     users.deleteAdminUser("adminusername3").then(response => {
       return new Promise(function(resolve) {
-        assert.equal(response, true);
+        assert.equal(response, expectedTrue);
         resolve();
       }).then(done);
     });
   });
 });
 
-describe("Test retrieve student data", () => {
-  it("responds with valid", async () => {
-    connection = await mysql.getNewConnection();
-    await connection.query(
-      `INSERT INTO courses (course_code,title, department) VALUES (?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,
-      ["ECSE 428", "Software engineering in practice", "ECSE"]
-    );
-    await connection.query(
-      `INSERT INTO course_offerings (id, scheduled_time, semester, course_code, section) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE id=id;`,
-      [321123, "MWF", "winter", "ECSE 428", "001"]
-    );
-    await connection.query(
-      `INSERT INTO users (username,email, password) VALUES (?,?,?) ON DUPLICATE KEY UPDATE username=username;`,
-      ["testUser", "email@domain.com", 12345678]
-    );
-    await connection.query(
-      `INSERT INTO students (student_id,username) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id=student_id;`,
-      [123321123, "testUser"]
-    );
-    await connection.query(
-      `INSERT INTO student_course_offerings (student_id,offering_id,semester) VALUES (?,?,?);`,
-      [123321123, 321123, "winter"]
-    );
-    await connection.release();
-    return users.getStudentData(123321123).then(function(res) {
-      let found = false;
-      let searchingFor = {
-        major: [],
-        minor: [],
-        courses: [{ course_code: "ECSE 428", semester: "winter" }]
-      };
-      if (JSON.stringify(res) == JSON.stringify(searchingFor)) {
-        found = true;
-      }
-      assert(true, found);
-    });
-  });
-});
+// TODO: Rewrite test for retrieving student data
+// describe("Test retrieve student data", function() {
+//   it("responds with valid", async function() {
+//     connection = await mysql.getNewConnection();
+//     await connection.query(
+//       `INSERT INTO courses (course_code,title, department) VALUES (?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,
+//       ["ECSE 428", "Software engineering in practice", "ECSE"]
+//     );
+//     await connection.query(
+//       `INSERT INTO course_offerings (id, scheduled_time, semester, course_code, section) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE id=id;`,
+//       [321123, "MWF", "winter", "ECSE 428", "001"]
+//     );
+//     await connection.query(
+//       `INSERT INTO users (username,email, password) VALUES (?,?,?) ON DUPLICATE KEY UPDATE username=username;`,
+//       ["testUser", "email@domain.com", 12345678]
+//     );
+//     await connection.query(
+//       `INSERT INTO students (student_id,username) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id=student_id;`,
+//       [123321123, "testUser"]
+//     );
+//     await connection.query(
+//       `INSERT INTO student_course_offerings (student_id,offering_id,semester) VALUES (?,?,?);`,
+//       [123321123, 321123, "winter"]
+//     );
+//     return users.getStudentData(123321123).then(function(res) {
+//       let found = false;
+//       let searchingFor = {
+//         major: [],
+//         minor: [],
+//         courses: [{ course_code: "ECSE 428", semester: "winter" }]
+//       };
+//       if (JSON.stringify(res) == JSON.stringify(searchingFor)) {
+//         found = true;
+//       }
+//       assert(true, found);
+//     });
+//   });
+// });
 
 describe("Test get student completed courses", () => {
   // initialize test data
@@ -671,7 +676,9 @@ describe("Test get student completed courses", () => {
       "TEST 001",
       "Get completed Course Test",
       "TEST",
-      "0"
+      "0",
+      "TEST",
+      3
     );
 
     const courseOffering = {
@@ -720,9 +727,10 @@ describe("Test get student completed courses", () => {
   });
 
   it("returns student completed course as JSON", async () => {
-    const expected = [{ course_code: "TEST 001", semester: "W2017" }];
+    const expected = { course_code: "TEST 001", semester: "W2017" };
     const res = await users.getCompletedCourses(260561054);
 
-    assert.equal(JSON.stringify(expected), res);
+    assert.equal(JSON.stringify(expected), JSON.stringify(res[0]));
   });
 });
+
