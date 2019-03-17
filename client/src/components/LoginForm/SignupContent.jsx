@@ -3,7 +3,18 @@ import Section from '../Section';
 import EditText from '../EditText';
 import DropDown from '../DropDownOutlined/DropDown';
 
+const years = ['2017', '2018', '2019'];
+const majors = [
+  'Computer Engineering',
+  'Electrical Engineering',
+  'Software Engineering',
+];
 class SignupContent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   render() {
     return (
       <Section className="form" flexDirection="column">
@@ -33,9 +44,9 @@ class SignupContent extends Component {
           />
         </Section>
         <Section className="subform" flexDirection="row">
-          <DropDown />
+          <DropDown label="Major" menuList={majors} />
           &nbsp;
-          <DropDown />
+          <DropDown label="Year enrolled" menuList={years} />
         </Section>
 
         {/* Buttons */}

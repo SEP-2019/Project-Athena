@@ -6,10 +6,20 @@ import {
   MuiThemeProvider,
   createMuiTheme,
 } from '@material-ui/core/styles';
+import MenuItem from '@material-ui/core/MenuItem';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#000',
+    },
+  },
+  typography: { useNextVariants: true },
+});
 
 const styles = theme => ({
   root: {
@@ -19,6 +29,9 @@ const styles = theme => ({
   formControl: {
     margin: '5px 0 5px 0',
     minWidth: 150,
+    width: 190git ,
+    background: 'white',
+    height: '54px',
   },
   selectEmpty: {
     marginTop: theme.spacing.unit * 2,
@@ -28,7 +41,6 @@ const styles = theme => ({
 class NativeSelects extends React.Component {
   state = {
     age: '',
-    name: 'hai',
     labelWidth: 0,
   };
 
@@ -44,43 +56,47 @@ class NativeSelects extends React.Component {
 
   render() {
     const { classes } = this.props;
+    const items = this.props.menuList;
 
     return (
-      <div className={classes.root}>
-        <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel
-            ref={ref => {
-              this.InputLabelRef = ref;
-            }}
-            htmlFor="outlined-age-native-simple"
-          >
-            Age
-          </InputLabel>
-          <Select
-            native
-            value={this.state.age}
-            onChange={this.handleChange('age')}
-            input={
-              <OutlinedInput
-                name="age"
-                labelWidth={this.state.labelWidth}
-                id="outlined-age-native-simple"
-              />
-            }
-          >
-            <option value="" />
-            <option value={10}>Ten</option>
-            <option value={20}>Twenty</option>
-            <option value={30}>Thirty</option>
-          </Select>
-        </FormControl>
-      </div>
+      <MuiThemeProvider theme={theme}>
+        <div className={classes.root}>
+          <FormControl variant="outlined" className={classes.formControl}>
+            <InputLabel
+              ref={ref => {
+                this.InputLabelRef = ref;
+              }}
+              htmlFor="outlined-age-native-simple"
+            >
+              {this.props.label}
+            </InputLabel>
+            <Select
+              value={this.state.age}
+              onChange={this.handleChange('age')}
+              input={
+                <OutlinedInput
+                  name="age"
+                  labelWidth={this.state.labelWidth}
+                  id="outlined-age-native-simple"
+                />
+              }
+            >
+              {this.props.menuList.map((item, index) => (
+                <MenuItem key={index} value={item} className="menu-item">
+                  {item}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+      </MuiThemeProvider>
     );
   }
 }
 
 NativeSelects.propTypes = {
   classes: PropTypes.object.isRequired,
+  menuList: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default withStyles(styles)(NativeSelects);
