@@ -7,12 +7,13 @@ const router = express.Router();
  * @apiDescription get list of courses that match a tag
  * @apiParam (query) {string} tag
  * @apiExample {curl} Example usage: GET /courses/getCourseByTag?tag=engineering
+ * @returns a list of JSON object [{"course_code":"CCOM 206","description":null},{"course_code":"CIVE 281","description":null}]
  * @author: Alex Lam
  */
-router.get("/getCourseByTag", async function(req, res, next) {
+router.get("/getCourseByTag", async function(req, res) {
   try {
     let tag = req.query.tag;
-    let result = await courses.queryCourseByTag(tag);
+    let result = await courses.getCourseByTag(tag);
     res.send(result);
   } catch (error) {
     console.log(error);
@@ -32,8 +33,10 @@ router.get("/getCourseByTag", async function(req, res, next) {
 	{
     "courseCode": "ECSE 428",
     "title": "Software Engineering Practice",
-    "departement" : "ECSE"
-    "phasedOut" : "0"
+    "departement": "ECSE",
+    "phasedOut": "0",
+    "description": "Practice in software",
+    "credits": 3
   }
 * Curl:
 	curl -X POST \
@@ -42,21 +45,25 @@ router.get("/getCourseByTag", async function(req, res, next) {
 	-d '{
     "courseCode": "ECSE 428",
     "title": "Software Engineering Practice",
-    "departement" : "ECSE"
-    "phasedOut" : "0"
+    "departement" : "ECSE",
+    "phasedOut" : "0",
+    "description" : "Practice in software",
+    "credits": 3
   }'
 *
 * @returns true if course was added successfully or false otherwise
 *
 * @author: Mathieu Savoie
 */
-router.post("/createCourse", function(req, res, next) {
+router.post("/createCourse", function(req, res) {
   const courseCode = req.body.courseCode;
   const title = req.body.title;
   const departement = req.body.departement;
   const phasedOut = req.body.phasedOut;
+  const description = req.body.description;
+  const credits = req.body.credits;
   courses
-    .addCourse(courseCode, title, departement, phasedOut)
+    .addCourse(courseCode, title, departement, phasedOut, description, credits)
     .then(val => {
       res.send(val);
     })
@@ -104,7 +111,7 @@ router.post("/createCourse", function(req, res, next) {
  *
  * @author: Steven Li
  */
-router.post("/addCompletedCourses", async (req, res, next) => {
+router.post("/addCompletedCourses", async (req, res) => {
   let studentId = req.body.student_id;
   let coursesJSON;
 
@@ -161,7 +168,7 @@ router.post("/addCompletedCourses", async (req, res, next) => {
  *
  * @author: Steven Li
  */
-router.post("/addCourseOfferings", async (req, res, next) => {
+router.post("/addCourseOfferings", async (req, res) => {
   let coursesJSON;
   try {
     coursesJSON = JSON.parse(req.body.courses);
@@ -185,7 +192,7 @@ router.post("/addCourseOfferings", async (req, res, next) => {
  * @apiExample {curl} Example usage: GET /courses/getAllCourses
  * @author: Steven Li
  */
-router.get("/getAllCourses", async (req, res, next) => {
+router.get("/getAllCourses", async (req, res) => {
   try {
     let result = await courses.getAllCourses();
     res.status(200).send(result);
@@ -226,7 +233,7 @@ router.get("/getAllCourses", async (req, res, next) => {
  *
  * @author: Steven Li
  */
-router.post("/addCoreq", async (req, res, next) => {
+router.post("/addCoreq", async (req, res) => {
   let coreqJSON;
   try {
     coreqJSON = JSON.parse(req.body.coreq);
@@ -275,7 +282,7 @@ router.post("/addCoreq", async (req, res, next) => {
  *
  * @author: Steven Li
  */
-router.post("/addPrereq", async (req, res, next) => {
+router.post("/addPrereq", async (req, res) => {
   let prereqJSON;
   try {
     prereqJSON = JSON.parse(req.body.prereq);
@@ -324,7 +331,7 @@ router.post("/addPrereq", async (req, res, next) => {
  *
  * @author: Steven Li
  */
-router.post("/updateCourse", async (req, res, next) => {
+router.post("/updateCourse", async (req, res) => {
   let course = req.body.course;
   let newTitle = req.body.new_title;
   let newTagsJSON;
@@ -359,7 +366,7 @@ router.post("/updateCourse", async (req, res, next) => {
  *         invalid format course code if course code format is incorrect
  * @author: Alex Lam
  */
-router.post("/phaseOutCourse", async (req, res, next) => {
+router.post("/phaseOutCourse", async (req, res) => {
   try {
     let result = await courses.phaseOutCourse(req.body.course_code);
     res.send(result);

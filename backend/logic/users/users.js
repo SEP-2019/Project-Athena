@@ -193,21 +193,21 @@ var getCompletedCourses = async studentID => {
 };
 
 var getStudentData = async studentID => {
-  let error = false;
+  let error;
   if (!format.verifyStudentId(studentID)) {
     error = "invalid format id";
   }
 
-  if (!error == false) {
+  if (error) {
     console.error(error);
     throw new Error(error);
   }
 
   let data;
   let conn = await mysql.getNewConnection();
-  let courses, major, minor;
+  let completedCourses, major, minors;
   try {
-    courses = await conn.query(
+    completedCourses = await conn.query(
       `SELECT course_code, semester
     FROM course_offerings
     WHERE (id, semester)
@@ -218,13 +218,112 @@ var getStudentData = async studentID => {
       `SELECT curriculum_name FROM student_majors WHERE student_id = ?;`,
       [studentID]
     );
-    minor = await conn.query(
+
+    minors = await conn.query(
       `SELECT curriculum_name FROM student_minors WHERE student_id = ?;`,
       [studentID]
     );
+
+    let currYear = new Date().getFullYear();
+    let currMonth = new Date().getMonth();
+    let fallSem, winterSem;
+    let curriculumName = major[0].curriculum_name;
+
+    if (currMonth < 3) {
+      fallSem = "";
+      winterSem = "W" + currYear;
+    } else {
+      fallSem = "F" + currYear;
+      winterSem = "W" + (currYear + 1);
+    }
+
+    let incompleteCore = await conn.query(
+       `SELECT course_code, semester 
+      FROM course_offerings 
+      WHERE (id 
+              NOT IN (SELECT offering_id 
+                      FROM student_course_offerings 
+                      WHERE student_id = ?)) 
+      AND (semester = ? OR semester = ?) 
+      AND (course_code 
+          IN (SELECT course_code 
+              FROM curriculum_core_classes 
+              WHERE curriculum_name = ?));`,
+      [studentID, fallSem, winterSem, curriculumName]
+    );
+    let desiredTC = await conn.query(
+      `SELECT course_code, semester 
+      FROM course_offerings 
+      WHERE (id 
+            NOT IN (SELECT offering_id 
+                    FROM student_course_offerings 
+                    WHERE student_id = ?))
+      AND (semester = ? OR semester = ?) 
+      AND (course_code 
+          IN (SELECT course_code 
+              FROM curriculum_tech_comps 
+              WHERE curriculum_name = ?)) 
+      AND (course_code
+          IN (SELECT course_code 
+              FROM student_desired_courses 
+              WHERE student_id = ?));`,
+      [studentID, fallSem, winterSem, curriculumName, studentID]
+    );
+
+    for (let i = 0; i < incompleteCore.length; i++) {
+      let c = incompleteCore[i];
+      c.prereqs = await conn.query(
+        `SELECT prereq_course_code 
+        FROM course_prereqs 
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      c.coreqs = await conn.query(
+        `SELECT coreq_course_code 
+        FROM course_coreqs 
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      c.description = await conn.query(
+        `SELECT description
+        FROM courses
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+    }
+
+    for (let i = 0; i < desiredTC.length; i++) {
+      let c = desiredTC[i];
+      c.prereqs = await conn.query(
+        `SELECT prereq_course_code 
+        FROM course_prereqs 
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      c.coreqs = await conn.query(
+        `SELECT coreq_course_code 
+        FROM course_coreqs 
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      c.description = await conn.query(
+        `SELECT description
+        FROM courses
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+    }
+
+
     conn.release();
 
-    let results = { major: major, minor: minor, courses: courses };
+    let results = {
+      major: major,
+      minor: minors,
+      completedCourses: completedCourses,
+      incompletedCore: incompleteCore,
+      desiredTC: desiredTC
+    };
 
     if (results) {
       data = JSON.stringify(results);

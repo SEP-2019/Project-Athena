@@ -20,7 +20,7 @@ describe("Test retrieve course by tag", function() {
       ["ECSE 428", "Engineering"]
     );
     await connection.release();
-    return courses.queryCourseByTag("Engineering").then(function(res) {
+    return courses.getCourseByTag("Engineering").then(function(res) {
       let found = false;
       let searchingFor = { course_code: "ECSE 428" };
       for (course in res) {
@@ -45,14 +45,18 @@ describe("Test assign course to curriculumn", () => {
       "TEST 001",
       "Assign Course to Curriculumn Test 001",
       "TEST",
-      "0"
+      "0",
+      "TEST",
+      3
     );
 
     await courses.addCourse(
       "TEST 002",
       "Assign Course to Curriculumn Test 002",
       "TEST",
-      "0"
+      "0",
+      "TEST",
+      3
     );
 
     await courses.assignCourseToCurriculum(
