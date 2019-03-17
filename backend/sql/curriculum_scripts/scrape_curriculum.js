@@ -24,7 +24,6 @@ if (process.argv.length < 4 || process.argv.length > 4) {
 const curriculum_URL = String(process.argv[2]);
 const tech_comps_URL = String(process.argv[3]);
 
-
 /*
 Example input 
 curriculum: 2018-2019-electrical-engineering-7-semester-curriculum
@@ -108,7 +107,7 @@ async function store_curriculum(curriculum) {
           course.credits
         ]
       );
-      
+
       //Links the courses to the current curriculum
       await connection.query(
         "INSERT INTO curriculum_core_classes (curriculum_name,course_code) VALUES(?,?);",
@@ -137,6 +136,16 @@ async function store_curriculum(curriculum) {
           [course.course_code, coreq]
         );
       });
+
+      // Create course offerings
+      for (let year = 2010; year < 2020; year++) {
+        for (let i = 0; i < course.semesters.length; i++) {
+          await connection.query(
+            "INSERT INTO course_offerings (semester, scheduled_time, course_code, section) VALUES (?, ?, ?, ?);",
+            [course.semesters[i] + year, "Not available", course.course_code, 1]
+          );
+        }
+      }
     });
 
     //Queries for curriculum Tech Comps
@@ -188,6 +197,26 @@ async function store_curriculum(curriculum) {
   }
 }
 
+function parse_semester(semester) {
+  let semesters = [];
+  semester.each((index, element) => {
+    switch (element.attribs.class) {
+      case "fall":
+        semesters.push("F");
+        break;
+      case "summer":
+        semesters.push("S");
+        break;
+      case "winter":
+        semesters.push("W");
+        break;
+      default:
+        break;
+    }
+  });
+  return semesters;
+}
+
 /**
  * Web Scrapes the specified McGill URL for course data
  * @param {URL} url
@@ -233,10 +262,9 @@ async function parse_courses(url, property) {
                     .match(/[0-9]{1}/g)
                 )
               : 0,
-           semester: Array.from($(course_element).find(".course_terms").getElementsByTagName("li")).forEach(function(course){
-              console.log(course.innerText);
-              // semester: Array.from($(course_element).find(".course_terms").find("li")).forEach( element => {console.log(element.text());
-          })
+            semesters: parse_semester(
+              $(course_element).find("li.course_terms > ul > li")
+            )
           };
 
           let coreqs = [];
