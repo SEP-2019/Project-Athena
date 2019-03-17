@@ -671,7 +671,9 @@ describe("Test get student completed courses", () => {
       "TEST 001",
       "Get completed Course Test",
       "TEST",
-      "0"
+      "0",
+      "TEST",
+      3
     );
 
     const courseOffering = {

@@ -7,6 +7,7 @@ const MIN_PASSWORD_LENGTH = 8;
 const MAX_EMAIL_LENGTH = 384;
 const ID_LENGTH = 9;
 const MAX_ID = 2147483647;
+const MAX_DESCRIPTION_LENGTH = 1000;
 
 /**
  * Verifies that the input only contains alphanumeric values
@@ -324,6 +325,22 @@ var verifyPhaseOut = phaseOut => {
   }
 };
 
+/**
+ * Verifies that the credits is an integer from 0 to 9
+ * @param {int} credits
+ */
+var verifyCredits = credits => {
+  if (!credits || !String(credits).match(/^[0123456789]$/i)) {
+    throw new Error("invalid format credits");
+  }
+};
+
+var verifyDescription = description => {
+  if (!description || String(description).length > MAX_DESCRIPTION_LENGTH) {
+    throw new Error("invalid format description");
+  }
+};
+
 module.exports = {
   verifyUsername,
   verifyPassword,
@@ -341,5 +358,7 @@ module.exports = {
   verifyCourseCode,
   verifyTitle,
   verifyDepartmentSubName,
-  verifyPhaseOut
+  verifyPhaseOut,
+  verifyCredits,
+  verifyDescription
 };
