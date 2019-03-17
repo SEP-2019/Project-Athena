@@ -284,6 +284,12 @@ var getStudentData = async studentID => {
         WHERE course_code = ?;`,
         [c.course_code]
       );
+      c.description = await conn.query(
+        `SELECT description
+        FROM courses
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
     }
 
     for (let i = 0; i < desiredTC.length; i++) {
@@ -297,6 +303,12 @@ var getStudentData = async studentID => {
       c.coreqs = await conn.query(
         `SELECT coreq_course_code 
         FROM course_coreqs 
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      c.description = await conn.query(
+        `SELECT description
+        FROM courses
         WHERE course_code = ?;`,
         [c.course_code]
       );
