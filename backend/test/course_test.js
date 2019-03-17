@@ -224,13 +224,12 @@ describe("Tests add student future desired courses", function() {
 
   it("responds with true indicating student desired courses were properly added ", function(done) {
     courses
-      .saveUserPreferences(id, ["ECSE 251", "ECSE 325"])
-      .catch(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response, true);
-          resolve();
-        }).then(done);
-      });
+    .saveUserPreferences(id, ["ECSE 251", "ECSE 210"]).then(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response, true);
+        resolve();
+      }).then(done);
+    });
   });
 
   after(async () => {
