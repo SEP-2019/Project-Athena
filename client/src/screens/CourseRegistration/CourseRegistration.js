@@ -56,6 +56,15 @@ class CourseRegistration extends Component {
   // Called on click of Select button, adds the course to list of selected courses
   onClickSelect() {
     this.setState(prevState => {
+      // Prevent adding the same course twice
+      if (
+        prevState.selectedCourses.some(
+          course => course.course_code === prevState.selectedSearch.course_code
+        )
+      ) {
+        return null;
+      }
+
       // Adds the selected semester to the course object
       const selection = {
         ...prevState.selectedSearch,
