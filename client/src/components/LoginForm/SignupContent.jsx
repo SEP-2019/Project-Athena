@@ -3,18 +3,14 @@ import Section from '../Section';
 import EditText from '../EditText';
 import DropDown from '../DropDownOutlined/DropDown';
 
-const years = ['2017', '2018', '2019'];
+const years = ['2014', '2015', '2016', '2017', '2018', '2019'];
 const majors = [
   'Computer Engineering',
   'Electrical Engineering',
   'Software Engineering',
 ];
-class SignupContent extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
 
+class SignupContent extends Component {
   render() {
     return (
       <Section className="form" flexDirection="column">
