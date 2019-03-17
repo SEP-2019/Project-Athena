@@ -3,23 +3,31 @@ const format = require("../../validation/format");
 
 /**
  * Returns a list of courses matching the tag
- * @author Alex Lam
+ * @author Alex Lam, Feras Al Taha
  * @param {string} tag
  * @returns A list of courses in JSON format
  * @throws Undefined tag if tag is null
  *         error if MySQL connection failed
  */
-var getCourseByTag = async function getCourseByTag(tag) {
+var getCourseByTag = async function getCourseByTag(tag,studentID) {
   if (!tag) {
     throw Error("Undefined tag");
   }
+  format.verifyStudentId(studentID);
 
   let connection = await mysql.getNewConnection();
   try {
     let courses = await connection.query(
-      `SELECT course_code,description FROM courses WHERE course_code IN 
-      (SELECT course_code FROM course_tags WHERE tag_name = ?);`,
-      tag
+      `SELECT course_tags.course_code, 
+              (IF(student_desired_courses.student_id = ?, TRUE, FALSE)) as desired, 
+              courses.description
+      FROM student_desired_courses 
+      RIGHT JOIN course_tags ON (course_tags.course_code = student_desired_courses.course_code)
+      JOIN courses ON (courses.course_code = course_tags.course_code)
+      WHERE (student_desired_courses.student_id = ? 
+            OR student_desired_courses.student_id is null) 
+      AND course_tags.tag_name = ?;`,
+      [studentID, studentID, tag]
     );
     connection.release();
     return JSON.parse(JSON.stringify(courses));
