@@ -89,4 +89,12 @@ router.post(
   })
 );
 
+router.get(
+  "/getCurriculumYears",
+  asyncMiddleware(async function(req, res, next) {
+    let result = await curriculums.getCurriculumYears();
+    res.send(customResponse(result))
+  })
+);
+
 module.exports = router;
