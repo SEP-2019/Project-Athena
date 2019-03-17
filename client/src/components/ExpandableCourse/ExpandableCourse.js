@@ -59,8 +59,6 @@ function ExpandableCourse(props) {
         <ExpansionPanelDetails>
           <Typography>
             {props.description}
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>

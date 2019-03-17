@@ -6,6 +6,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import ExpandableCourse from '../ExpandableCourse/ExpandableCourse';
 
 const overrideStyle = {
     color: '#FFFFFF',
@@ -25,42 +26,26 @@ class CourseTable extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            courses: props.children,
+            courses: props.courses,
         }
     }
 
 
     render() {
         return (
-            // by default the table will span the width of the screen. Width should be
-            // specified by its parent element
-            <Paper>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Course</TableCell>
-                            <TableCell align="right">Number of Credits</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {this.props.courses.map((course) => (
-                            <TableRow key={course.courseName}>
-                                <TableCell>{course.courseName}</TableCell>
-                                <TableCell align="right">{course.numCredits}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </Paper>
+            <div>
+                {this.props.courses.map((course, index) => (
+                    <ExpandableCourse
+                        key={index}
+                        index={index}
+                        course_code={course.courseName}
+                        description={course.courseName}
+                    />
+                
+                ))}
+            </div>
         );
     }
 }
-
-CourseTable.propTypes = {
-    courses: PropTypes.shape({
-        courseName: PropTypes.string,
-        numCredits: PropTypes.number,
-    }),
-};
 
 export default CourseTable;

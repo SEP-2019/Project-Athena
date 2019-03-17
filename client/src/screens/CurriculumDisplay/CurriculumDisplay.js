@@ -15,48 +15,6 @@ function createSemester(name, courses) {
   return { name, courses }
 }
 
-// function to generate sample data until the endpoint is done in the backend
-function dummyData() {
-  return [
-    createSemester('Fall 2015',
-      [
-        createCourse('COMP 202', 3),
-        createCourse('MATH 262', 3),
-        createCourse('MATH 263', 3),
-        createCourse('[Complimentary Group A]', 3),
-        createCourse('[Complimentary Group B]', 3),
-      ]
-    ),
-    createSemester('Winter 2016',
-      [
-        createCourse('ECSE 200', 3),
-        createCourse('ECSE 212', 3),
-        createCourse('COMP 250', 3),
-        createCourse('MATH 270', 3),
-        createCourse('FACC 100', 1),
-      ]
-    ),
-    createSemester('Fall 2016',
-      [
-        createCourse('ECSE 211', 3),
-        createCourse('COMP 206', 3),
-        createCourse('COMP 251', 3),
-        createCourse('ECSE 210', 3),
-        createCourse('CCOM 206', 3),
-      ]
-    ),
-    createSemester('Winter 2017',
-      [
-        createCourse('ECSE 306', 3),
-        createCourse('ECSE 316', 5),
-        createCourse('MATH 360', 3),
-        createCourse('ECSE 333', 3),
-      ]
-    )
-  ]
-}
-
-
 class CurriculumDisplay extends Component {
   constructor(props) {
     super(props);
@@ -109,6 +67,7 @@ class CurriculumDisplay extends Component {
     // something is selcted but has no courses of the selected type available
     if (!props.details[props.typeOfCourses]) return <div>The selected curriculum has no valid courses at this time.</div>
 
+    console.log([...new Set(props.details[props.typeOfCourses].map(x => x.course_code))])
     return <CourseTable courses={
       // get unique courses by code since there can by duplicates
       // TODO: get number of credits per course
