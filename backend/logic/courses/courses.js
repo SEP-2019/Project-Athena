@@ -441,11 +441,11 @@ var saveUserPreferences = async (student_id, courses) => {
     format.verifyCourseCode(courses[i]);
   }
 
-  let connection = mysql.getNewConnection();
+  let connection = await mysql.getNewConnection();
   try {
     await connection.beginTransaction();
     await connection.query(
-      "DELETE * FROM student_desired_courses WHERE student_id = ?;",
+      "DELETE FROM student_desired_courses WHERE student_id = ?;",
       [student_id]
     );
     for (let i = 0; i < courses.length; i++) {
@@ -458,6 +458,7 @@ var saveUserPreferences = async (student_id, courses) => {
     return true;
   } catch (err) {
     console.error(err);
+    await connection.rollback();
     throw new Error("false");
   } finally {
     connection.release();

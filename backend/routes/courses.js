@@ -429,7 +429,7 @@ router.post("/assignCourseToCurriculum", async (req, res) => {
  *
  * @returns true if future desired courses were added successfully
  *          false if future desired courses were not added
- *          invalid format future courses if the future_courses format is invalid
+ *          invalid format future courses if the courses format is invalid
  *          database connection handling
  *
  * @author: Mathieu Savoie
@@ -439,7 +439,7 @@ router.post("/updateFutureCourse", async (req, res, next) => {
   let futureCourses;
 
   try {
-    futureCourses = JSON.parse(JSON.stringify(req.body.future_courses));
+    futureCourses = JSON.parse(JSON.stringify(req.body.courses));
   } catch (error) {
     res.status(500).send("invalid format course code");
     return;

@@ -1,6 +1,7 @@
 const courses = require("../logic/courses/courses.js");
 const assert = require("assert");
 const mysql = require("../sql/connection");
+const users = require("../logic/users/users.js");
 
 describe("Test retrieve course by tag", function() {
   it("responds with valid", async function() {
@@ -145,5 +146,100 @@ describe("Test assign course to curriculumn", () => {
     ]);
 
     await conn.release();
+  });
+});
+
+describe("Tests add student future desired courses", function() {
+
+  username = "MathieuTest";
+  password = "Mat123!@#";
+  email = "mat.test@mcgill.ca";
+  id = "192837465";
+
+  invalid_id_1 = "260111111"
+  invalid_id_2 = "26280x028"
+
+  before(async () => {
+
+    await users.insertStudentUser (username, password, email, id);
+
+  });
+
+  it("responds with invalid format student id 1", function(done) {
+    courses
+      .saveUserPreferences(null, ["ECSE 307", "ECSE 251", "ECSE 325"])
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, "invalid format student id");
+          resolve();
+        }).then(done);
+      });
+  });
+
+  
+  it("responds with invalid format student id 2", function(done) {
+    courses
+      .saveUserPreferences(invalid_id_1, ["ECSE 307", "ECSE 251", "ECSE 325"])
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, "false");
+          resolve();
+        }).then(done);
+      });
+  });
+
+  it("responds with invalid format student id 3", function(done) {
+    courses
+      .saveUserPreferences(invalid_id_2, ["ECSE 307", "ECSE 251", "ECSE 325"])
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, "invalid format student id");
+          resolve();
+        }).then(done);
+      });
+  });
+
+  it("responds with invalid format course code 1", function(done) {
+    courses
+      .saveUserPreferences(id, ["ECSE 999", "ECSE 251", "ECSE 325"])
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, "false");
+          resolve();
+        }).then(done);
+      });
+  });
+  
+
+  it("responds with invalid format course code 2", function(done) {
+    courses
+      .saveUserPreferences(id, ["Z1Z2 L21", "ECSE 251", "ECSE 325"])
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, "invalid format course code");
+          resolve();
+        }).then(done);
+      });
+  });
+
+  it("responds with true indicating student desired courses were properly added ", function(done) {
+    courses
+      .saveUserPreferences(id, ["ECSE 251", "ECSE 325"])
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response, true);
+          resolve();
+        }).then(done);
+      });
+  });
+
+  after(async () => {
+
+    await conn.query(
+      `DELETE FROM student_desired_courses WHERE student_id = ?;`,
+      [id]
+    );
+
+    await users.deleteStudentUser(username);
   });
 });
