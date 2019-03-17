@@ -35,9 +35,8 @@ var getAllTags = async () => {
  *         invalid format tag if tag is null
  */
 var addTag = async tag => {
+  format.verifyTag(tag);
   let connection = await mysql.getNewConnection();
-  await format.verifyTag(tag);
-
   try {
     await connection.query("INSERT INTO tags (name) VALUES (?);", tag);
     return true;
@@ -59,9 +58,8 @@ var addTag = async tag => {
  *         invalid format tag if tag is null
  */
 var removeTag = async tag => {
+  format.verifyTag(tag);
   let connection = await mysql.getNewConnection();
-  await format.verifyTag(tag);
-
   try {
     await connection.beginTransaction();
     await connection.query("DELETE FROM course_tags WHERE tag_name = ?;", tag);
@@ -83,14 +81,14 @@ var removeTag = async tag => {
  * @param {Array} tags An array of tags
  */
 var assignTagsToCourse = async (course, tags) => {
-  let connection = await mysql.getNewConnection();
-  await format.verifyCourseCode(course);
+  format.verifyCourseCode(course);
   if (!tags) {
     throw new Error("invalid format tag");
   }
   for (let i = 0; i < tags.length; i++) {
-    await format.verifyTag(tags[i]);
+    format.verifyTag(tags[i]);
   }
+  let connection = await mysql.getNewConnection();
 
   try {
     await connection.beginTransaction();

@@ -55,7 +55,7 @@ router.post("/createTag", async function (req, res, next) {
  * @apiDescription deletes a tag
  * @apiExample {curl} Example usage: 
  * Http:
- *	POST /tags/deleteTag HTTP/1.1
+ *	DELETE /tags/deleteTag HTTP/1.1
  *	Host: localhost:3001
  *	Content-Type: application/json
  *	    {
@@ -70,7 +70,7 @@ router.post("/createTag", async function (req, res, next) {
  *      }'
  * @author: Steven Li
  */
-router.post("/deleteTag", async function (req, res, next) {
+router.delete("/deleteTag", async function (req, res, next) {
   let tag = req.body.tag;
 
   try {
@@ -109,9 +109,9 @@ router.post("/assignTagsToCourse", async function (req, res, next) {
   let tag;
 
   try {
-    tag = JSON.parse(req.body.tags);
+    tag = JSON.parse(JSON.stringify(req.body.tag));
   } catch (err) {
-    res.status(500).send("invalid format tags");
+    res.status(500).send("invalid format tag");
   }
 
   try {

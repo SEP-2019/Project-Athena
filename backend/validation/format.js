@@ -328,7 +328,7 @@ var verifyPhaseOut = phaseOut => {
  * Verifies that the tag is not null
  * @param {String} tag
  */
-var verifyTag = async tag => {
+var verifyTag = tag => {
   if (!tag) {
     throw new Error("invalid format tag");
   }
