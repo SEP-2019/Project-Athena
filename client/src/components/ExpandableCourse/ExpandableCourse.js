@@ -6,8 +6,6 @@ import MuiExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-import './CourseCheckBox.css';
-
 const ExpansionPanel = withStyles({
   root: {
     border: '1px solid rgba(0,0,0,.15)',
@@ -49,31 +47,25 @@ const ExpansionPanelDetails = withStyles({
   },
 })(MuiExpansionPanelDetails);
 
-function CourseCheckBox(props) {
+function ExpandableCourse(props) {
   return (
-    <ExpansionPanel>
-      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-        <div htmlFor={props.index} className="course_checkbox">
-          <label className="checkbox_label">{props.course_code}</label>
-          <input
-            id={props.index}
-            type="checkbox"
-            name={props.course_code}
-            checked={props.checked}
-            onChange={props.handleChange}
-          />
-          <label htmlFor={props.index} className="custom_large_checkbox" />
-        </div>
-      </ExpansionPanelSummary>
-      <ExpansionPanelDetails>
-        <Typography>
-          {/* TODO: Backend Team needs to add Description to Courses and then Add props.description */}
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-          malesuada lacus ex, sit amet blandit leo lobortis eget.
-        </Typography>
-      </ExpansionPanelDetails>
-    </ExpansionPanel>
+    <div className={props.index}>
+      <ExpansionPanel onChange={props.handleChange}>
+        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography className={props.course_code}>
+            {props.course_code}
+          </Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+          <Typography>
+            {props.description}
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+            malesuada lacus ex, sit amet blandit leo lobortis eget.
+          </Typography>
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+    </div>
   );
 }
 
-export default CourseCheckBox;
+export default ExpandableCourse;

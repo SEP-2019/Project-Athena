@@ -55,7 +55,6 @@ class MandatoryPanel extends Component {
       <div className="tab_content">
         <div className="spacer" />
         <div className="course-list-container">
-          {console.log(this.state.courses)}
           {!coursesAreLoading ? (
             <CompleteCourseList
               courses={courses}
