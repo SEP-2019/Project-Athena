@@ -727,10 +727,10 @@ describe("Test get student completed courses", () => {
   });
 
   it("returns student completed course as JSON", async () => {
-    const expected = [{ course_code: "TEST 001", semester: "W2017" }];
+    const expected = { course_code: "TEST 001", semester: "W2017" };
     const res = await users.getCompletedCourses(260561054);
 
-    assert.equal(JSON.stringify(expected), res);
+    assert.equal(JSON.stringify(expected), JSON.stringify(res[0]));
   });
 });
 
