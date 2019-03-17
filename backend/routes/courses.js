@@ -1,6 +1,8 @@
 const express = require("express");
 const courses = require("../logic/courses/courses");
 const router = express.Router();
+let customResponse = require("../validation/customResponse");
+let asyncMiddleware = require("./errorHandlingMiddleware");
 
 /**
  * @api {get} /getCourseByTag
@@ -10,16 +12,14 @@ const router = express.Router();
  * @returns a list of JSON object [{"course_code":"CCOM 206","description":null},{"course_code":"CIVE 281","description":null}]
  * @author: Alex Lam
  */
-router.get("/getCourseByTag", async function(req, res) {
-  try {
+router.get(
+  "/getCourseByTag",
+  asyncMiddleware(async function(req, res, next) {
     let tag = req.query.tag;
     let result = await courses.getCourseByTag(tag);
-    res.send(result);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error.message);
-  }
-});
+    res.send(customResponse(result));
+  })
+);
 
 /*
 * @api {post} /createCourse
@@ -55,22 +55,19 @@ router.get("/getCourseByTag", async function(req, res) {
 *
 * @author: Mathieu Savoie
 */
-router.post("/createCourse", function(req, res) {
+router.post(
+  "/createCourse",
+  asyncMiddleware(async function(req, res, next) {
   const courseCode = req.body.courseCode;
   const title = req.body.title;
   const departement = req.body.departement;
   const phasedOut = req.body.phasedOut;
   const description = req.body.description;
   const credits = req.body.credits;
-  courses
-    .addCourse(courseCode, title, departement, phasedOut, description, credits)
-    .then(val => {
-      res.send(val);
-    })
-    .catch(err => {
-      res.status(500).send(err.message);
-    });
-});
+    let result = await courses.addCourse(courseCode, title, departement, phasedOut, description, credits)
+    res.send(customResponse(result));
+  })
+);
 
 /**
  * @api {post} /addCompletedCourses
@@ -106,30 +103,20 @@ router.post("/createCourse", function(req, res) {
  * @returns true if courses were added successfully
  *          false if courses were not added
  *          invalid format id if student_id format is not valid
- *          invalid format courses if the course format is not valid
+ *          Invalid course format if the course format is not valid
  *          database connection handling
  *
  * @author: Steven Li
  */
-router.post("/addCompletedCourses", async (req, res) => {
-  let studentId = req.body.student_id;
-  let coursesJSON;
+router.post(
+  "/addCompletedCourses",
+  asyncMiddleware(async (req, res, next) => {
+    let studentId = req.body.student_id;
 
-  try {
-    coursesJSON = JSON.parse(req.body.courses);
-  } catch (error) {
-    res.status(500).send("invalid format courses");
-    return;
-  }
-
-  try {
-    let result = await courses.addCompletedCourses(studentId, coursesJSON);
-    res.status(200).send(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send(err.message);
-  }
-});
+    let result = await courses.addCompletedCourses(studentId, req.body.courses);
+    res.send(customResponse(result));
+  })
+);
 
 /**
  * @api {post} /addCourseOfferings
@@ -141,7 +128,7 @@ router.post("/addCompletedCourses", async (req, res) => {
  *	Content-Type: application/json
  *	   {
  *       "courses": {
- *         "ECSE 428": [{"id": 253, "semester": "W2017", "section": 1, "scheduled_time": "M 10:05-13:35 T 10:35-11:35 F 14:05-16:05", }]
+ *         "ECSE 428": [{"id": 253, "semester": "W2017", "section": 1, "scheduled_time": "M 10:05-13:35 T 10:35-11:35 F 14:05-16:05" }],
  *         "ECSE 356": [{"id": 2758, "semester": "S2019", "section": 2, "scheduled_time": "W 10:05-13:05 W 16:05-17:05"}],
  *         "ECSE 422": [{"id": 25993, "semester": "F2019", "section": 1, "scheduled_time": "M 8:35-10:05 W 8:35-10:05"},
  *                      {"id": 25993, "semester": "W2018", "section": 3, "scheduled_time": "M 10:05-11:05 W 10:05-11:05 T 10:05-11:05"}]
@@ -163,28 +150,18 @@ router.post("/addCompletedCourses", async (req, res) => {
  * @returns true if courses were added successfully
  *          false if courses were not added
  *          invalid format id if student_id format is not valid
- *          invalid format courses if the course format is not valid
+ *          Invalid course format if the course format is not valid
  *          database connection handling
  *
  * @author: Steven Li
  */
-router.post("/addCourseOfferings", async (req, res) => {
-  let coursesJSON;
-  try {
-    coursesJSON = JSON.parse(req.body.courses);
-  } catch (error) {
-    res.status(500).send("invalid format courses");
-    return;
-  }
-
-  try {
-    let result = await courses.addCourseOfferings(coursesJSON);
-    res.status(200).send(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send(err.message);
-  }
-});
+router.post(
+  "/addCourseOfferings",
+  asyncMiddleware(async (req, res, next) => {
+    let result = await courses.addCourseOfferings(req.body.courses);
+    res.send(customResponse(result));
+  })
+);
 
 /**
  * @api {get} /getAllCourses
@@ -192,14 +169,13 @@ router.post("/addCourseOfferings", async (req, res) => {
  * @apiExample {curl} Example usage: GET /courses/getAllCourses
  * @author: Steven Li
  */
-router.get("/getAllCourses", async (req, res) => {
-  try {
+router.get(
+  "/getAllCourses",
+  asyncMiddleware(async (req, res, next) => {
     let result = await courses.getAllCourses();
-    res.status(200).send(result);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
+    res.send(customResponse(result));
+  })
+);
 
 /**
  * @api {post} /addCoreq
@@ -211,7 +187,7 @@ router.get("/getAllCourses", async (req, res) => {
  *	Content-Type: application/json
  *	   {
  *       "coreq": {
- *         "ECSE 428": ["ECSE 321"]
+ *         "ECSE 428": ["ECSE 321"],
  *         "MATH 270": ["MATH 140", "MATH 200"]
  *       }
  *     }
@@ -233,22 +209,13 @@ router.get("/getAllCourses", async (req, res) => {
  *
  * @author: Steven Li
  */
-router.post("/addCoreq", async (req, res) => {
-  let coreqJSON;
-  try {
-    coreqJSON = JSON.parse(req.body.coreq);
-  } catch (err) {
-    res.status(400).send("invalid format coreq");
-    return;
-  }
-
-  try {
-    let result = await courses.addCoreq(coreqJSON);
-    res.status(200).send(result);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
+router.post(
+  "/addCoreq",
+  asyncMiddleware(async (req, res, next) => {
+    let result = await courses.addCoreq(req.body.coreq);
+    res.send(customResponse(result));
+  })
+);
 
 /**
  * @api {post} /addPrereq
@@ -260,7 +227,7 @@ router.post("/addCoreq", async (req, res) => {
  *	Content-Type: application/json
  *	   {
  *       "prereq": {
- *         "ECSE 428": ["ECSE 321"]
+ *         "ECSE 428": ["ECSE 321"],
  *         "MATH 270": ["MATH 140", "MATH 200"]
  *       }
  *     }
@@ -277,27 +244,18 @@ router.post("/addCoreq", async (req, res) => {
  *
  * @returns true if courses were added successfully
  *          false if courses were not added
- *          invalid format prereq if the prereq format is invalid
+ *          Invalid prereq course format if the prereq format is invalid
  *          database connection handling
  *
  * @author: Steven Li
  */
-router.post("/addPrereq", async (req, res) => {
-  let prereqJSON;
-  try {
-    prereqJSON = JSON.parse(req.body.prereq);
-  } catch (err) {
-    res.status(400).send("invalid format prereq");
-    return;
-  }
-
-  try {
-    let result = await courses.addPrereq(prereqJSON);
-    res.status(200).send(result);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
+router.post(
+  "/addPrereq",
+  asyncMiddleware(async (req, res, next) => {
+    let result = await courses.addPrereq(req.body.prereq);
+    res.send(customResponse(result));
+  })
+);
 
 /**
  * @api {post} /updateCourse
@@ -331,28 +289,23 @@ router.post("/addPrereq", async (req, res) => {
  *
  * @author: Steven Li
  */
-router.post("/updateCourse", async (req, res) => {
-  let course = req.body.course;
-  let newTitle = req.body.new_title;
-  let newTagsJSON;
-  try {
-    newTagsJSON = JSON.parse(req.body.new_tags);
-  } catch (err) {
-    console.error(err);
-    res.status(400).send(err.message);
-    return;
-  }
+router.post(
+  "/updateCourse",
+  asyncMiddleware(async (req, res, next) => {
+    let course = req.body.course;
+    let newTitle = req.body.new_title;
 
-  try {
-    let result = await courses.updateCourse(course, newTitle, newTagsJSON);
-    res.status(200).send(result);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
+    let result = await courses.updateCourse(
+      course,
+      newTitle,
+      req.body.new_tags
+    );
+    res.send(customResponse(result));
+  })
+);
 
 /**
- * @api {post} /phaseOutCourses
+ * @api {post} /phaseOutCourse
  * @apiDescription phases out a current course (no longer offered)
  * @apiExample (http) 
         POST /courses/phaseOutCourse
@@ -366,14 +319,13 @@ router.post("/updateCourse", async (req, res) => {
  *         invalid format course code if course code format is incorrect
  * @author: Alex Lam
  */
-router.post("/phaseOutCourse", async (req, res) => {
-  try {
+router.post(
+  "/phaseOutCourse",
+  asyncMiddleware(async (req, res, next) => {
     let result = await courses.phaseOutCourse(req.body.course_code);
-    res.send(result);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
+    res.send(customResponse(result));
+  })
+);
 
 /**
  *
@@ -395,21 +347,20 @@ router.post("/phaseOutCourse", async (req, res) => {
  * @author: Yufei Liu
  *
  */
-router.post("/assignCourseToCurriculum", async (req, res) => {
-  const courseType = req.body.courseType;
-  const courseCode = req.body.courseCode;
-  const curriculum = req.body.curriculum;
+router.post(
+  "/assignCourseToCurriculum",
+  asyncMiddleware(async (req, res, next) => {
+    const courseType = req.body.courseType;
+    const courseCode = req.body.courseCode;
+    const curriculum = req.body.curriculum;
 
-  try {
-    await courses.assignCourseToCurriculum(courseType, courseCode, curriculum);
-    res.status(200).send(true);
-  } catch (err) {
-    if (err.message === "Internal Server Error!\n") {
-      res.status(500).send(err.message);
-    } else {
-      res.status(400).send(err.message);
-    }
-  }
-});
+    let response = await courses.assignCourseToCurriculum(
+      courseType,
+      courseCode,
+      curriculum
+    );
+    res.send(customResponse(response));
+  })
+);
 
 module.exports = router;

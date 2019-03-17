@@ -1,6 +1,5 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
-
 import PropTypes from 'prop-types';
 import {
   withStyles,
@@ -13,6 +12,8 @@ const styles = theme => ({
     display: 'flex',
     flexWrap: 'wrap',
     background: 'white',
+    height: '54px',
+    margin: '5px 0 5px 0',
   },
 });
 
@@ -30,6 +31,7 @@ function CustomizedInputs(props) {
   return (
     <MuiThemeProvider theme={theme}>
       <TextField
+        required={props.required}
         className={classes.root}
         id={props.id}
         label={props.label}
