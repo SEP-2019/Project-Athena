@@ -168,4 +168,78 @@ router.get("/getStudentData", async (req, res) => {
   }
 });
 
+/**
+ *
+ * @api {post} /assignStudentMajor
+ * @apiDescription assign or update a Major curriculum to a student
+ * @apiParam (body) {Integer} studentID, {string} major
+ * @apiExample {curl} Example usage:
+ *	curl -X POST \
+ *  -H 'Content-Type: application/json' \
+ *  -d '{"studentID": 260678788, "major": "Electrical Engineering"}' \
+ *  http://localhost:3001/courses/assignStudentMajor
+ *
+ * @returns True on success
+ *          invalid student ID
+ *          invalid curriculum name
+ *          student does not exist
+ *          curriculum does not exist
+ *          student already assigned major
+ *
+ * @author: Gareth Peters
+ *
+ */
+
+router.post("/assignStudentMajor", async (req, res) => {
+  const studentID = req.query.studentID;
+  const major = req.query.major;
+  try {
+    await users.assignStudentMajor(studentID, major);
+    res.status(200).send(true);
+  } catch (error) {
+    if (err.message === "Internal Server Error!\n") {
+      res.status(500).send(err.message);
+    } else {
+      res.status(400).send(err.message);
+    }
+  }
+});
+
+/**
+ *
+ * @api {post} /assignStudentMinor
+ * @apiDescription assign or update a Minor curriculum to a student
+ * @apiParam (body) {Integer} studentID, {string} minor
+ * @apiExample {curl} Example usage:
+ *	curl -X POST \
+ *  -H 'Content-Type: application/json' \
+ *  -d '{"studentID": 260678788, "minor": "Software Engineering"}' \
+ *  http://localhost:3001/courses/assignStudentMinor
+ *
+ * @returns True on success
+ *          invalid student ID
+ *          invalid curriculum name
+ *          student does not exist
+ *          curriculum does not exist
+ *          student already assigned minor
+ *
+ * @author: Gareth Peters
+ *
+ */
+
+router.post("/assignStudentMinor", async (req, res) => {
+  const studentID = req.query.studentID;
+  const minor = req.query.minor;
+  try {
+    await users.assignStudentMinor(studentID, minor);
+    res.status(200).send(true);
+  } catch (error) {
+    if (err.message === "Internal Server Error!\n") {
+      res.status(500).send(err.message);
+    } else {
+      res.status(400).send(err.message);
+    }
+  }
+});
+
 module.exports = router;

@@ -1,6 +1,6 @@
 const MAX_USERNAME_LENGTH = 64;
 const MAX_PASSWORD_LENGTH = 64;
-const MAX_CURR_NAME_LENGTH = 128;
+const MAX_CURR_NAME_LENGTH = 256;
 const MAX_DEPARTMENT_LENGTH = 256;
 const MAX_DEPARTMENTSUBNAME_LENGTH = 4;
 const MIN_PASSWORD_LENGTH = 8;
@@ -27,7 +27,7 @@ function isAlteredAlphanumeric(str) {
   if (!str) {
     return false;
   }
-  return String(str).match(/^([a-z0-9]|[-]|[:])+$/i);
+  return String(str).match(/^([a-zA-Z0-9:| \-])+$/i);
 }
 
 /**
@@ -68,11 +68,7 @@ var verifyUsername = username => {
  * @param {string} password
  */
 var verifyPassword = password => {
-  if (
-    !password ||
-    String(password).length > MAX_PASSWORD_LENGTH ||
-    String(password).length < MIN_PASSWORD_LENGTH
-  ) {
+  if (!password || String(password).length > MAX_PASSWORD_LENGTH || String(password).length < MIN_PASSWORD_LENGTH) {
     return false;
   }
   return true;
@@ -223,11 +219,7 @@ var verifyCourseOffering = courseOfferings => {
     }
 
     courseOfferings[course].forEach(row => {
-      if (
-        !isNumeric(row.id) ||
-        !isMcGillSemester(row.semester) ||
-        !isNumeric(row.section)
-      ) {
+      if (!isNumeric(row.id) || !isMcGillSemester(row.semester) || !isNumeric(row.section)) {
         throw new Error(error);
       }
     });
@@ -305,11 +297,7 @@ var verifyTitle = title => {
  * @param {String} department
  */
 var verifyDepartmentSubName = department => {
-  if (
-    !department ||
-    String(department).length !== MAX_DEPARTMENTSUBNAME_LENGTH ||
-    !isAlphabet(department)
-  ) {
+  if (!department || String(department).length !== MAX_DEPARTMENTSUBNAME_LENGTH || !isAlphabet(department)) {
     throw new Error("invalid format department name");
   }
 };
