@@ -29,7 +29,7 @@ const styles = theme => ({
   formControl: {
     margin: '5px 0 5px 0',
     minWidth: 150,
-    width: 190git ,
+    width: 190,
     background: 'white',
     height: '54px',
   },
@@ -56,7 +56,6 @@ class NativeSelects extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const items = this.props.menuList;
 
     return (
       <MuiThemeProvider theme={theme}>
