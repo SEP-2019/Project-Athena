@@ -1,5 +1,8 @@
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 exports.hashPass = password => {
-  return crypto.createHash('sha512').update(password).digest('base64');
-}
+  return crypto
+    .createHash("sha512")
+    .update(password)
+    .digest("base64");
+};

@@ -65,8 +65,6 @@ class CourseRegistration extends Component {
         selectedCourses: [...prevState.selectedCourses, selection],
       };
     });
-
-    //TODO: Clear input
   }
 
   // Called on click of a search suggestion, updates the selected course
@@ -105,10 +103,8 @@ class CourseRegistration extends Component {
                 className="selection-search"
                 data={tempData}
                 getValue={this.onSelectFromSearch}
+                onClickSelect={this.onClickSelect}
               />
-              <button className="selection-button" onClick={this.onClickSelect}>
-                Select
-              </button>
             </div>
           </div>
           <ul className="selected-side">
