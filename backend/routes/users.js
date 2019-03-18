@@ -111,15 +111,33 @@ router.get(
   })
 );
 
-/* Retrieve user's username and password and compare to stored values for logging in */
+/**
+ *
+ * @api {post} /login
+ * @apiDescription This endpoint will authenticate user's username and password
+ * @apiParam (body) {string} username, {string} password
+ * @apiExample {curl} Example usage:
+ *	curl -X POST \
+ *	http://localhost:3001/users/login \
+ *	-H 'Content-Type: application/json' \
+ *	-d '{
+ *		"username": "administrator",
+ *		"password": "passAdmin",
+ *	}'
+ *
+ * @returns student ID on authenticated
+ *          Incorrect username or password.
+ *
+ * @author: Gareth Peters & Yufei Liu
+ *
+ */
 router.post(
   "/login",
   asyncMiddleware(async (req, res, next) => {
     const username = req.body.username;
     const password = req.body.password;
-    if (await users.login(username, password)) {
-      res.send(customResponse("Authenticated"));
-    }
+    const studentID = await users.login(username, password);
+    res.send(String(customResponse(studentID).Response));
   })
 );
 
