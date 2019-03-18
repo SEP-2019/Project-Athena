@@ -1,19 +1,96 @@
 import React, { Component } from 'react';
 import Section from '../Section';
 import EditText from '../EditText';
+import axios from 'axios';
 import './LoginForm.css';
 
+const LOGIN_URL = 'http://localhost:3001/users/login';
+
 class LoginContent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: '',
+      password: '',
+    };
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.onLogin = this.onLogin.bind(this);
+  }
+
+  onLogin() {
+    if (this.isInputValid()) {
+      //Send Request
+      axios
+        .post(LOGIN_URL, {
+          username: this.state.username,
+          password: this.state.password,
+        })
+        .then(response => {
+          // Got good response
+          console.log(response);
+          // TODO: change page
+        })
+        .catch(loginError => {
+          // Invalid login
+          console.log(loginError);
+          this.setError(loginError);
+          // TODO: Set different errors depending on the ErrorMessage
+          // this.setError('Invalid credentials!');
+        });
+    }
+  }
+
+  isInputValid() {
+    if (this.isEmpty(this.state.username)) {
+      this.setError('Student ID is required.');
+      return false;
+    } else if (this.isEmpty(this.state.password)) {
+      this.setError('Password is required.');
+      return false;
+    }
+
+    // No error
+    this.setError('');
+    return true;
+  }
+
+  setError(message) {
+    document.getElementById('error-msg').innerHTML = message;
+  }
+
+  isEmpty(value) {
+    return !value;
+  }
+
+  handleInputChange(event = {}) {
+    const name = event.target && event.target.name;
+    const value = event.target && event.target.value;
+    this.setState({ [name]: value });
+  }
+
   render() {
     return (
       <Section className="form" flexDirection="column">
-        <EditText label="Email" id="outlined-email-input" type="email" />
+        <p className="error" id="error-msg" />
         <EditText
-          label="Password"
-          id="outlined-password-input"
-          type="password"
+          required
+          label="Student ID"
+          id="username-input"
+          type="username"
+          defaultValue={this.state.username}
+          onChange={this.handleInputChange}
         />
-        <button className="primary-button">Log in</button>
+        <EditText
+          required
+          label="Password"
+          id="password-input"
+          type="password"
+          defaultValue={this.state.password}
+          onChange={this.handleInputChange}
+        />
+        <button className="primary-button" onClick={this.onLogin}>
+          Log in
+        </button>
         <button className="secondary-button" onClick={this.props.handleChange}>
           Sign up
         </button>

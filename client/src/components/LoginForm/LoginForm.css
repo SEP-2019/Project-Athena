@@ -15,3 +15,8 @@
 
   font-weight: 400;
 }
+
+.error {
+  margin-bottom: 0.75vh;
+  color: #b20007;
+}
