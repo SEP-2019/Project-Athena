@@ -14,10 +14,6 @@ const overrideStyle = {
     padding: '3px 0 3px 15px',
 };
 
-function createData(courseName, numCredits) {
-    return { courseName, numCredits };
-}
-
 class CourseTable extends Component {
     handleChange(event) {
         this.props.getValue(event.target.value);
@@ -28,13 +24,14 @@ class CourseTable extends Component {
         this.state = {
             courses: props.courses,
         }
+        console.log(this.state.courses[0][0])
     }
 
 
     render() {
         return (
             <div>
-                {this.props.courses.map((course, index) => (
+                {this.state.courses.map((course, index) => (
                     <ExpandableCourse
                         key={index}
                         index={index}

@@ -29,11 +29,11 @@ class CurriculumDisplay extends Component {
     this.state = {
       studentId: 123321123,
       curriculumNames: [],
-      curriculumName: "",
+      curriculumName: "View ECSE Curriculums",
       completedCourses: [],
       incompleteCourses: [],
       studentDetails: null,
-      selectedCurriculum: "",
+      selectedCurriculum: "View ECSE Curriculums",
       selectedCurriculumDetials: null,
       curriculumError: null,
       studentDataError: null,
@@ -76,10 +76,11 @@ class CurriculumDisplay extends Component {
     .get('http://localhost:3001/users/getStudentData?studentID=' + studentid)
     .then(response => {
       let res = response.data
+      console.log(res)
       this.setState({
-        curriculumName: res.major[0], 
+        curriculumName: res.major[0].curriculum_name, 
         completedCourses: this.parseCourseData(res.completedCourses, "semester"),
-        //incompleteCourses: this.parseCourseData(res.incompletedCore, "semseter"),
+        incompleteCourses: this.parseCourseData(res.incompletedCore, "semester"),
       })
       console.log(this.state)
     })
@@ -89,13 +90,16 @@ class CurriculumDisplay extends Component {
   }
 
   parseCourseData(data, key){
+
+    // transform the data into the format: [{semester: "W2019", courses: [{course_code: "ECSE 428", course_name: "SWE practice"}]}]
     // go through the completed courses and group them by semester
     let group = _.groupBy(data, key)
+    console.log(group)
     let courses = Object.keys(group)
       .map(function(k) { 
         return {semester: k, courses: group[k]}
       })
-      console.log(courses)
+      //console.log(courses)
       return courses
   }
 
@@ -106,66 +110,60 @@ class CurriculumDisplay extends Component {
   }
 
   getCourseTable(props){
-    // typeOfCourses is either core or complimentary, depending on what gets passed from render()
-
-    // nothing is selected
-    if (!props.details) return <div>No courses found</div> ;
-
-    
-    // something is selcted but has no courses of the selected type available
-    //if (!props.details[props.typeOfCourses]) return <div>The selected curriculum has no valid courses at this time.</div>
-
-    //console.log(props.details.map(function(c) {return {course_code: c.course_code}} ) )
 
     console.log(props)
 
+    // nothing is selected
+    if (!props.details || props.details.length === 0) return <div>No courses found</div> ;
+
+        //if (!props.details[props.typeOfCourses]) return <div>The selected curriculum has no valid courses at this time.</div>
+
+    //console.log(props.details.map(function(c) {return {course_code: c.course_code}} ) )
+
+   
+
     return <CourseTable courses={
-      // get unique courses by code since there can by duplicates
-      // TODO: get number of credits per course
-      //props.mapFunction(props.details)
-      props.details.map(c => c[0].courses)
-    } />;
+      props.mapFunction(props.details.courses)
+    }/>;
   }
 
   render() {
     return (
       <div className="page">
         <div className="curriculum-display">
-          <div className="page-header">View ECSE Curriculums</div>
-          <div className="curriculum-selection-menu">
-            <div className="dropdown-section">
-              <DropDown
-                menuList={this.state.curriculumNames}
-                defaultValue={this.state.selectedCurriculum}
-                getValue={this.updateSelectedCurriculum}
-              />
-            </div>
-          </div>
-
+          <div className="page-header">{"Current Curriculum: " + this.state.curriculumName}</div>
           <div className="curriculum-content">
            
               <div className="semester-course-display" key="Mandatory Courses">
-                <div className="semester-name">Mandatory Courses</div>
-                <div className="semester-course-table" style={{ width: 512 }}>
-
-                 
-                  <this.getCourseTable 
-                    details={this.state.completedCourses} 
-                    typeOfCourses={"completedCourses"}
-                    mapFunction = { (courses) => courses.map(function(c) {return {course_code: c.course_code}}) }
-                    />
+                 {this.state.completedCourses.map ((completedSemester) => (
+                   <div>
+                    <div className="semester-name">{completedSemester.semester}</div>
+                      <div className="semester-course-table" style={{ width: 512 }}>
+                      <this.getCourseTable 
+                      details={completedSemester} 
+                      typeOfCourses={"completedCourses"}
+                      mapFunction = { courses => courses}
+                      />
+                      </div>
+                     </div>
+                 ))}
                   
-                </div>
+                
               </div>
               <div className="semester-course-display" key="Technical Complimentary Courses">
-                <div className="semester-name">Technical Complimentary Courses</div>
-                <div className="semester-course-table" style={{ width: 512 }}>
-                  {/* <this.getCourseTable
-                    details={this.state.incompleteCourses}
-                    typeOfCourses={"incompleteCourses"}
-                    mapFunction = { (course) =>  course.course_code}
-                    /> */}
-                </div>
+                
+                {this.state.incompleteCourses.map ((incompleteSemester) => (
+                  <div>
+                    <div className="semester-name">{incompleteSemester.semester}</div>
+                    <div className="semester-course-table" style={{ width: 512 }}>
+                      <this.getCourseTable 
+                        details={incompleteSemester} 
+                        typeOfCourses={"incompleteCourses"}
+                        mapFunction = { courses => courses}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
            
           </div>
