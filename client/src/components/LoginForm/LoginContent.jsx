@@ -33,19 +33,37 @@ class LoginContent extends Component {
         .catch(loginError => {
           // Invalid login
           console.log(loginError);
-          this.setError(loginError);
-          // TODO: Set different errors depending on the ErrorMessage
-          // this.setError('Invalid credentials!');
+          var error = loginError.response.data.ErrorMessage;
+          if (
+            error === 'Password length must be between 8 and 64' ||
+            error === 'User does not exist' ||
+            error === 'Username must be alphanumeric'
+          ) {
+            this.setInvalidCredentials();
+          } else {
+            this.setError(error);
+          }
         });
     }
   }
 
   isInputValid() {
-    if (this.isEmpty(this.state.username)) {
+    var id = this.state.username;
+    var password = this.state.password;
+    // Check if username & password are empty
+    if (this.isEmpty(id)) {
       this.setError('Student ID is required.');
       return false;
-    } else if (this.isEmpty(this.state.password)) {
+    } else if (this.isEmpty(password)) {
       this.setError('Password is required.');
+      return false;
+    } else if (!/^\d+$/.test(id)) {
+      // Invalid Student ID (contains letters)
+      this.setInvalidCredentials();
+      return false;
+    } else if (password.length < 8 || password.length > 64) {
+      // Password length out of range
+      this.setInvalidCredentials();
       return false;
     }
 
@@ -56,6 +74,10 @@ class LoginContent extends Component {
 
   setError(message) {
     document.getElementById('error-msg').innerHTML = message;
+  }
+
+  setInvalidCredentials() {
+    this.setError('Invalid crendentials. Please try again.');
   }
 
   isEmpty(value) {

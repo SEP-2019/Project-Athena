@@ -1,6 +1,7 @@
 const mysql = require("../../sql/connection");
 const format = require("../../validation/format");
 const hasher = require("../../validation/hash");
+let CustomError = require("../../validation/CustomErrors").CustomError;
 
 var insertStudentUser = async (username, password, email, id) => {
   // Connect to database
@@ -72,15 +73,14 @@ var insertAdminUser = async (username, password, email, id) => {
   let hash = hasher.hashPass(password);
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users (username, email, password) VALUES(?, ?, ?);", [
-      username,
-      email,
-      hash
-    ]);
-    await connection.query("INSERT INTO staff_members (staff_id, username) VALUES(?, ?);", [
-      id,
-      username
-    ]);
+    await connection.query(
+      "INSERT INTO users (username, email, password) VALUES(?, ?, ?);",
+      [username, email, hash]
+    );
+    await connection.query(
+      "INSERT INTO staff_members (staff_id, username) VALUES(?, ?);",
+      [id, username]
+    );
     await connection.commit();
     connection.release();
     return true;
@@ -105,7 +105,7 @@ var deleteAdminUser = async username => {
     await connection.query("DELETE FROM staff_members WHERE staff_id = ?;", [
       staff_id[0].staff_id
     ]);
-    
+
     await connection.query("DELETE FROM users WHERE username = ?;", [username]);
     await connection.commit();
     return true;
@@ -174,7 +174,7 @@ var getStudentData = async studentID => {
     }
 
     let incompleteCore = await conn.query(
-       `SELECT course_code, semester 
+      `SELECT course_code, semester 
       FROM course_offerings 
       WHERE (id 
               NOT IN (SELECT offering_id 
@@ -250,7 +250,6 @@ var getStudentData = async studentID => {
       );
     }
 
-
     conn.release();
 
     let results = {
@@ -287,12 +286,15 @@ var login = async (username, password) => {
       "SELECT * FROM users WHERE username = ?;",
       [username]
     );
+
+    if (userInfo == undefined || userInfo.length == 0) {
+      throw new CustomError("User does not exist", 400);
+    }
+    console.log(userInfo)
     if (!userInfo || !isValidPassword(userInfo[0].password, password)) {
-      throw new Error("Incorrect username or password.");
+      throw new CustomError("Incorrect username or password.", 400);
     }
     return true;
-  } catch (error) {
-    throw error;
   } finally {
     connection.release();
   }

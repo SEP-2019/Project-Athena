@@ -1,4 +1,4 @@
-let FormatError = require("./FormatError")
+let FormatError = require("./CustomErrors").FormatError;
 const MAX_USERNAME_LENGTH = 64;
 const MAX_PASSWORD_LENGTH = 64;
 const MAX_CURR_NAME_LENGTH = 128;
