@@ -6,6 +6,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import CourseTable from '../../components/CourseTable'
 import DropDown from '../../components/DropDown/DropDown';
 import axios from 'axios';
+import _ from 'lodash'
+import { runInThisContext } from 'vm';
 
 function createCourse(courseName, numCredits) {
   return { courseName, numCredits };
@@ -19,14 +21,25 @@ class CurriculumDisplay extends Component {
   constructor(props) {
     super(props);
     this.updateSelectedCurriculum = this.updateSelectedCurriculum.bind(this);
+    this.getStudentData = this.getStudentData.bind(this);
     this.fetchCurriculum = this.fetchCurriculum.bind(this);
+    this.parseCourseData = this.parseCourseData.bind(this);
+    this.getCourseTable = this.getCourseTable.bind(this);
+    this.getCompletedCourseTables = this.getCompletedCourseTables.bind(this)
     this.state = {
+      studentId: 123321123,
       curriculumNames: [],
+      curriculumName: "",
+      completedCourses: [],
+      incompleteCourses: [],
+      studentDetails: null,
       selectedCurriculum: "",
       selectedCurriculumDetials: null,
       curriculumError: null,
+      studentDataError: null,
     };
     this.fetchCurriculum()
+    this.getStudentData(this.state.studentId)
   }
 
   fetchCurriculum() {
@@ -58,21 +71,59 @@ class CurriculumDisplay extends Component {
     )
   }
 
+  getStudentData(studentid){
+    axios
+    .get('http://localhost:3001/users/getStudentData?studentID=' + studentid)
+    .then(response => {
+      let res = response.data
+      this.setState({
+        curriculumName: res.major[0], 
+        completedCourses: this.parseCourseData(res.completedCourses, "semester"),
+        //incompleteCourses: this.parseCourseData(res.incompletedCore, "semseter"),
+      })
+      console.log(this.state)
+    })
+    .catch(studentDataError =>
+      this.setState({studentDataError})
+    )
+  }
+
+  parseCourseData(data, key){
+    // go through the completed courses and group them by semester
+    let group = _.groupBy(data, key)
+    let courses = Object.keys(group)
+      .map(function(k) { 
+        return {semester: k, courses: group[k]}
+      })
+      console.log(courses)
+      return courses
+  }
+
+  getCompletedCourseTables(props){
+    if(!props.completedCourses) return <div>No semesters completed</div>
+
+    return this.getCourseTable({details: props.completedCourses})//props.completedCourses.map(c => this.getCourseTable(props.completedCourses))
+  }
+
   getCourseTable(props){
     // typeOfCourses is either core or complimentary, depending on what gets passed from render()
 
     // nothing is selected
-    if (!props.details) return <div>Please select a curriculum from the dropdown menu</div> ;
+    if (!props.details) return <div>No courses found</div> ;
 
+    
     // something is selcted but has no courses of the selected type available
-    if (!props.details[props.typeOfCourses]) return <div>The selected curriculum has no valid courses at this time.</div>
+    //if (!props.details[props.typeOfCourses]) return <div>The selected curriculum has no valid courses at this time.</div>
 
-    console.log([...new Set(props.details[props.typeOfCourses].map(x => x.course_code))])
+    //console.log(props.details.map(function(c) {return {course_code: c.course_code}} ) )
+
+    console.log(props)
+
     return <CourseTable courses={
       // get unique courses by code since there can by duplicates
       // TODO: get number of credits per course
-      [...new Set(props.details[props.typeOfCourses].map(c => c.course_code))]
-      .map(code => createCourse(code, 3))
+      //props.mapFunction(props.details)
+      props.details.map(c => c[0].courses)
     } />;
   }
 
@@ -89,20 +140,6 @@ class CurriculumDisplay extends Component {
                 getValue={this.updateSelectedCurriculum}
               />
             </div>
-            {/* <div className="dropdown-section">
-              <DropDown
-                menuList={["Fall 2015", "Winter 2016"]}
-                defaultValue="Select Start Semester"
-                getValue={() => console.log("testing")}
-              />
-            </div>
-            <div className="dropdown-section">
-              <DropDown
-                menuList={["Entry from CEGEP", "International Student", "Entry from out-of-province Highschool"]}
-                defaultValue="Select Origin"
-                getValue={() => console.log("testing")}
-              />
-            </div> */}
           </div>
 
           <div className="curriculum-content">
@@ -110,13 +147,24 @@ class CurriculumDisplay extends Component {
               <div className="semester-course-display" key="Mandatory Courses">
                 <div className="semester-name">Mandatory Courses</div>
                 <div className="semester-course-table" style={{ width: 512 }}>
-                  <this.getCourseTable details={this.state.selectedCurriculumDetials} typeOfCourses={"core_classes"}/>
+
+                 
+                  <this.getCourseTable 
+                    details={this.state.completedCourses} 
+                    typeOfCourses={"completedCourses"}
+                    mapFunction = { (courses) => courses.map(function(c) {return {course_code: c.course_code}}) }
+                    />
+                  
                 </div>
               </div>
               <div className="semester-course-display" key="Technical Complimentary Courses">
                 <div className="semester-name">Technical Complimentary Courses</div>
                 <div className="semester-course-table" style={{ width: 512 }}>
-                  <this.getCourseTable details={this.state.selectedCurriculumDetials} typeOfCourses={"tech_comps"}/>
+                  {/* <this.getCourseTable
+                    details={this.state.incompleteCourses}
+                    typeOfCourses={"incompleteCourses"}
+                    mapFunction = { (course) =>  course.course_code}
+                    /> */}
                 </div>
               </div>
            

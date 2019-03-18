@@ -38,8 +38,8 @@ class CourseTable extends Component {
                     <ExpandableCourse
                         key={index}
                         index={index}
-                        course_code={course.courseName}
-                        description={course.courseName}
+                        course_code={course.course_code}
+                        description={course.course_code}
                     />
                 
                 ))}
