@@ -1,76 +1,33 @@
 import React, { Component } from 'react';
 import './CurriculumDisplay.css';
 import WithHeaderBar from '../../hocs/WithHeaderBar';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
 import CourseTable from '../../components/CourseTable'
 import DropDown from '../../components/DropDown/DropDown';
 import axios from 'axios';
 import _ from 'lodash'
-import { runInThisContext } from 'vm';
-
-function createCourse(courseName, numCredits) {
-  return { courseName, numCredits };
-}
-
-function createSemester(name, courses) {
-  return { name, courses }
-}
 
 class CurriculumDisplay extends Component {
   constructor(props) {
     super(props);
-    this.updateSelectedCurriculum = this.updateSelectedCurriculum.bind(this);
     this.getStudentData = this.getStudentData.bind(this);
-    this.fetchCurriculum = this.fetchCurriculum.bind(this);
     this.parseCourseData = this.parseCourseData.bind(this);
     this.getCourseTable = this.getCourseTable.bind(this);
-    this.getCompletedCourseTables = this.getCompletedCourseTables.bind(this)
     this.state = {
-      studentId: 123321123,
-      curriculumNames: [],
+      studentId: 123321123, // placeholder student id until sessions/persistance are implemented
       curriculumName: "View ECSE Curriculums",
       completedCourses: [],
       incompleteCourses: [],
-      studentDetails: null,
-      selectedCurriculum: "View ECSE Curriculums",
-      selectedCurriculumDetials: null,
-      curriculumError: null,
       studentDataError: null,
     };
-    this.fetchCurriculum()
     this.getStudentData(this.state.studentId)
   }
 
-  fetchCurriculum() {
-    // first get the list of the curriculum names, then fetch each curriculum
-    axios
-      .get('http://localhost:3001/curriculums/getAllCurriculumNames')
-      .then(response => 
-        this.setState({
-          curriculumNames: response.data,
-        })
-      )
-      .catch(curriculumError =>
-        this.setState({ curriculumError })
-      );
-  }
-
-  updateSelectedCurriculum(selected){
-    axios
-    .get('http://localhost:3001/curriculums/getCurriculum?name=' + selected)
-    .then(response => {
-      console.log(response.data)
-      this.setState({
-        selectedCurriculum: selected,
-        selectedCurriculumDetials: response.data,
-      })
-    })
-    .catch(curriculumError =>
-      this.setState({curriculumError})
-    )
-  }
-
+  /**
+   * Fetches the data of a student from the backend, this includes their major, minor,
+   * completed courses, and incomplete semesters and courses
+   * 
+   * @param {int} studentid The id of the student
+   */
   getStudentData(studentid){
     axios
     .get('http://localhost:3001/users/getStudentData?studentID=' + studentid)
@@ -89,38 +46,34 @@ class CurriculumDisplay extends Component {
     )
   }
 
+  /**
+   * Goes through the given course data, groups it by the given key, then transforms it into the following format:
+   * [{semester: "W2019", courses: [{course_code: "ECSE 428", course_name: "SWE practice"}]}]
+   * 
+   * @param {Object} data course data to be parsed
+   * @param {string} key which key to group the data by
+   */
   parseCourseData(data, key){
-
-    // transform the data into the format: [{semester: "W2019", courses: [{course_code: "ECSE 428", course_name: "SWE practice"}]}]
-    // go through the completed courses and group them by semester
     let group = _.groupBy(data, key)
-    console.log(group)
+
     let courses = Object.keys(group)
       .map(function(k) { 
         return {semester: k, courses: group[k]}
       })
-      //console.log(courses)
+
       return courses
   }
 
-  getCompletedCourseTables(props){
-    if(!props.completedCourses) return <div>No semesters completed</div>
-
-    return this.getCourseTable({details: props.completedCourses})//props.completedCourses.map(c => this.getCourseTable(props.completedCourses))
-  }
-
+   /**
+   * Passes the given list of courses to the CourseTable component
+   * 
+   * @param {Object} props properties to pass in. Should be in the form of {details: {semester: "W2019", courses: []}, mapFunction: f}
+   */
   getCourseTable(props){
-
     console.log(props)
 
     // nothing is selected
     if (!props.details || props.details.length === 0) return <div>No courses found</div> ;
-
-        //if (!props.details[props.typeOfCourses]) return <div>The selected curriculum has no valid courses at this time.</div>
-
-    //console.log(props.details.map(function(c) {return {course_code: c.course_code}} ) )
-
-   
 
     return <CourseTable courses={
       props.mapFunction(props.details.courses)
@@ -148,10 +101,8 @@ class CurriculumDisplay extends Component {
                      </div>
                  ))}
                   
-                
               </div>
               <div className="semester-course-display" key="Technical Complimentary Courses">
-                
                 {this.state.incompleteCourses.map ((incompleteSemester) => (
                   <div>
                     <div className="semester-name">{incompleteSemester.semester}</div>
@@ -165,7 +116,6 @@ class CurriculumDisplay extends Component {
                   </div>
                 ))}
               </div>
-           
           </div>
         </div>
       </div >
