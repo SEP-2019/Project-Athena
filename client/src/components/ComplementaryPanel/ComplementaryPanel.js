@@ -20,6 +20,7 @@ class ComplementaryPanel extends Component {
       suggestions: [],
       suggestionsAreLoading: false,
       suggestionError: null,
+      loadedCourses: new Set(),
     };
   }
 
@@ -67,7 +68,6 @@ class ComplementaryPanel extends Component {
   }
 
   componentWillMount = () => {
-    this.loadedCourses = new Set();
     this.checkedTags = new Set();
   };
 
@@ -77,12 +77,12 @@ class ComplementaryPanel extends Component {
       suggestionsAreLoading: true,
     });
 
-    var newSuggestions = [...this.state.suggestions];
+    let newSuggestions = [...this.state.suggestions];
     newTags.map(tag => {
       if (tag.checked && !newSuggestions.some(e => e.name === tag.name)) {
         this.fetchCourseSuggestions(tag.name);
       } else if (!tag.checked) {
-        var index = newSuggestions.findIndex(e => e.name === tag.name);
+        const index = newSuggestions.findIndex(e => e.name === tag.name);
         if (index !== -1) {
           newSuggestions.splice(index, 1);
           this.setState({ suggestions: newSuggestions });
@@ -93,15 +93,15 @@ class ComplementaryPanel extends Component {
   };
 
   updateCoursesCheckedState = (tagName, courseName, newCourses) => {
-    var newSuggestions = [...this.state.suggestions];
-    var tagIndex = newSuggestions.findIndex(e => e.name === tagName);
+    let newSuggestions = [...this.state.suggestions];
+    const tagIndex = newSuggestions.findIndex(e => e.name === tagName);
     newSuggestions[tagIndex].courses = newCourses;
     this.setState({ suggestions: newSuggestions });
   };
 
   clearSelection = e => {
     e.preventDefault();
-    var newSuggestions = [...this.state.suggestions];
+    let newSuggestions = [...this.state.suggestions];
     newSuggestions.forEach(function(obj) {
       obj.courses.map(course => {
         if (course.checked) {
@@ -110,7 +110,11 @@ class ComplementaryPanel extends Component {
         return null;
       });
     });
-    this.setState({ suggestions: newSuggestions });
+    const newSet = new Set();
+    this.setState({
+      suggestions: newSuggestions,
+      loadedCourses: newSet,
+    });
   };
 
   loadSuggestions = (tag, courses) => {
@@ -120,7 +124,7 @@ class ComplementaryPanel extends Component {
         key={tag}
         tag={tag}
         courses={courses}
-        loadedCourses={this.loadedCourses}
+        loadedCourses={this.state.loadedCourses}
         updateCoursesCheckedState={this.updateCoursesCheckedState}
         errorMessage={content =>
           suggestionError ? (
