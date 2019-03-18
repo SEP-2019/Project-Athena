@@ -734,3 +734,42 @@ describe("Test get student completed courses", () => {
   });
 });
 
+describe("Test get student completed courses", () => {
+  // initialize test data
+  before(async () => {
+    // Setup
+    // users - students
+    // courses
+    // course_offering
+    // student_course_offering
+    // curriculums
+    // curriculum_core_classes
+    // curriculum_tech_comps
+    // curriculum_complementaries
+    // student_majors
+    // student_minors
+    // student_desired_courses
+    // course_prereqs
+    // course_coreqs
+  });
+
+
+  after(async () => {
+    // Tear down:
+    // course_coreqs
+    // course_prereqs
+    // student_desired_courses
+    // student_minors
+    // student_majors
+    // curriculum_complementaries
+    // curriculum_tech_comps
+    // curriculum_core_classes
+    // curriculums
+    // student_course_offering
+    // course_offering
+    // courses
+    // users - students
+  });
+
+});
+
