@@ -169,62 +169,57 @@ describe("Tests add student future desired courses", function() {
 
   });
 
-  it("responds with invalid format student id 1", function(done) {
-    courses
-      .saveUserPreferences(null, ["ECSE 307", "ECSE 251", "ECSE 325"])
-      .catch(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response.message, "Id cannot be empty");
-          resolve();
-        }).then(done);
-      });
+  it("responds with invalid format student id 1", async() => {
+    let res = "";
+    try {
+      courses.saveUserPreferences(null, ["ECSE 307", "ECSE 251", "ECSE 325"]);
+    } catch (err) {
+      res = err;
+      assert.equal(res, "Id cannot be empty");
+    }
   });
+
+  it("responds with invalid format student id 2", async() => {
+    let res = "";
+    try {
+      courses.saveUserPreferences(invalid_id_1, ["ECSE 307", "ECSE 251", "ECSE 325"]);
+    } catch (err) {
+      res = err;
+      assert.equal(res, "false");
+    }
+  });
+
+  it("responds with invalid format student id 3", async() => {
+    let res = "";
+    try {
+      courses.saveUserPreferences(invalid_id_2, ["ECSE 307", "ECSE 251", "ECSE 325"]);
+    } catch (err) {
+      res = err;
+      assert.equal(res, "Id must be numeric");
+    }
+  });
+
+  it("responds with invalid format course code 1", async() => {
+    let res = "";
+    try {
+      courses.saveUserPreferences(id, ["ECSE 999", "ECSE 251", "ECSE 325"]);
+    } catch (err) {
+      res = err;
+      assert.equal(res, "false");
+    }
+  });
+
+  it("responds with invalid format course code 2", async() => {
+      let res = "";
+      try {
+        courses.saveUserPreferences(id, ["Z1Z2 L21", "ECSE 251", "ECSE 325"]);
+      } catch (err) {
+        res = err;
+        assert.equal(res, "Invalid format course code for course Z1Z2 L21");
+      }
+    });
 
   
-  it("responds with invalid format student id 2", function(done) {
-    courses
-      .saveUserPreferences(invalid_id_1, ["ECSE 307", "ECSE 251", "ECSE 325"])
-      .catch(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response.message, "false");
-          resolve();
-        }).then(done);
-      });
-  });
-
-  it("responds with invalid format student id 3", function(done) {
-    courses
-      .saveUserPreferences(invalid_id_2, ["ECSE 307", "ECSE 251", "ECSE 325"])
-      .catch(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response.message, "Id must be numeric");
-          resolve();
-        }).then(done);
-      });
-  });
-
-  it("responds with invalid format course code 1", function(done) {
-    courses
-      .saveUserPreferences(id, ["ECSE 999", "ECSE 251", "ECSE 325"])
-      .catch(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response.message, "false");
-          resolve();
-        }).then(done);
-      });
-  });
-
-  it("responds with invalid format course code 2", function(done) {
-    courses
-      .saveUserPreferences(id, ["Z1Z2 L21", "ECSE 251", "ECSE 325"])
-      .catch(response => {
-        return new Promise(function(resolve) {
-          assert.equal(response.message, "Invalid format course code for course Z1Z2 L21");
-          resolve();
-        }).then(done);
-      });
-  });
-
   it("responds with true indicating student desired courses were properly added ", function(done) {
     courses
     .saveUserPreferences(id, ["ECSE 251", "ECSE 210"]).then(response => {
