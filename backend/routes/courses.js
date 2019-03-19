@@ -364,11 +364,11 @@ router.post(
 );
 
 /**
- * @api {post} /updateFutureCourse
+ * @api {post} /updateDesiredCourse
  * @apiDescription This endpoint will add future desired courses
  * @apiExample {curl} Example usage:
  * Http:
- *	POST /courses/updateFutureCourse HTTP/1.1
+ *	POST /courses/updateDesiredCourse HTTP/1.1
  *	Host: localhost:3001
  *	Content-Type: application/json
  *	   {
@@ -377,7 +377,7 @@ router.post(
  *     }
  * Curl:
  *	curl -X POST \
- *	http://localhost:3001/courses/updateFutureCourse
+ *	http://localhost:3001/courses/updateDesiredCourse
  *	-H 'Content-Type: application/json' \
  *	-d '{
  *       "student_id": "225058391",
@@ -391,7 +391,7 @@ router.post(
  *
  * @author: Mathieu Savoie
  */
-router.post("/updateFutureCourse", async (req, res, next) => {
+router.post("/updateDesiredCourse", async (req, res, next) => {
   let studentId = req.body.student_id;
   let futureCourses;
 
