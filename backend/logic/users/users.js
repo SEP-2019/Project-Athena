@@ -289,7 +289,7 @@ var login = async (username, password) => {
     if (userInfo == undefined || userInfo.length == 0) {
       throw new CustomError("User does not exist", 400);
     }
-    console.log(userInfo);
+
     if (!userInfo || !isValidPassword(userInfo[0].password, password)) {
       throw new CustomError("Incorrect username or password.", 400);
     }
@@ -302,9 +302,8 @@ var login = async (username, password) => {
     if (studentData === undefined) {
       throw new Error("No student account found!");
     }
-    console.log(studentData);
-    // return studentID[0].student_id;
-    return true;
+
+    return JSON.stringify(studentData[0]);
   } catch (err) {
     throw err;
   } finally {
