@@ -28,7 +28,9 @@ class LoginContent extends Component {
         .then(response => {
           // Got good response
           console.log(response);
-          // TODO: change page
+          // TODO: change page, save student ID and name when backend is done
+          // temp for testing
+          this.setError('login successful');
         })
         .catch(loginError => {
           // Invalid login
@@ -93,7 +95,7 @@ class LoginContent extends Component {
   render() {
     return (
       <Section className="form" flexDirection="column">
-        <p className="error" id="error-msg" />
+        <text className="error" id="error-msg" />
         <EditText
           required
           label="Student ID"

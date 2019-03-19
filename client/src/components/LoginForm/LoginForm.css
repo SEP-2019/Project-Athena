@@ -20,3 +20,15 @@
   margin-bottom: 0.75vh;
   color: #b20007;
 }
+
+.link {
+  margin-inline-start: 1vh;
+  color: blue;
+  text-decoration: underline;
+}
+
+.note {
+  font-weight: 480;
+  margin-top: 0.5vh;
+  margin-bottom: 1.5vh;
+}
