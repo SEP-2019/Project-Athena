@@ -11,14 +11,14 @@ export default {
         "student_id": student_id
     }
     return Api().post('users/addStudentUser', data)
-  }
-
-  compare_course(course_list){
+  },
+  
+  compare_course (course_list){
     var data = {
         "completed_courses": course_list
     }
     return Api().post('users/completedCourses/comparison', data)
-  }
+  },
 
   login(username, password){
     var data = {
@@ -26,7 +26,7 @@ export default {
         "password": password
     }
     return Api().post('users/login', data)
-  }
+  },
 
 
   // GET REQUESTS
@@ -37,7 +37,7 @@ export default {
         }
     }
     return Api().get('users/getStudentData', param)
-  }
+  },
 
   completed_courses(id){
    var param = {

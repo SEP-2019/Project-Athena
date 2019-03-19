@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 
-// IMPORT the service you would like to call
+// Import the service you would like to call
 import UserService from '../../services/UserService'
+import CourseService from '../../services/CourseService'
+import CurriculumService from '../../services/CurriculumService'
+import TagService from '../../services/TagService'
 
 class ApiExample extends Component {
 
