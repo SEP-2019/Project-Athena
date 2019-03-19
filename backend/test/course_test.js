@@ -153,7 +153,7 @@ describe("Test assign course to curriculumn", () => {
   });
 });
 
-describe("Tests add student future desired courses", function() {
+describe("Tests add student future desired courses", () => {
 
   username = "MathieuTest";
   password = "Mat123!@#";
@@ -216,6 +216,16 @@ describe("Tests add student future desired courses", function() {
       } catch (err) {
         res = err;
         assert.equal(res, "Invalid format course code for course Z1Z2 L21");
+      }
+    });
+
+    it("responds with invalid format course code 3", async() => {
+      let res = "";
+      try {
+        courses.saveUserPreferences(id, null);
+      } catch (err) {
+        res = err;
+        assert.equal(res, "empty courses list");
       }
     });
 

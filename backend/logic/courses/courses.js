@@ -415,7 +415,7 @@ var saveUserPreferences = async (student_id, courses) => {
     throw new Error("invalid format student id");
   }
   if (!courses) {
-    throw new Error("invalid format course code");
+    throw new Error("empty courses list");
   }
   for (let i = 0; i < courses.length; i++) {
     format.verifyCourseCode(courses[i]);
