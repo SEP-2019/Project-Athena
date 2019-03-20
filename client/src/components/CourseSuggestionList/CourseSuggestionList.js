@@ -16,7 +16,7 @@ class CourseSuggestionList extends Component {
     this.selectedCheckboxes = this.props.loadedCourses;
   };
 
-  handleChange(index, checked, checkbox) {
+  handleChange = (index, checked, checkbox) => {
     if (typeof checkbox === 'undefined') {
       return;
     }
@@ -32,7 +32,7 @@ class CourseSuggestionList extends Component {
       console.log(checkbox, 'is selected');
     }
     this.props.updateCoursesCheckedState(tag, courses);
-  }
+  };
 
   createCourseList = (course_label, index) => (
     <div className="suggestion-course" key={index}>
@@ -45,22 +45,19 @@ class CourseSuggestionList extends Component {
       <div className="course-list">
         <div>
           <h4 className="tag-label">{this.props.tag}</h4>
-          {this.props.errorMessage(
-            this.props.courses.map((course, index) => (
-              <CourseCheckBox
-                key={index}
-                index={this.props.tag + course.course_code}
-                course_code={course.course_code}
-                checked={
-                  this.selectedCheckboxes.has(course.course_code) ? true : false
-                }
-                handleChange={e =>
-                  this.handleChange(index, e.target.checked, e.target.name)
-                }
-              />
-            )),
-            this.props.error
-          )}
+          {this.props.courses.map((course, index) => (
+            <CourseCheckBox
+              key={index}
+              index={this.props.tag + course.course_code}
+              course_code={course.course_code}
+              checked={
+                this.selectedCheckboxes.has(course.course_code) ? true : false
+              }
+              handleChange={e =>
+                this.handleChange(index, e.target.checked, e.target.name)
+              }
+            />
+          ))}
         </div>
       </div>
     );

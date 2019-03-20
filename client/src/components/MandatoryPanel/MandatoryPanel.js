@@ -10,31 +10,33 @@ class MandatoryPanel extends Component {
   state = {
     courses: [],
     coursesAreLoading: true,
-    courseError: null,
   };
 
-  addCheckedProperty(data) {
+  addCheckedProperty = data => {
     return data.map(obj => {
       obj.checked = false;
       return obj;
     });
-  }
+  };
 
   fetchCourses = async () => {
     const response = await axios
       .get(`${url}/courses/getAllCourses`)
-      .catch(courseError =>
-        this.setState({ courseError, coursesAreLoading: false })
-      );
-    this.setState({
-      courses: this.addCheckedProperty(response.data.Response),
-      coursesAreLoading: false,
-    });
+      .catch(error => {
+        console.error(error);
+        this.setState({ coursesAreLoading: false });
+      });
+    if (response) {
+      this.setState({
+        courses: this.addCheckedProperty(response.data.Response),
+        coursesAreLoading: false,
+      });
+    }
   };
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.fetchCourses();
-  }
+  };
 
   componentWillMount = () => {
     this.selectedCourses = new Set();
@@ -44,15 +46,6 @@ class MandatoryPanel extends Component {
     this.setState({
       courses: newCourses,
     });
-  };
-
-  displayError = content => {
-    const { courseError } = this.state;
-    return courseError ? (
-      <p className="Error">{courseError.message}</p>
-    ) : (
-      content
-    );
   };
 
   render() {
@@ -66,7 +59,6 @@ class MandatoryPanel extends Component {
               courses={courses}
               selectedCourses={this.selectedCourses}
               updateCoursesCheckedState={this.updateCoursesCheckedState}
-              errorMessage={this.displayError}
             />
           ) : (
             <h3>Loading the courses...</h3>

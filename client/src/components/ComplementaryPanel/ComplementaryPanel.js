@@ -14,11 +14,9 @@ class ComplementaryPanel extends Component {
   state = {
     tags: [],
     tagsAreLoading: true,
-    tagError: null,
 
     suggestions: [],
     suggestionsAreLoading: false,
-    suggestionError: null,
     loadedCourses: new Set(),
   };
 
@@ -30,36 +28,43 @@ class ComplementaryPanel extends Component {
   }
 
   fetchTags = async () => {
-    const response = await axios
-      .get(`${url}/tags/getAllTags`)
-      .catch(tagError => this.setState({ tagError, tagsAreLoading: false }));
-    this.setState({
-      tags: this.addCheckedProperty(response.data.Response),
-      tagsAreLoading: false,
+    const response = await axios.get(`${url}/tags/getAllTags`).catch(error => {
+      console.error(error);
+      this.setState({ tagsAreLoading: false });
     });
+    if (response) {
+      this.setState({
+        tags: this.addCheckedProperty(response.data.Response),
+        tagsAreLoading: false,
+      });
+    }
   };
 
   fetchCourseSuggestions = async newTag => {
     const response = await axios
       .get(`${url}/courses/getCourseByTag?tag=${newTag}`)
-      .catch(suggestionError =>
-        this.setState({ suggestionError, suggestionsAreLoading: false })
-      );
-    this.setState(prevState => ({
-      suggestions: [
-        ...prevState.suggestions,
-        {
-          name: newTag,
-          courses: this.addCheckedProperty(response.data.Response),
-        },
-      ],
-      suggestionsAreLoading: false,
-    }));
+      .catch(error => {
+        console.error(error);
+        this.setState({ suggestionsAreLoading: false });
+      });
+    if (response) {
+      this.setState(prevState => ({
+        suggestions: [
+          ...prevState.suggestions,
+          {
+            name: newTag,
+            courses: this.addCheckedProperty(response.data.Response),
+          },
+        ],
+        suggestionsAreLoading: false,
+      }));
+    }
   };
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.fetchTags();
-  }
+    // TODO: fetchUserData to get CompletedCourses
+  };
 
   componentWillMount = () => {
     this.checkedTags = new Set();
@@ -93,8 +98,7 @@ class ComplementaryPanel extends Component {
     this.setState({ suggestions: newSuggestions });
   };
 
-  clearSelection = e => {
-    e.preventDefault();
+  clearSelection = () => {
     let newSuggestions = [...this.state.suggestions];
     newSuggestions.forEach(function(obj) {
       obj.courses.map(course => {
@@ -111,21 +115,12 @@ class ComplementaryPanel extends Component {
     });
   };
 
-  displayError = content => {
-    const { suggestionError } = this.state;
-    return suggestionError ? (
-      <p className="Error">{suggestionError.message}</p>
-    ) : (
-      content
-    );
-  };
-
-  displayError = (content, error) => {
-    return error ? <p className="Error">{error.message}</p> : content;
+  applySelection = () => {
+    console.log(this.state.suggestions);
+    // TODO: POST request to save
   };
 
   loadSuggestions = (tag, courses) => {
-    const { suggestionError } = this.state;
     return (
       <CourseSuggestionList
         key={tag}
@@ -133,14 +128,12 @@ class ComplementaryPanel extends Component {
         courses={courses}
         loadedCourses={this.state.loadedCourses}
         updateCoursesCheckedState={this.updateCoursesCheckedState}
-        errorMessage={this.displayError}
-        error={suggestionError}
       />
     );
   };
 
   render() {
-    const { tagsAreLoading, tags, tagError, suggestions } = this.state;
+    const { tagsAreLoading, tags, suggestions } = this.state;
     return (
       <div className="tab_content">
         <div className="spacer" />
@@ -150,10 +143,9 @@ class ComplementaryPanel extends Component {
               <TagListWithSnackBar
                 tags={tags}
                 clearSelection={this.clearSelection}
+                applySelection={this.applySelection}
                 checkedTags={this.checkedTags}
                 updateTagsCheckedState={this.updateTagsCheckedState}
-                errorMessage={this.displayError}
-                error={tagError}
               />
             </SnackbarProvider>
           ) : (
