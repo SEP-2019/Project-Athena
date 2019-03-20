@@ -401,6 +401,50 @@ var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
   return true;
 };
 
+/**
+ * Saves user preferences to the database.
+ * @author Steven Li
+ * @param {int} student_id A student id
+ * @param {JSON} courses An array of course codes
+ * @throws invalid format course code
+ *         invalid format student id
+ *         mysql connection errors
+ */
+var saveUserPreferences = async (student_id, courses) => {
+  if (!format.verifyStudentId(student_id)) {
+    throw new Error("invalid format student id");
+  }
+  if (!courses) {
+    throw new Error("empty courses list");
+  }
+  for (let i = 0; i < courses.length; i++) {
+    format.verifyCourseCode(courses[i]);
+  }
+
+  let connection = await mysql.getNewConnection();
+  try {
+    await connection.beginTransaction();
+    await connection.query(
+      "DELETE FROM student_desired_courses WHERE student_id = ?;",
+      [student_id]
+    );
+    for (let i = 0; i < courses.length; i++) {
+      await connection.query(
+        "INSERT INTO student_desired_courses (course_code, student_id) VALUES (?, ?);",
+        [courses[i], student_id]
+      );
+    }
+    await connection.commit();
+    return true;
+  } catch (err) {
+    console.error(err);
+    await connection.rollback();
+    throw new Error("false");
+  } finally {
+    connection.release();
+  }
+};
+
 module.exports = {
   getCourseByTag,
   addCourse,
@@ -411,5 +455,6 @@ module.exports = {
   addPrereq,
   updateCourse,
   phaseOutCourse,
-  assignCourseToCurriculum
+  assignCourseToCurriculum,
+  saveUserPreferences
 };
