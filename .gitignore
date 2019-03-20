@@ -8,3 +8,6 @@ node_modules
 .jsbeautifyrc
 .idea
 .env
+.DS_Store
+.DS_Store?
+*.DS_Store

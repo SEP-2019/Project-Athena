@@ -3,23 +3,29 @@ const format = require("../../validation/format");
 
 /**
  * Returns a list of courses matching the tag
- * @author Alex Lam
- * @param {string} tag
+ * @author Alex Lam, Feras Al Taha
+ * @param {string} tag, studentID
  * @returns A list of courses in JSON format
  * @throws Undefined tag if tag is null
  *         error if MySQL connection failed
  */
-var getCourseByTag = async function getCourseByTag(tag) {
-  if (!tag) {
-    throw Error("Undefined tag");
-  }
+var getCourseByTag = async function getCourseByTag(tag,studentID) {
+  format.verifyTag(tag);
+  format.verifyStudentId(studentID);
 
   let connection = await mysql.getNewConnection();
   try {
     let courses = await connection.query(
-      `SELECT course_code,description FROM courses WHERE course_code IN 
-      (SELECT course_code FROM course_tags WHERE tag_name = ?);`,
-      tag
+      `SELECT course_tags.course_code, 
+              (IF(student_desired_courses.student_id = ?, TRUE, FALSE)) as desired, 
+              courses.description, courses.title
+      FROM student_desired_courses 
+      RIGHT JOIN course_tags ON (course_tags.course_code = student_desired_courses.course_code)
+      JOIN courses ON (courses.course_code = course_tags.course_code)
+      WHERE (student_desired_courses.student_id = ? 
+            OR student_desired_courses.student_id is null) 
+      AND course_tags.tag_name = ?;`,
+      [studentID, studentID, tag]
     );
     return JSON.parse(JSON.stringify(courses));
   } finally {
@@ -401,6 +407,50 @@ var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
   return true;
 };
 
+/**
+ * Saves user preferences to the database.
+ * @author Steven Li
+ * @param {int} student_id A student id
+ * @param {JSON} courses An array of course codes
+ * @throws invalid format course code
+ *         invalid format student id
+ *         mysql connection errors
+ */
+var saveUserPreferences = async (student_id, courses) => {
+  if (!format.verifyStudentId(student_id)) {
+    throw new Error("invalid format student id");
+  }
+  if (!courses) {
+    throw new Error("empty courses list");
+  }
+  for (let i = 0; i < courses.length; i++) {
+    format.verifyCourseCode(courses[i]);
+  }
+
+  let connection = await mysql.getNewConnection();
+  try {
+    await connection.beginTransaction();
+    await connection.query(
+      "DELETE FROM student_desired_courses WHERE student_id = ?;",
+      [student_id]
+    );
+    for (let i = 0; i < courses.length; i++) {
+      await connection.query(
+        "INSERT INTO student_desired_courses (course_code, student_id) VALUES (?, ?);",
+        [courses[i], student_id]
+      );
+    }
+    await connection.commit();
+    return true;
+  } catch (err) {
+    console.error(err);
+    await connection.rollback();
+    throw new Error("false");
+  } finally {
+    connection.release();
+  }
+};
+
 module.exports = {
   getCourseByTag,
   addCourse,
@@ -411,5 +461,6 @@ module.exports = {
   addPrereq,
   updateCourse,
   phaseOutCourse,
-  assignCourseToCurriculum
+  assignCourseToCurriculum,
+  saveUserPreferences
 };

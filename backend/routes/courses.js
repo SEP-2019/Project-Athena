@@ -6,17 +6,18 @@ let asyncMiddleware = require("./errorHandlingMiddleware");
 
 /**
  * @api {get} /getCourseByTag
- * @apiDescription get list of courses that match a tag
- * @apiParam (query) {string} tag
- * @apiExample {curl} Example usage: GET /courses/getCourseByTag?tag=engineering
- * @returns a list of JSON object [{"course_code":"CCOM 206","description":null},{"course_code":"CIVE 281","description":null}]
- * @author: Alex Lam
+ * @apiDescription get list of courses that match a tag with their description and whether they are desired by the student
+ * @apiParam (query) {string} tag, {int} studentID
+ * @apiExample {curl} Example usage: GET /courses/getCourseByTag?tag=engineering&studentID=2
+ * @returns a list of JSON object [{"course_code": "CCOM 206","desired": 0,"description": null,"title": "Communication in Engineering"},{"course_code": "CIVE 281","desired": 1,"description": null,"title": "Analytical Mechanics"}]
+ * @author: Alex Lam, Feras Al Taha
  */
 router.get(
   "/getCourseByTag",
   asyncMiddleware(async function(req, res, next) {
     let tag = req.query.tag;
-    let result = await courses.getCourseByTag(tag);
+    let studentID = req.query.studentID;
+    let result = await courses.getCourseByTag(tag, studentID);
     res.send(customResponse(result));
   })
 );
@@ -362,5 +363,53 @@ router.post(
     res.send(customResponse(response));
   })
 );
+
+/**
+ * @api {post} /updateDesiredCourse
+ * @apiDescription This endpoint will add future desired courses
+ * @apiExample {curl} Example usage:
+ * Http:
+ *	POST /courses/updateDesiredCourse HTTP/1.1
+ *	Host: localhost:3001
+ *	Content-Type: application/json
+ *	   {
+ *       "student_id": "225058391",
+ *       "courses": ["ECSE 321", "ECSE 323"]
+ *     }
+ * Curl:
+ *	curl -X POST \
+ *	http://localhost:3001/courses/updateDesiredCourse
+ *	-H 'Content-Type: application/json' \
+ *	-d '{
+ *       "student_id": "225058391",
+ *       "courses": ["ECSE 321", "ECSE 323"]
+ *     }'
+ *
+ * @returns true if future desired courses were added successfully
+ *          false if future desired courses were not added
+ *          invalid format future courses if the courses format is invalid
+ *          database connection handling
+ *
+ * @author: Mathieu Savoie
+ */
+router.post("/updateDesiredCourse", async (req, res, next) => {
+  let studentId = req.body.student_id;
+  let futureCourses;
+
+  try {
+    futureCourses = JSON.parse(JSON.stringify(req.body.courses));
+  } catch (error) {
+    res.status(500).send("invalid format course code");
+    return;
+  }
+
+  try {
+    let result = await courses.saveUserPreferences(studentId, futureCourses);
+    res.status(200).send(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
 
 module.exports = router;

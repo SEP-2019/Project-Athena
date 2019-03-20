@@ -1,4 +1,4 @@
---Apply to dev database once PR merged
+-- Apply to dev database once PR merged
 ALTER TABLE courses ADD COLUMN phased_out BOOLEAN default '0';
 
 ALTER TABLE course_offerings MODIFY COLUMN id INT auto_increment;
