@@ -86,7 +86,8 @@ class TagList extends Component {
                 CLEAR ALL
               </button>
             </div>
-          </div>
+          </div>,
+          this.props.error
         )}
       </form>
     );

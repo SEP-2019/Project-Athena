@@ -31,7 +31,7 @@ class CourseSuggestionList extends Component {
       this.selectedCheckboxes.add(checkbox);
       console.log(checkbox, 'is selected');
     }
-    this.props.updateCoursesCheckedState(tag, checkbox, courses);
+    this.props.updateCoursesCheckedState(tag, courses);
   }
 
   createCourseList = (course_label, index) => (
@@ -49,7 +49,7 @@ class CourseSuggestionList extends Component {
             this.props.courses.map((course, index) => (
               <CourseCheckBox
                 key={index}
-                index={course.course_code + index}
+                index={this.props.tag + course.course_code}
                 course_code={course.course_code}
                 checked={
                   this.selectedCheckboxes.has(course.course_code) ? true : false
@@ -58,7 +58,8 @@ class CourseSuggestionList extends Component {
                   this.handleChange(index, e.target.checked, e.target.name)
                 }
               />
-            ))
+            )),
+            this.props.error
           )}
         </div>
       </div>
