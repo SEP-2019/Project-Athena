@@ -279,9 +279,8 @@ var login = async (username, password) => {
   // Check for invalid formatting
   format.verifyUsername(username);
   format.verifyPassword(password);
-  let connection = await mysql.getNewConnection();
 
-  // Begin transaction with database
+  let connection = await mysql.getNewConnection();
   try {
     let userInfo = await connection.query(
       "SELECT * FROM users WHERE username = ?;",
@@ -291,11 +290,14 @@ var login = async (username, password) => {
     if (userInfo == undefined || userInfo.length == 0) {
       throw new CustomError("User does not exist", 400);
     }
-    console.log(userInfo)
+
     if (!userInfo || !isValidPassword(userInfo[0].password, password)) {
       throw new CustomError("Incorrect username or password.", 400);
     }
-    return true;
+
+    return userInfo[0].email;
+  } catch (err) {
+    throw err;
   } finally {
     connection.release();
   }
