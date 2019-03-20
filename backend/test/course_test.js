@@ -2,7 +2,6 @@ const courses = require("../logic/courses/courses.js");
 const users = require("../logic/users/users.js");
 const assert = require("assert");
 const mysql = require("../sql/connection");
-const users = require("../logic/users/users.js");
 
 describe("Test retrieve course by tag", function() {
   before(async () => {
