@@ -125,7 +125,7 @@ router.get(
  *		"password": "passAdmin",
  *	}'
  *
- * @returns JSON contains student ID and username e.g: {"student_id":279263971,"username":"studentUser1"}
+ * @returns Student email e.g: {"Response":"student.user1@mail.mcgill.ca"}
  *          Incorrect username or password.
  *
  * @author: Gareth Peters & Yufei Liu
@@ -136,8 +136,8 @@ router.post(
   asyncMiddleware(async (req, res, next) => {
     const username = req.body.username;
     const password = req.body.password;
-    const studentData = await users.login(username, password);
-    res.send(String(customResponse(studentData).Response));
+    const studentEmail = await users.login(username, password);
+    res.status(200).send(customResponse(studentEmail));
   })
 );
 

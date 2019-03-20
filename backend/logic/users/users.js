@@ -294,16 +294,7 @@ var login = async (username, password) => {
       throw new CustomError("Incorrect username or password.", 400);
     }
 
-    const studentData = await connection.query(
-      `SELECT * FROM students WHERE username = ?;`,
-      [username]
-    );
-
-    if (studentData === undefined) {
-      throw new Error("No student account found!");
-    }
-
-    return JSON.stringify(studentData[0]);
+    return userInfo[0].email;
   } catch (err) {
     throw err;
   } finally {
