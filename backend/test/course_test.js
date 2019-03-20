@@ -1,10 +1,11 @@
 const courses = require("../logic/courses/courses.js");
+const users = require("../logic/users/users.js");
 const assert = require("assert");
 const mysql = require("../sql/connection");
 const users = require("../logic/users/users.js");
 
 describe("Test retrieve course by tag", function() {
-  it("responds with valid", async function() {
+  before(async () => {
     connection = await mysql.getNewConnection();
     await connection.query(
       `INSERT INTO courses (course_code,title, department) VALUES
@@ -20,8 +21,22 @@ describe("Test retrieve course by tag", function() {
         (?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,
       ["ECSE 428", "Engineering"]
     );
+    await users.insertStudentUser(
+      "getCourseByTagTest",
+      "getCourseByTagTest",
+      "getCourseByTagTest@email.com",
+      260561055
+    );
+    await connection.query(
+      `INSERT INTO student_desired_courses (course_code, student_id) VALUES
+        (?,?) ON DUPLICATE KEY UPDATE course_code=course_code;`,
+      ["ECSE 428", 260561055]
+    );
     await connection.release();
-    return courses.getCourseByTag("Engineering").then(function(res) {
+  });
+
+  it("responds with valid", async function() {
+    return courses.getCourseByTag("Engineering", 260561055).then(function(res) {
       let found = false;
       let searchingFor = { course_code: "ECSE 428" };
       for (course in res) {
@@ -31,6 +46,16 @@ describe("Test retrieve course by tag", function() {
       assert(true, found);
     });
   });
+
+  after(async () => {
+    connection = await mysql.getNewConnection();
+    await connection.query(
+      `DELETE FROM student_desired_courses WHERE student_id = 260561055;`
+    );
+    await users.deleteStudentUser("getCourseByTagTest");
+    await connection.release();
+  });
+
 });
 
 describe("Test assign course to curriculumn", () => {

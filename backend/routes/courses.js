@@ -6,17 +6,18 @@ let asyncMiddleware = require("./errorHandlingMiddleware");
 
 /**
  * @api {get} /getCourseByTag
- * @apiDescription get list of courses that match a tag
- * @apiParam (query) {string} tag
- * @apiExample {curl} Example usage: GET /courses/getCourseByTag?tag=engineering
- * @returns a list of JSON object [{"course_code":"CCOM 206","description":null},{"course_code":"CIVE 281","description":null}]
- * @author: Alex Lam
+ * @apiDescription get list of courses that match a tag with their description and whether they are desired by the student
+ * @apiParam (query) {string} tag, {int} studentID
+ * @apiExample {curl} Example usage: GET /courses/getCourseByTag?tag=engineering&studentID=2
+ * @returns a list of JSON object [{"course_code": "CCOM 206","desired": 0,"description": null,"title": "Communication in Engineering"},{"course_code": "CIVE 281","desired": 1,"description": null,"title": "Analytical Mechanics"}]
+ * @author: Alex Lam, Feras Al Taha
  */
 router.get(
   "/getCourseByTag",
   asyncMiddleware(async function(req, res, next) {
     let tag = req.query.tag;
-    let result = await courses.getCourseByTag(tag);
+    let studentID = req.query.studentID;
+    let result = await courses.getCourseByTag(tag, studentID);
     res.send(customResponse(result));
   })
 );
