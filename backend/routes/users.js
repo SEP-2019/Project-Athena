@@ -137,7 +137,7 @@ router.post(
     const username = req.body.username;
     const password = req.body.password;
     const studentEmail = await users.login(username, password);
-    res.status(200).send(customResponse(studentEmail));
+    res.send(customResponse(studentEmail));
   })
 );
 
