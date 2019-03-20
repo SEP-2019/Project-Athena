@@ -9,6 +9,7 @@ import './ComplementaryPanel.css';
 
 const TagListWithSnackBar = withSnackbar(TagList);
 const url = 'http://localhost:3001';
+const sid = '123456789';
 
 class ComplementaryPanel extends Component {
   state = {
@@ -42,7 +43,7 @@ class ComplementaryPanel extends Component {
 
   fetchCourseSuggestions = async newTag => {
     const response = await axios
-      .get(`${url}/courses/getCourseByTag?tag=${newTag}`)
+      .get(`${url}/courses/getCourseByTag?tag=${newTag}&studentID=${sid}`)
       .catch(error => {
         console.error(error);
         this.setState({ suggestionsAreLoading: false });
@@ -53,7 +54,7 @@ class ComplementaryPanel extends Component {
           ...prevState.suggestions,
           {
             name: newTag,
-            courses: this.addCheckedProperty(response.data.Response),
+            courses: response.data.Response,
           },
         ],
         suggestionsAreLoading: false,
@@ -102,8 +103,8 @@ class ComplementaryPanel extends Component {
     let newSuggestions = [...this.state.suggestions];
     newSuggestions.forEach(function(obj) {
       obj.courses.map(course => {
-        if (course.checked) {
-          course.checked = false;
+        if (course.desired) {
+          course.desired = false;
         }
         return null;
       });
