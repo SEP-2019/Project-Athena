@@ -40,13 +40,12 @@ var deleteStudentUser = async username => {
   let connection = await mysql.getNewConnection();
   try {
     await connection.beginTransaction();
-    let student_id = await connection.query(
-      "SELECT student_id FROM students WHERE username = ?;",
-      username
-    );
-    await connection.query("DELETE FROM students WHERE student_id = ?;", [
-      student_id[0].student_id
-    ]);
+    await connection.query(
+      `DELETE FROM students WHERE student_id =
+          (SELECT * FROM (SELECT student_id
+                          FROM students
+                          WHERE username = ?) t);`, 
+    [username]);
     await connection.query("DELETE FROM users WHERE username = ?;", [username]);
     await connection.commit();
     connection.release();

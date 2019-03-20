@@ -4,15 +4,13 @@ const format = require("../../validation/format");
 /**
  * Returns a list of courses matching the tag
  * @author Alex Lam, Feras Al Taha
- * @param {string} tag
+ * @param {string} tag, studentID
  * @returns A list of courses in JSON format
  * @throws Undefined tag if tag is null
  *         error if MySQL connection failed
  */
 var getCourseByTag = async function getCourseByTag(tag,studentID) {
-  if (!tag) {
-    throw Error("Undefined tag");
-  }
+  format.verifyTag(tag);
   format.verifyStudentId(studentID);
 
   let connection = await mysql.getNewConnection();
