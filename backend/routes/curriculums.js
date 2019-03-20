@@ -5,6 +5,24 @@ let customResponse = require("../validation/customResponse");
 let asyncMiddleware = require("./errorHandlingMiddleware");
 
 /**
+ * @api{get} /getAllCurriculumNames
+ * @apiDescription gets a list of all curriculum names
+ * @apiExample {curl} Example usage: GET /curriculums/getAllCurriculumNames
+ * @author Patrick Lai
+ * @returns : 
+ * {
+ * }
+ */
+router.get("/getAllCurriculumNames", async (req, res, next) => {
+  try{
+    let result = await curriculums.getAllCurriculumNames();
+    res.status(200).send(result);
+  } catch (err){
+    res.status(500).send(err.message);
+  }
+})
+
+/**
  * @api {get} /getCurriculum
  * @apiDescription gets a curriculum's courses from its name
  * @apiExample {curl} Example usage: GET /curriculums/getCurriculum?name=...
