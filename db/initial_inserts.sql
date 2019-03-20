@@ -1,4 +1,4 @@
---Initial inserts, ad inserts here that should ALWAYS be in the database
+-- Initial inserts, add inserts here that should ALWAYS be in the database
 INSERT INTO courses
     (course_code,title, department)
 VALUES
@@ -14,8 +14,7 @@ INSERT INTO course_tag
 VALUES
     ('ECSE 428', 'Engineering');
 
-INSERT INTO `
-users`
+INSERT INTO `users`
 (username, email, password)
 VALUES
     ('academicStaff1', 'academic.staff.1@mcgill.ca', 'qxGPhzqRSjmjwmaSaC6z7UrouwrJrUQYfqdBiSk3GqnTus4BeoPT5TicDtT2xoP0YTJBTMgdBGG9Wyw36DhFzA=='),
@@ -32,8 +31,7 @@ VALUES
     ('testStaff10', 'test.staff.10@mail.mcgill.ca', 'wy86yqSnlhhM6uad06lYoeFVOg1RxvBp3tkCY7CGdB303nCXjqKcFYUAnhJhxEnLf6qUCjcIf8mXlnkV4czdbw=='),
     ('UPEUDECh', 'email.upeu@mcgill.internal.ca', 'Q26oDkTeIkW23Xmd1zJ0YNmNYp4A6tH+7cXZVRMskEVwCO22UQdpArQVE5WCKFiXPCopt2y/6J7cJyCnuLuuqQ==');
 
-INSERT INTO `
-staff_members`
+INSERT INTO `staff_members`
 (staff_id, username)
 VALUES
     (75939, 'academicStaff1'),
@@ -42,8 +40,7 @@ VALUES
     (3523828, 'testStaff10'),
     (81235235, 'UPEUDECh');
 
-INSERT INTO `
-students`
+INSERT INTO `students`
 (student_id, username)
 VALUES
     (382730172, 'aegrousT'),

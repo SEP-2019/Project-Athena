@@ -1,3 +1,8 @@
+.search-bar {
+  display: flex;
+  align-items: center;
+}
+
 .react-autosuggest__container {
   position: relative;
 }
@@ -61,4 +66,13 @@
 .suggestion-code {
   margin-right: 5px;
   font-weight: bold;
+}
+
+.selection-button {
+  margin-left: 20px;
+  padding: 10px 25px;
+  background-color: #b20007;
+  color: white;
+  border-radius: 5px;
+  border: none;
 }

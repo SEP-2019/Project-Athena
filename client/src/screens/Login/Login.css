@@ -24,13 +24,13 @@ body {
 }
 
 .description {
-  width: 50%;
+  width: 45%;
   margin-left: 10vh;
   margin-inline-end: 10vh;
 }
 
 .form {
-  width: 50vh;
+  width: 24rem;
   margin-inline-end: 10vh;
 }
 

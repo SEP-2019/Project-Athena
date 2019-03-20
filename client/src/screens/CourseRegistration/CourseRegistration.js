@@ -56,6 +56,15 @@ class CourseRegistration extends Component {
   // Called on click of Select button, adds the course to list of selected courses
   onClickSelect() {
     this.setState(prevState => {
+      // Prevents adding the same course twice
+      if (
+        prevState.selectedCourses.some(
+          course => course.course_code === prevState.selectedSearch.course_code
+        )
+      ) {
+        return null;
+      }
+
       // Adds the selected semester to the course object
       const selection = {
         ...prevState.selectedSearch,
@@ -65,8 +74,6 @@ class CourseRegistration extends Component {
         selectedCourses: [...prevState.selectedCourses, selection],
       };
     });
-
-    //TODO: Clear input
   }
 
   // Called on click of a search suggestion, updates the selected course
@@ -105,10 +112,8 @@ class CourseRegistration extends Component {
                 className="selection-search"
                 data={tempData}
                 getValue={this.onSelectFromSearch}
+                onClickSelect={this.onClickSelect}
               />
-              <button className="selection-button" onClick={this.onClickSelect}>
-                Select
-              </button>
             </div>
           </div>
           <ul className="selected-side">

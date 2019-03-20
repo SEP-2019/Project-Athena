@@ -9,20 +9,10 @@ const format = require("../../validation/format");
  */
 var getAllTags = async () => {
   let connection = await mysql.getNewConnection();
-  let tags;
   let result = [];
-
-  try {
-    result = await connection.query("SELECT name FROM tags;");
-  } catch (error) {
-    console.error(error);
-  }
+  result = await connection.query("SELECT name FROM tags;");
   connection.release();
-
-  if (result) {
-    tags = result;
-  }
-  return tags;
+  return result;
 };
 
 /**

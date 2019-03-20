@@ -6,7 +6,7 @@ node_modules
 
 .vscode
 .jsbeautifyrc
-
+.idea
 .env
 .DS_Store
 .DS_Store?
