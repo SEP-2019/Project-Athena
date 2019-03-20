@@ -734,14 +734,74 @@ describe("Test get student completed courses", () => {
   });
 });
 
-describe("Test get student completed courses", () => {
-  // initialize test data
+describe("Test get student's data", () => {
+
+  // initialize test data:
+
+  // Student User
+  username = "MathieuTest";
+  password = "Mat123!@#";
+  email = "mat.test@mcgill.ca";
+  student_id = "192837465";
+
+  // Courses
+  // ECSE 279
+  courseCode_1 = "ECSE 279";
+  title_1 = "Software Unit Test 1";
+  departement_1 = "ECSE";
+  phasedOut_1 = 0;
+  description_1 = "Test the integrity of various independent functions";
+  credits_1 = 3;
+
+  // ECSE 379 - prereq ECSE 279
+  courseCode_2 = "ECSE 379";
+  title_2 = "Software Unit Test 2";
+  departement_2 = "ECSE";
+  phasedOut_2 = 0;
+  description_2 = "Test the integrity of varioud dependent functions";
+  credits_2 = 3;
+
+  // Course Offering --> see below
+  // Student course Offering --> see below
+
+  // Curriculum
+
+
+  
+
   before(async () => {
-    // Setup
+    // Setup:
     // users - students
+    await users.insertStudentUser (username, password, email, student_id);
     // courses
+    await courses.addCourse(courseCode_1, title_1, department_1, phasedOut_1, description_1, credits_1);
+    await courses.addCourse(courseCode_2, title_2, department_2, phasedOut_2, description_2, credits_2);
     // course_offering
-    // student_course_offering
+    const courseOffering = {
+      "TEST 001": [
+        {
+          id: 11279,
+          semester: "W2018",
+          section: 1,
+          scheduled_time: "M 10:05-13:35 T 10:35-11:35 F 14:05-16:05"
+        }
+      ],
+      "TEST 002": [
+        {
+          id: 22379,
+          semester: "W2018",
+          section: 1,
+          scheduled_time: "W 10:05-13:05 W 16:05-17:05"
+        }
+      ]
+    };
+    await courses.addCourseOfferings(courseOffering);
+    // student_course_offering (or use courses.addCompletedCourses())
+    await conn.query(
+      `INSERT INTO student_course_offerings (student_id, offering_id, semester)
+    VALUES(?, ?, ?);`,
+      [student_id, 11279, "W2018"]
+    );
     // curriculums
     // curriculum_core_classes
     // curriculum_tech_comps
@@ -766,10 +826,23 @@ describe("Test get student completed courses", () => {
     // curriculum_core_classes
     // curriculums
     // student_course_offering
+    await conn.query(
+      `DELETE FROM student_course_offerings WHERE student_id = ?;`, [student_id]);
     // course_offering
+    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [11279]);
+    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [22379]);
     // courses
+    await conn.query(
+      `DELETE FROM courses WHERE course_code = ?;`,
+      [courseCode_1]
+    );
+    await conn.query(
+      `DELETE FROM courses WHERE course_code = ?;`,
+      [courseCode_2]
+    );
     // users - students
-  });
+    await users.deleteStudentUser(username);
 
+  });
 });
 
