@@ -138,7 +138,6 @@ var getCompletedCourses = async studentID => {
 var getStudentData = async studentID => {
   format.verifyStudentId(studentID);
 
-  let data;
   let conn = await mysql.getNewConnection();
   let completedCourses, major, minors;
   try {
@@ -149,6 +148,7 @@ var getStudentData = async studentID => {
     IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`,
       [studentID]
     );
+
     major = await conn.query(
       `SELECT curriculum_name FROM student_majors WHERE student_id = ?;`,
       [studentID]
@@ -162,6 +162,11 @@ var getStudentData = async studentID => {
     let currYear = new Date().getFullYear();
     let currMonth = new Date().getMonth();
     let fallSem, winterSem;
+
+    if(major.length == 0){
+      throw new Error("Student does not have any majors");
+    }
+
     let curriculumName = major[0].curriculum_name;
 
     if (currMonth < 3) {
@@ -259,10 +264,7 @@ var getStudentData = async studentID => {
       desiredTC: desiredTC
     };
 
-    if (results) {
-      data = JSON.stringify(results);
-    }
-    return data;
+    return results;
   } catch (err) {
     conn.release();
     throw err;
