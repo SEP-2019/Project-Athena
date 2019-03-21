@@ -837,7 +837,7 @@ describe("Test get student's data", () => {
   coreqs = {
     "ECSE 276": ["ECSE 279"]
   };
-  //Student Desired Courses
+  //Student Desired Courses (COMP 499)
   // Curriculum
   // curriculum_core_classes
   // curriculum_tech_comps
@@ -865,6 +865,7 @@ describe("Test get student's data", () => {
     // course_coreqs
     await courses.addCoreq(coreqs);
     // student_desired_courses
+    await courses.saveUserPreferences(student_id, ["COMp 499"]);
     // curriculums
     // curriculum_core_classes
     // curriculum_tech_comps
@@ -873,6 +874,8 @@ describe("Test get student's data", () => {
     // student_minors
   });
 
+
+  // --- TESTS ---
 
 
   after(async () => {
@@ -884,6 +887,7 @@ describe("Test get student's data", () => {
     // curriculum_core_classes
     // curriculums
     // student_desired_courses
+    await conn.query(`DELETE FROM student_desired_courses WHERE student_id = ?;`,[student_id]);
     // course_coreqs
     await conn.query(`DELETE FROM course_coreqs WHERE course_code = ?;`, ["ECSE 276"]);
     //await conn.query(`DELETE FROM course_coreqs WHERE course_code = ?;`, ["ECSE 279"]); (not sure if needed)
