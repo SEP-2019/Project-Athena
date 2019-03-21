@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from 'react-router-dom';
 import CourseRegistration from './screens/CourseRegistration';
 import CourseSuggestion from './screens/CourseSuggestion';
 import Login from './screens/Login';
@@ -11,10 +16,11 @@ class App extends Component {
     return (
       <Router>
         <Switch>
-          <Route exact path="/login" component={Login} />
+          <Route path="/login" component={Login} />
           <Route path="/courseregistration" component={CourseRegistration} />
           <Route path="/curriculumdisplay" component={CurriculumDisplay} />
           <Route path="/Home" component={CourseSuggestion} />
+          <Redirect to="/login" />
         </Switch>
       </Router>
     );

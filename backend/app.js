@@ -53,7 +53,7 @@ app.use(function(err, req, res, next) {
     //mysql error
     res.status(400);
     err.message = err.code;
-    console.error(err)
+    console.error(err);
   } else {
     res.status(500);
   }
