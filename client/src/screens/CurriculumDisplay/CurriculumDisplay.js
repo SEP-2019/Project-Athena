@@ -33,8 +33,9 @@ class CurriculumDisplay extends Component {
     axios
       .get('http://localhost:3001/users/getStudentData?studentID=' + studentid)
       .then(response => {
-        let res = response.data;
 
+        let res = response.data.Response;
+        
         this.setState({
           curriculumName: res.major[0].curriculum_name,
           completedCourses: this.parseCourseData(
