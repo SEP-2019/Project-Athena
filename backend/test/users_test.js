@@ -736,6 +736,16 @@ describe("Test get student completed courses", () => {
 
 describe("Test get student's data", () => {
 
+  /**
+   * Student 1: 
+   * Major: Electrical Engineering-2018-2019-8-semester-curriculum
+   * Minor: B.Eng - Minor Software Engineering
+   * Completed Courses: ECSE 276 (<-coreq->) ECSE 279, ECSE 379 (prereq ECSE279)
+   * Incomplete Core classes: ECSE 479 (prereq ECSE 379)
+   * Desired TC: COMP 499
+   * 
+   * Question --> why IncompletedCoreClass + desiredTC have a semester associated to them? (see getStudentData Route)
+   */
   // initialize test data:
 
   // Student User
@@ -745,28 +755,95 @@ describe("Test get student's data", () => {
   student_id = "192837465";
 
   // Courses
-  // ECSE 279
-  courseCode_1 = "ECSE 279";
-  title_1 = "Software Unit Test 1";
-  departement_1 = "ECSE";
-  phasedOut_1 = 0;
-  description_1 = "Test the integrity of various independent functions";
-  credits_1 = 3;
-
+  // ECSE 276 (Coreq with ECSE 279)
+  courseCode_1 = "ECSE 276";
+  title_1 = "Software Design";
+  ecseDepartment = "ECSE";
+  notPhasedOut = 0;
+  description_1 = "Software design and intro on automation testing";
+  credits_3 = 3;
+  // ECSE 279 (Coreq with ECSE 276)
+  courseCode_2 = "ECSE 279";
+  title_2 = "Software Unit Test 1";
+  description_2 = "Test automation continuation";
   // ECSE 379 - prereq ECSE 279
-  courseCode_2 = "ECSE 379";
-  title_2 = "Software Unit Test 2";
-  departement_2 = "ECSE";
-  phasedOut_2 = 0;
-  description_2 = "Test the integrity of varioud dependent functions";
-  credits_2 = 3;
-
-  // Course Offering --> see below
-  // Student course Offering --> see below
-
+  courseCode_3 = "ECSE 379";
+  title_3 = "Software Unit Test 2";
+  description_3 = "Test the integrity of varioud dependent functions";
+  // ECSE 479 (prereq ECSE 379)
+  courseCode_4 = "ECSE 479";
+  title_4 = "Deployement Methodologies";
+  description_4 = "Learning deployement methodologies and practices";
+  // ECSE 499
+  courseCode_5 = "COMP 499";
+  compDepartment = "COMP";
+  title_5 = "Software Techical Complementary";
+  description = "Threads and more";
+  // Course Offering
+  courseOffering = {
+    "ECSE 276": [
+      {
+        id: 11276,
+        semester: "W2018",
+        section: 1,
+        scheduled_time: "M 8:35-09:25 T 8:35-09:25 F 8:35-09:25"
+      }
+    ],
+    "ECSE 279": [
+      {
+        id: 11279,
+        semester: "W2018",
+        section: 1,
+        scheduled_time: "M 10:05-13:35 T 10:35-11:35 F 14:05-16:05"
+      }
+    ],
+    "ECSE 379": [
+      {
+        id: 22379,
+        semester: "W2018",
+        section: 1,
+        scheduled_time: "W 10:05-13:05 W 16:05-17:05"
+      }
+    ],
+    "ECSE 479": [
+      {
+        id: 33479,
+        semester: "F2019",
+        section: 1,
+        scheduled_time: "W 10:05-13:05 W 16:05-17:05"
+      }
+    ],
+    "ECSE 499": [
+      {
+        id: 44499,
+        semester: "F2019",
+        section: 1,
+        scheduled_time: "M 8:35-09:25 T 8:35-09:25 F 8:35-09:25"
+      }
+    ]
+  };
+  // Student course Offering
+  completedCourses = {
+    "ECSE 276": [{"semester": "W2018", "section": 1}],
+    "ECSE 279": [{"semester": "W2018", "section": 1}],
+    "ECSE 379": [{"semester": "W2018", "section": 1}]
+  };
+  // Prereqs
+  prereqs = {
+    "ECSE 379": ["ECSE 279"],
+    "ECSE 479": ["ECSE 379"]
+  };
+  // Coreqs
+  coreqs = {
+    "ECSE 276": ["ECSE 279"]
+  };
+  //Student Desired Courses
   // Curriculum
-
-
+  // curriculum_core_classes
+  // curriculum_tech_comps
+  // curriculum_complementaries
+  // student_majors
+  // student_minors
   
 
   before(async () => {
@@ -774,63 +851,53 @@ describe("Test get student's data", () => {
     // users - students
     await users.insertStudentUser (username, password, email, student_id);
     // courses
-    await courses.addCourse(courseCode_1, title_1, department_1, phasedOut_1, description_1, credits_1);
-    await courses.addCourse(courseCode_2, title_2, department_2, phasedOut_2, description_2, credits_2);
+    await courses.addCourse(courseCode_1, title_1, ecseDepartment, notPhasedOut, description_1, credits_3);
+    await courses.addCourse(courseCode_2, title_2, ecseDepartment, notPhasedOut, description_2, credits_3);
+    await courses.addCourse(courseCode_3, title_3, ecseDepartment, notPhasedOut, description_3, credits_3);
+    await courses.addCourse(courseCode_4, title_4, ecseDepartment, notPhasedOut, description_4, credits_3);
+    await courses.addCourse(courseCode_5, title_5, compDepartment, notPhasedOut, description_5, credits_3);
     // course_offering
-    const courseOffering = {
-      "TEST 001": [
-        {
-          id: 11279,
-          semester: "W2018",
-          section: 1,
-          scheduled_time: "M 10:05-13:35 T 10:35-11:35 F 14:05-16:05"
-        }
-      ],
-      "TEST 002": [
-        {
-          id: 22379,
-          semester: "W2018",
-          section: 1,
-          scheduled_time: "W 10:05-13:05 W 16:05-17:05"
-        }
-      ]
-    };
     await courses.addCourseOfferings(courseOffering);
     // student_course_offering (or use courses.addCompletedCourses())
-    await conn.query(
-      `INSERT INTO student_course_offerings (student_id, offering_id, semester)
-    VALUES(?, ?, ?);`,
-      [student_id, 11279, "W2018"]
-    );
+    await courses.addCompletedCourses(student_id, completedCourses);
+    // course_prereqs
+    await courses.addPrereq(prereqs);
+    // course_coreqs
+    await courses.addCoreq(coreqs);
+    // student_desired_courses
     // curriculums
     // curriculum_core_classes
     // curriculum_tech_comps
     // curriculum_complementaries
     // student_majors
     // student_minors
-    // student_desired_courses
-    // course_prereqs
-    // course_coreqs
   });
+
 
 
   after(async () => {
     // Tear down:
-    // course_coreqs
-    // course_prereqs
-    // student_desired_courses
     // student_minors
     // student_majors
     // curriculum_complementaries
     // curriculum_tech_comps
     // curriculum_core_classes
     // curriculums
+    // student_desired_courses
+    // course_coreqs
+    await conn.query(`DELETE FROM course_coreqs WHERE course_code = ?;`, ["ECSE 276"]);
+    //await conn.query(`DELETE FROM course_coreqs WHERE course_code = ?;`, ["ECSE 279"]); (not sure if needed)
+    // course_prereqs
+    await conn.query(`DELETE FROM course_prereqs WHERE course_code = ?;`, ["ECSE 379"]);
+    await conn.query(`DELETE FROM course_prereqs WHERE course_code = ?;`, ["ECSE 479"]);
     // student_course_offering
-    await conn.query(
-      `DELETE FROM student_course_offerings WHERE student_id = ?;`, [student_id]);
-    // course_offering
+    await conn.query(`DELETE FROM student_course_offerings WHERE student_id = ?;`, [student_id]);
+    // course_offerings
+    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [11276]);
     await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [11279]);
     await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [22379]);
+    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [33479]);
+    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [44499]);
     // courses
     await conn.query(
       `DELETE FROM courses WHERE course_code = ?;`,
@@ -840,9 +907,20 @@ describe("Test get student's data", () => {
       `DELETE FROM courses WHERE course_code = ?;`,
       [courseCode_2]
     );
+    await conn.query(
+      `DELETE FROM courses WHERE course_code = ?;`,
+      [courseCode_3]
+    );
+    await conn.query(
+      `DELETE FROM courses WHERE course_code = ?;`,
+      [courseCode_4]
+    );
+    await conn.query(
+      `DELETE FROM courses WHERE course_code = ?;`,
+      [courseCode_5]
+    );
     // users - students
     await users.deleteStudentUser(username);
-
   });
 });
 
