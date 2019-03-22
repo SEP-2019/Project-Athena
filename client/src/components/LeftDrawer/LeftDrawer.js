@@ -28,6 +28,10 @@ class LeftDrawer extends React.Component {
     });
   };
 
+  logout = () => {
+    //TODO
+  };
+
   render() {
     const { classes } = this.props;
 
@@ -58,6 +62,18 @@ class LeftDrawer extends React.Component {
               </ListItem>
             </Link>
           ))}
+          <Link to={'/login'} key={4} className="link">
+            <ListItem button onClick={this.logout()}>
+              <ListItemIcon>
+                <img
+                  alt="for pages"
+                  src="http://mawarupenguindrum.moonfruit.fr/communities/5/000/001/348/125/images/1860781.png"
+                  style={{ width: 30, height: 30 }}
+                />
+              </ListItemIcon>
+              <ListItemText primary={'Logout'} />
+            </ListItem>
+          </Link>
         </List>
       </div>
     );
