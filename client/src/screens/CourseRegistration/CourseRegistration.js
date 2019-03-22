@@ -1,51 +1,28 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import './CourseRegistration.css';
 import WithHeaderBar from '../../hocs/WithHeaderBar';
 import CourseRegistrationItem from './CourseRegistrationItem/CourseRegistrationItem';
 import DropDown from '../../components/DropDown';
 import SearchBar from '../../components/SearchBar';
 
-const tempData = [
-  {
-    course_code: 'COMP 202',
-    title: 'Foundations of Programming',
-  },
-  {
-    course_code: 'MATH 262',
-    title: 'Intermediate Calculus',
-  },
-  {
-    course_code: 'MATH 263',
-    title: 'ODEs for Engineers',
-  },
-  {
-    course_code: 'COMP 250',
-    title: 'Intro to Computer Science',
-  },
-  {
-    course_code: 'ECSE 428',
-    title: 'Software Engineering Project',
-  },
-  {
-    course_code: 'ECSE 429',
-    title: 'Software Validation',
-  },
-];
-
-const tempSemesters = ['Fall 2017', 'Winter 2017', 'Fall 2018', 'Winter 2018'];
-
 class CourseRegistration extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedSearch: '',
-      selectedSemester: tempSemesters[0],
-      selectedCourses: [],
+      allCourses: [], // list of all courses to select
+      semesters: [], // list of all semesters to select
+      selectedSearch: '', // selected course
+      selectedSemester: '', // selected semester
+      selectedCourses: [], // courses that have already been selected
     };
     this.updateSelectedSemester = this.updateSelectedSemester.bind(this);
     this.onClickSelect = this.onClickSelect.bind(this);
     this.onSelectFromSearch = this.onSelectFromSearch.bind(this);
     this.removeCourse = this.removeCourse.bind(this);
+    this.findSemesters = this.findSemesters.bind(this);
+    this.fetchAllCourses = this.fetchAllCourses.bind(this);
+    this.fetchUserData = this.fetchUserData.bind(this);
   }
 
   // Updates the selected semester in the dropdown
@@ -62,6 +39,11 @@ class CourseRegistration extends Component {
           course => course.course_code === prevState.selectedSearch.course_code
         )
       ) {
+        return null;
+      }
+
+      // Prevents adding course without selecting a semester
+      if (!prevState.selectedSemester) {
         return null;
       }
 
@@ -90,7 +72,62 @@ class CourseRegistration extends Component {
     }));
   }
 
+  // Returns the semesters displayed in the drop down
+  findSemesters(startYear) {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    let year = startYear;
+    let semesters = [];
+    for (year; year <= currentYear; year++) {
+      if (year === startYear) {
+        semesters.push('Fall ' + year.toString());
+      } else if (year === currentYear) {
+        semesters.push('Winter ' + year.toString());
+        if (today.getMonth() > 8) {
+          semesters.push('Fall ' + year.toString());
+        }
+      } else {
+        semesters.push('Winter ' + year.toString());
+        semesters.push('Fall ' + year.toString());
+      }
+    }
+    return semesters;
+  }
+
+  // TODO: remove because the student data should be passed down from login
+  fetchUserData() {
+    return axios.get(
+      'http://localhost:3001/users/getStudentData?studentID=999999999'
+    );
+  }
+
+  fetchAllCourses() {
+    return axios.get('http://localhost:3001/courses/getAllCourses');
+  }
+
+  componentDidMount() {
+    axios
+      .all([this.fetchAllCourses(), this.fetchUserData()])
+      .then(
+        axios.spread((courses, user) => {
+          let coursesData = courses.data.Response;
+          let userData = user.data.Response;
+          const major = userData.major[0].curriculum_name;
+          // find start year of the student
+          const year = parseInt(major.split('|')[1]);
+          this.setState({
+            semesters: this.findSemesters(year),
+            allCourses: coursesData,
+          });
+        })
+      )
+      .catch(error => console.log('ERROR', error));
+  }
+
   render() {
+    const allCourses = this.state.allCourses;
+    const semesters = this.state.semesters;
+
     return (
       <div className="course-registration">
         <div className="instruction">
@@ -103,14 +140,14 @@ class CourseRegistration extends Component {
               <DropDown
                 defaultValue={this.state.selectedSemester}
                 getValue={this.updateSelectedSemester}
-                menuList={tempSemesters}
+                menuList={semesters}
                 className="select"
               />
             </div>
             <div className="selection-course">
               <SearchBar
                 className="selection-search"
-                data={tempData}
+                data={allCourses}
                 getValue={this.onSelectFromSearch}
                 onClickSelect={this.onClickSelect}
               />
