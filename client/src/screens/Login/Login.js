@@ -27,7 +27,7 @@ class Login extends Component {
         >
           <Section className="description">{this.state.text}</Section>
           <Section className="form">
-            <LoginForm />
+            <LoginForm setEmail={this.props.setEmail}/>
           </Section>
         </Section>
         <Section className="footer" />

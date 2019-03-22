@@ -44,6 +44,7 @@ class LoginContent extends Component {
         .then(response => {
           // Save email & redirect
           console.log(response);
+          this.props.setEmail(response.data.Response);
           this.setState({ responseEmail: response.data.Response }, () => {
             // TODO remove: prints email
             validation.setError(this.state.responseEmail);
@@ -54,7 +55,7 @@ class LoginContent extends Component {
           // Invalid login
           console.log(loginError);
           var error = loginError.response.data.ErrorMessage;
-          if (validation.checkError(error)) {
+          if (validation.checkLoginError(error)) {
             this.setInvalidCredentials();
           } else {
             validation.setError(error);
