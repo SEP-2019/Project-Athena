@@ -4,6 +4,7 @@ import EditText from '../EditText';
 import DropDown from '../DropDownOutlined/DropDown';
 import axios from 'axios';
 import * as validation from './Validation';
+import { customHistory as history } from '../../';
 
 const tempYears = ['2014', '2015', '2016', '2017', '2018', '2019'];
 const tempCurriculum = ['7 semesters', '8 semesters'];
@@ -20,7 +21,7 @@ class SignupContent extends Component {
       username: '',
       email: '',
       password: '',
-      pwd: '',
+      confirmPassword: '',
       usernameError: false,
       emailError: false,
       passwordError: false,
@@ -67,7 +68,6 @@ class SignupContent extends Component {
           console.log(response);
           // TODO: change page, save email when backend is done
           this.redirect();
-          this.setError(response.data.Response);
         })
         .catch(loginError => {
           console.log(loginError);
@@ -82,9 +82,9 @@ class SignupContent extends Component {
     }
   }
 
-  redirect() {
-    //TODO
-  }
+  redirect = () => {
+    history.push('/courseregistration');
+  };
 
   isInputValid(id, email, password, confirmPassword) {
     var isValid = true;
@@ -128,7 +128,7 @@ class SignupContent extends Component {
 
   updateErrorState(field, isError) {
     this.setState({
-      [field]: [isError],
+      [field]: isError,
     });
   }
 
