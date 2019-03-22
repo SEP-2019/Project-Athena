@@ -323,15 +323,12 @@ describe("Tests add student user", function() {
       });
   });
 
-  /*
-  Need to be fixed. For some reason verifyYear throws a FormatError, but it is not retrieved properly by insertStudentUser
-  so the error that is seen by the tests are "Curriculum does not exist" error.
   it(`responds with ${expectedCurriculumYearLength4} 1`, function(done) {
     users
       .insertStudentUser("username1", "password", "email@email.com", "222222222", "Software Engineering", "111", "7-semester-curriculum")
-      .then(response => {
+      .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, expectedCurriculumYearLength4);
+          assert.equal(response.message, expectedCurriculumYearLength4);
           resolve();
         }).then(done);
       });
@@ -340,14 +337,13 @@ describe("Tests add student user", function() {
   it(`responds with ${expectedCurriculumYearLength4} 2`, function(done) {
     users
       .insertStudentUser("username1", "password", "email@email.com", "222222222", "Software Engineering", "111111", "7-semester-curriculum")
-      .then(response => {
+      .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, expectedCurriculumYearLength4);
+          assert.equal(response.message, expectedCurriculumYearLength4);
           resolve();
         }).then(done);
       });
   });
-  */
 
   it(`responds with curriculum does not exist 1`, function(done) {
     let major = "Liberal Arts|2017|2018|7-semester-curriculum";

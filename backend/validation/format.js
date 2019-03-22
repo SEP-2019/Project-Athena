@@ -282,14 +282,12 @@ var verifyCourseOffering = async courseOfferings => {
  * Verifies that the year is in the following format: 1234
  * @param {String} semester
  */
-var verifyYear = async year => {
+var verifyYear = year => {
   if (!year) {
     throw new FormatError("Curriculum year cannot be empty");
   }
   if (!/^\d{4}$/.test(year)) {
-    console.log(year);
     throw new FormatError("Curriculum year must be an integer of length 4");
-    console.log("teheheheheh");
   }
   return true;
 };
