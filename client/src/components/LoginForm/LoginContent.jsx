@@ -46,9 +46,8 @@ class LoginContent extends Component {
         .then(response => {
           // Save email & redirect
           console.log(response);
-          this.props.setEmail(response.data.Response, () => {
-            this.redirect();
-          });
+          this.props.setEmail(response.data.Response);
+          this.redirect();
         })
         .catch(loginError => {
           // Invalid login
