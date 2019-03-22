@@ -3,6 +3,7 @@ import Section from '../Section';
 import EditText from '../EditText';
 import axios from 'axios';
 import './LoginForm.css';
+import * as validation from './Validation';
 
 const LOGIN_URL = 'http://localhost:3001/users/login';
 
@@ -12,14 +13,29 @@ class LoginContent extends Component {
     this.state = {
       username: '',
       password: '',
+      usernameError: false,
+      passwordError: false,
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.onLogin = this.onLogin.bind(this);
   }
 
   onLogin() {
+    // Reset errors
+    this.setState(
+      {
+        usernameError: false,
+        passwordError: false,
+      },
+      () => {
+        validation.setError('');
+        this.sendRequest();
+      }
+    );
+  }
+
+  sendRequest() {
     if (this.isInputValid()) {
-      //Send Request
       axios
         .post(LOGIN_URL, {
           username: this.state.username,
@@ -30,7 +46,7 @@ class LoginContent extends Component {
           console.log(response);
           this.setState({ responseEmail: response.data.Response }, () => {
             // TODO remove: prints email
-            this.setError(this.state.responseEmail);
+            validation.setError(this.state.responseEmail);
             this.redirect();
           });
         })
@@ -38,16 +54,10 @@ class LoginContent extends Component {
           // Invalid login
           console.log(loginError);
           var error = loginError.response.data.ErrorMessage;
-          if (
-            error === 'Password length must be between 8 and 64' ||
-            error === 'User does not exist' ||
-            error === 'Username length must be less than 64' ||
-            error === 'Username must be alphanumeric' ||
-            error === 'Incorrect username or password.'
-          ) {
+          if (validation.checkError(error)) {
             this.setInvalidCredentials();
           } else {
-            this.setError(error);
+            validation.setError(error);
           }
         });
     }
@@ -60,38 +70,42 @@ class LoginContent extends Component {
   isInputValid() {
     var id = this.state.username;
     var password = this.state.password;
+    var isValid = true;
+
     // Check if username & password are empty
-    if (this.isEmpty(id)) {
-      this.setError('Student ID is required.');
-      return false;
-    } else if (this.isEmpty(password)) {
-      this.setError('Password is required.');
-      return false;
-    } else if (!/^\d+$/.test(id) || id.length !== 9) {
-      // Invalid Student ID (contains letters)
-      this.setInvalidCredentials();
-      return false;
-    } else if (password.length < 8 || password.length > 64) {
-      // Password length out of range
-      this.setInvalidCredentials();
-      return false;
+    if (validation.isEmpty(password)) {
+      validation.setError('Password is required.');
+      this.updateErrorState('passwordError', true);
+      isValid = false;
+    }
+    if (validation.isEmpty(id)) {
+      validation.setError('Student ID is required.');
+      this.updateErrorState('usernameError', true);
+      isValid = false;
     }
 
-    // No error
-    this.setError('');
-    return true;
+    if (isValid === true) {
+      if (validation.isStudentId(id)) {
+        this.setInvalidCredentials();
+        isValid = false;
+      } else if (validation.checkPassword(password)) {
+        // Password length out of range
+        this.setInvalidCredentials();
+        isValid = false;
+      }
+    }
+
+    return isValid;
   }
 
-  setError(message) {
-    document.getElementById('error-msg').innerHTML = message;
+  updateErrorState(field, isError) {
+    this.setState({
+      [field]: [isError],
+    });
   }
 
   setInvalidCredentials() {
-    this.setError('Invalid crendentials. Please try again.');
-  }
-
-  isEmpty(value) {
-    return !value;
+    validation.setError('Invalid crendentials. Please try again.');
   }
 
   handleInputChange(event = {}) {
@@ -112,6 +126,7 @@ class LoginContent extends Component {
           name="username"
           defaultValue={this.state.username}
           onChange={this.handleInputChange}
+          error={this.state.usernameError}
         />
         <EditText
           required
@@ -121,6 +136,7 @@ class LoginContent extends Component {
           name="password"
           defaultValue={this.state.password}
           onChange={this.handleInputChange}
+          error={this.state.passwordError}
         />
         <button className="primary-button" onClick={this.onLogin}>
           Log in
