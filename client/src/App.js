@@ -8,21 +8,24 @@ import {
 import CourseRegistration from './screens/CourseRegistration';
 import CourseSuggestion from './screens/CourseSuggestion';
 import Login from './screens/Login';
-import './App.css';
 import CurriculumDisplay from './screens/CurriculumDisplay';
+import { StudentProvider } from './contexts/StudentContext';
+import './App.css';
 
 class App extends Component {
   render() {
     return (
-      <Router>
-        <Switch>
-          <Route path="/login" component={Login} />
-          <Route path="/courseregistration" component={CourseRegistration} />
-          <Route path="/curriculumdisplay" component={CurriculumDisplay} />
-          <Route path="/Home" component={CourseSuggestion} />
-          <Redirect to="/login" />
-        </Switch>
-      </Router>
+      <StudentProvider>
+        <Router>
+          <Switch>
+            <Route path="/login" component={Login} />
+            <Route path="/courseregistration" component={CourseRegistration} />
+            <Route path="/curriculumdisplay" component={CurriculumDisplay} />
+            <Route path="/Home" component={CourseSuggestion} />
+            <Redirect to="/login" />
+          </Switch>
+        </Router>
+      </StudentProvider>
     );
   }
 }
