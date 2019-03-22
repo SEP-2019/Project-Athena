@@ -15,25 +15,13 @@ var getCurriculum = async function(name) {
   let connection = await mysql.getNewConnection();
 
   try {
-    let curriculum = await connection.query(
-      "SELECT * FROM curriculums WHERE curriculum_name=?;",
-      name
-    );
+    let curriculum = await connection.query("SELECT * FROM curriculums WHERE curriculum_name=?;", name);
 
-    let core_classes = await connection.query(
-      "SELECT course_code FROM curriculum_core_classes WHERE curriculum_name=?;",
-      name
-    );
+    let core_classes = await connection.query("SELECT course_code FROM curriculum_core_classes WHERE curriculum_name=?;", name);
 
-    let tech_comps = await connection.query(
-      "SELECT course_code FROM curriculum_tech_comps WHERE curriculum_name=?;",
-      name
-    );
+    let tech_comps = await connection.query("SELECT course_code FROM curriculum_tech_comps WHERE curriculum_name=?;", name);
 
-    let complementaries = await connection.query(
-      "SELECT course_code FROM curriculum_complementaries WHERE curriculum_name=?;",
-      name
-    );
+    let complementaries = await connection.query("SELECT course_code FROM curriculum_complementaries WHERE curriculum_name=?;", name);
 
     curriculum = JSON.parse(JSON.stringify(curriculum[0]));
     core_classes = JSON.parse(JSON.stringify(core_classes));
@@ -53,26 +41,18 @@ var getCurriculum = async function(name) {
   }
 };
 
-var createCurriculum = async (
-  name,
-  type,
-  department,
-  numOfElectives,
-  cores,
-  techComps,
-  comps
-) => {
+var createCurriculum = async (name, type, department, numOfElectives, cores, techComps, comps) => {
   let error = false;
 
   if (!format.verifyCurriculumName(name)) {
     error = "Invalid curriculum name";
-  } else if (!format.verifyCurrType(type)) {
-    error = "Invalid curriculum type";
-  } else if (!format.verifyDepartment(department)) {
+  } else if (!format.verifyDepartmentName(department)) {
     error = "Invalid department";
   } else if (!format.verifyNumOfElectives(numOfElectives)) {
     error = "Invalid number of electives";
-  }
+  } /*else if (!format.verifyCurrType(type)) {
+    error = "Invalid curriculum type";
+  }*/
 
   if (!error == false) {
     console.error(error);
@@ -80,9 +60,9 @@ var createCurriculum = async (
   }
 
   try {
-    format.verifyCourse(cores);
-    format.verifyCourse(techComps);
-    format.verifyCourse(comps);
+    await format.verifyCourseCodes(cores);
+    await format.verifyCourseCodes(techComps);
+    await format.verifyCourseCodes(comps);
   } catch (error) {
     console.error(error);
     throw new Error(error.message);
@@ -92,52 +72,36 @@ var createCurriculum = async (
 
   try {
     await connection.beginTransaction();
-    await connection.query(
-      "INSERT INTO curriculums (curriculum_name, type, department, numOfElectives) VALUES(?, ?, ?, ?);",
-      [name, type, department, numOfElectives]
-    );
-    for (let core in cores) {
-      let course_count = await connection.query(
-        "SELECT COUNT(*) FROM courses WHERE course_code = ?;",
-        [core]
-      );
+    await connection.query("INSERT INTO curriculums (curriculum_name, type, department, numOfElectives) VALUES(?, ?, ?, ?);", [
+      name,
+      type,
+      department,
+      numOfElectives
+    ]);
+    for (var i = 0; i < cores.length; i++) {
+      let course_count = await connection.query("SELECT COUNT(*) FROM courses WHERE course_code = ?;", [cores[i]]);
 
       if (course_count) {
-        await connection.query(
-          "INSERT INTO curriculum_core_class (curriculum_name, course_code) VALUES(?, ?);",
-          [name, core]
-        );
+        await connection.query("INSERT INTO curriculum_core_classes (curriculum_name, course_code) VALUES(?, ?);", [name, cores[i]]);
       } else {
-        throw new Error("Course ${core} does not exist");
+        throw new Error("Course ${cores[i]} does not exist\n");
       }
     }
-    for (let techComp in techComps) {
-      let course_count = await connection.query(
-        "SELECT COUNT(*) FROM courses WHERE course_code = ?;",
-        [techComp]
-      );
+    for (var i = 0; i < techComps.length; i++) {
+      let course_count = await connection.query("SELECT COUNT(*) FROM courses WHERE course_code = ?;", [techComps[i]]);
 
       if (course_count) {
-        await connection.query(
-          "INSERT INTO curriculum_tech_comp (curriculum_name, course_code) VALUES(?, ?);",
-          [name, techComp]
-        );
+        await connection.query("INSERT INTO curriculum_tech_comps (curriculum_name, course_code) VALUES(?, ?);", [name, techComps[i]]);
       } else {
-        throw new Error("Course ${techComp} does not exist");
+        throw new Error("Course ${techComps[i]} does not exist\n");
       }
     }
-    for (let comp in comps) {
-      let course_count = await connection.query(
-        "SELECT COUNT(*) FROM courses WHERE course_code = ?;",
-        [comp]
-      );
+    for (var i = 0; i < comps.length; i++) {
+      let course_count = await connection.query("SELECT COUNT(*) FROM courses WHERE course_code = ?;", [comps[i]]);
       if (course_count) {
-        await connection.query(
-          "INSERT INTO curriculum_complementaries (curriculum_name, course_code) VALUES(?, ?);",
-          [name, comp]
-        );
+        await connection.query("INSERT INTO curriculum_complementaries (curriculum_name, course_code) VALUES(?, ?);", [name, comps[i]]);
       } else {
-        throw new Error("Course ${comp} does not exist");
+        throw new Error("Course ${comps[i]} does not exist\n");
       }
     }
     await connection.commit();

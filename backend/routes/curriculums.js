@@ -73,15 +73,7 @@ router.post("/createCurriculum", function(req, res) {
   const techComps = req.body.techComps;
   const comps = req.body.comps;
   curriculums
-    .createCurriculum(
-      name,
-      type,
-      department,
-      numOfElectives,
-      cores,
-      techComps,
-      comps
-    )
+    .createCurriculum(name, type, department, numOfElectives, cores, techComps, comps)
     .then(val => {
       res.send(val);
     })

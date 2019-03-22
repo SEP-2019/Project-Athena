@@ -1,6 +1,7 @@
 const mocha = require("mocha");
 const users = require("../logic/users/users.js");
 const courses = require("../logic/courses/courses");
+const curriculums = require("../logic/curriculums/curriculums");
 const assert = require("assert");
 const nock = require("nock");
 const mysql = require("../sql/connection");
@@ -583,132 +584,70 @@ describe("Test get student completed courses", () => {
   });
 });
 
-describe("Tests assign student a major", () => {
-  it("ensures student is assigned to major", async () => {
-    await users.assignStudentMajor("123321123", "Electrical Engineering|2014|2015|7-semester-curriculum");
-
-    let conn = await mysql.getNewConnection();
-    let assigned = await conn.query(`SELECT * FROM student_majors WHERE student_id = ?;`, ["123321123"]);
-    assert.equal(assigned[0].student_id, "123321123");
-    assert.equal(assigned[0].curriculum_name, "Electrical Engineering|2014|2015|7-semester-curriculum");
-    conn.release();
-  });
-  it("ensures student is updated to be assigned to new major", async () => {
-    await users.assignStudentMajor("123321123", "Software Engineering|2016|2017|7-semester-curriculum");
-    await users.assignStudentMajor("123321123", "Electrical Engineering|2014|2015|7-semester-curriculum");
-
-    let conn = await mysql.getNewConnection();
-    let assigned = await conn.query(`SELECT * FROM student_majors WHERE student_id = ?;`, ["123321123"]);
-    assert.equal(assigned[0].student_id, "123321123");
-    assert.equal(assigned[0].curriculum_name, "Electrical Engineering|2014|2015|7-semester-curriculum");
-    conn.release();
-  });
-  it("responds with invalid student id", async () => {
-    try {
-      await users.assignStudentMajor("ABCDEFG", "Electrical Engineering|2014|2015|7-semester-curriculum");
-    } catch (error) {
-      assert.equal(error.message, "Invalid student id");
-    }
-  });
-  it("responds with invalid curriculum name", async () => {
-    try {
-      await users.assignStudentMajor("260678626", null);
-    } catch (error) {
-      assert.equal(error.message, "Invalid curriculum name");
-    }
-  });
-  it("responds with student id does not exist", async () => {
-    try {
-      await users.assignStudentMajor("260678626", "Electrical Engineering|2014|2015|7-semester-curriculum");
-    } catch (error) {
-      assert.equal(error.message, `Student user with student ID 260678626 does not exist!\n`);
-    }
-  });
-  it("responds with curriculum does not exist", async () => {
-    try {
-      await users.assignStudentMajor("123321123", "Electrical Engineering|2014|2015|10-semester-curriculum");
-    } catch (error) {
-      assert.equal(error.message, `Curriculum with name Electrical Engineering|2014|2015|10-semester-curriculum does not exist!\n`);
-    }
-  });
-  it("responds with student is already assigned to major", async () => {
-    await users.assignStudentMajor("123321123", "Electrical Engineering|2014|2015|7-semester-curriculum");
-    try {
-      await users.assignStudentMajor("123321123", "Electrical Engineering|2014|2015|7-semester-curriculum");
-    } catch (error) {
-      assert.equal(error.message, `Student is already assigned to Electrical Engineering|2014|2015|7-semester-curriculum as a major\n`);
-    }
-  });
-  after(async () => {
-    const conn = await mysql.getNewConnection();
-
-    await conn.query(`DELETE FROM student_majors WHERE student_id = ?;`, ["123321123"]);
-
-    await conn.release();
-  });
-});
-
 describe("Tests assign student a minor", () => {
+  before(async () => {
+    await users.insertStudentUser("TESTMINOR", "password123", "dummy@hotmail.com", "260678627");
+  });
   it("ensures student is assigned to minor", async () => {
-    await users.assignStudentMinor("123321123", "Electrical Engineering|2014|2015|7-semester-curriculum");
+    await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|7-semester-curriculum");
 
     let conn = await mysql.getNewConnection();
-    let assigned = await conn.query(`SELECT * FROM student_minors WHERE student_id = ?;`, ["123321123"]);
-    assert.equal(assigned[0].student_id, "123321123");
-    assert.equal(assigned[0].curriculum_name, "Electrical Engineering|2014|2015|7-semester-curriculum");
+    let assigned = await conn.query(`SELECT * FROM student_minors WHERE student_id = ?;`, ["260678627"]);
+    assert.equal(assigned[0].student_id, "260678627");
+    assert.equal(assigned[0].curriculum_name, "Electrical Engineering|2015|2016|7-semester-curriculum");
     conn.release();
   });
   it("ensures student is updated to be assigned to new minor", async () => {
-    await users.assignStudentMinor("123321123", "Software Engineering|2016|2017|7-semester-curriculum");
-    await users.assignStudentMinor("123321123", "Electrical Engineering|2014|2015|7-semester-curriculum");
+    await users.assignStudentMinor("260678627", "Software Engineering|2017|2018|7-semester-curriculum");
+    await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|7-semester-curriculum");
 
     let conn = await mysql.getNewConnection();
-    let assigned = await conn.query(`SELECT * FROM student_minors WHERE student_id = ?;`, ["123321123"]);
-    assert.equal(assigned[0].student_id, "123321123");
-    assert.equal(assigned[0].curriculum_name, "Electrical Engineering|2014|2015|7-semester-curriculum");
+    let assigned = await conn.query(`SELECT * FROM student_minors WHERE student_id = ?;`, ["260678627"]);
+    assert.equal(assigned[0].student_id, "260678627");
+    assert.equal(assigned[0].curriculum_name, "Electrical Engineering|2015|2016|7-semester-curriculum");
     conn.release();
   });
   it("responds with invalid student id", async () => {
     try {
-      await users.assignStudentMinor("ABCDEFG", "Electrical Engineering|2014|2015|7-semester-curriculum");
+      await users.assignStudentMinor("ABCDEFG", "Electrical Engineering|2015|2016|7-semester-curriculum");
     } catch (error) {
       assert.equal(error.message, "Invalid student id");
     }
   });
   it("responds with invalid curriculum name", async () => {
     try {
-      await users.assignStudentMinor("260678626", null);
+      await users.assignStudentMinor("260678627", null);
     } catch (error) {
       assert.equal(error.message, "Invalid curriculum name");
     }
   });
   it("responds with student id does not exist", async () => {
     try {
-      await users.assignStudentMinor("260678626", "Electrical Engineering|2014|2015|7-semester-curriculum");
+      await users.assignStudentMinor("100000000", "Electrical Engineering|2015|2016|7-semester-curriculum");
     } catch (error) {
-      assert.equal(error.message, `Student user with student ID 260678626 does not exist!\n`);
+      assert.equal(error.message, `Student user with student ID 100000000 does not exist!\n`);
     }
   });
   it("responds with curriculum does not exist", async () => {
     try {
-      await users.assignStudentMinor("123321123", "Electrical Engineering|2014|2015|10-semester-curriculum");
+      await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|10-semester-curriculum");
     } catch (error) {
-      assert.equal(error.message, `Curriculum with name Electrical Engineering|2014|2015|10-semester-curriculum does not exist!\n`);
+      assert.equal(error.message, `Curriculum with name Electrical Engineering|2015|2016|10-semester-curriculum does not exist!\n`);
     }
   });
   it("responds with student is already assigned to minor", async () => {
-    await users.assignStudentMinor("123321123", "Electrical Engineering|2014|2015|7-semester-curriculum");
+    await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|7-semester-curriculum");
     try {
-      await users.assignStudentMinor("123321123", "Electrical Engineering|2014|2015|7-semester-curriculum");
+      await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|7-semester-curriculum");
     } catch (error) {
-      assert.equal(error.message, `Student is already assigned to Electrical Engineering|2014|2015|7-semester-curriculum as a minor\n`);
+      assert.equal(error.message, `Student is already assigned to Electrical Engineering|2015|2016|7-semester-curriculum as a minor\n`);
     }
   });
   after(async () => {
     const conn = await mysql.getNewConnection();
 
-    await conn.query(`DELETE FROM student_majors WHERE student_id = ?;`, ["123321123"]);
-
+    await conn.query(`DELETE FROM student_minors WHERE student_id = ?;`, ["260678627"]);
+    await users.deleteStudentUser("TESTMINOR");
     await conn.release();
   });
 });

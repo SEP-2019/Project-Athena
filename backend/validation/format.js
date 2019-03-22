@@ -145,7 +145,7 @@ var verifyDepartmentName = department => {
  * @param {int} numOfElectives
  */
 var verifyNumOfElectives = numOfElectives => {
-  if (!id || !isNumeric(id)) {
+  if (!numOfElectives || !isNumeric(numOfElectives)) {
     return false;
   }
   return true;
@@ -176,6 +176,23 @@ var verifyCourse = courses => {
         throw new Error(error);
       }
     });
+  }
+};
+
+/**
+ * Verifies that a list of courses is valid
+ * @param {JSON} courses
+ *
+ *        ["ECSE 428", "ECSE 321", "ECSE 200"]
+ *
+ */
+var verifyCourseCodes = courses => {
+  if (!courses) {
+    throw new Error("Courses cannot be empty");
+  }
+
+  for (var i = 0; i < courses.length; i++) {
+    verifyCourseCode(courses[i]);
   }
 };
 
@@ -329,5 +346,6 @@ module.exports = {
   verifyCourseCode,
   verifyTitle,
   verifyDepartmentSubName,
-  verifyPhaseOut
+  verifyPhaseOut,
+  verifyCourseCodes
 };
