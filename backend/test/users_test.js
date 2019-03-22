@@ -1,6 +1,7 @@
 const mocha = require("mocha");
 const users = require("../logic/users/users.js");
-const courses = require("../logic/courses/courses");
+const courses = require("../logic/courses/courses.js");
+const curriculums = require("../logic/curriculums/curriculums.js")
 const assert = require("assert");
 const nock = require("nock");
 const mysql = require("../sql/connection");
@@ -739,9 +740,11 @@ describe("Test get student's data", () => {
   /**
    * Student 1: 
    * Major: Electrical Engineering-2018-2019-8-semester-curriculum
-   * Minor: B.Eng - Minor Software Engineering
+   * Minor: Software Engineering Minor-2015-2016-1-semester-curriculum
    * Completed Courses: ECSE 276 (<-coreq->) ECSE 279, ECSE 379 (prereq ECSE279)
    * Incomplete Core classes: ECSE 479 (prereq ECSE 379)
+   * Incomplete Minor classes: ECSE 199
+   * Incomplete complementary: ANTH 299
    * Desired TC: COMP 499
    * 
    * Question --> why IncompletedCoreClass + desiredTC have a semester associated to them? (see getStudentData Route)
@@ -778,7 +781,17 @@ describe("Test get student's data", () => {
   courseCode_5 = "COMP 499";
   compDepartment = "COMP";
   title_5 = "Software Techical Complementary";
-  description = "Threads and more";
+  description_5 = "Threads and more";
+  // ANTH 299
+  courseCode_6 = "ANTH 299";
+  anthDepartment = "ANTH";
+  title_6 = "Anthropology development";
+  description_6 = "Anthropology focused on societies";
+  // ECSE 199
+  courseCode_7 = "ECSE 199";
+  title_7 = "Software minor for Electrical";
+  description_7  = "Software Stuff";
+
   // Course Offering
   courseOffering = {
     "ECSE 276": [
@@ -820,6 +833,22 @@ describe("Test get student's data", () => {
         section: 1,
         scheduled_time: "M 8:35-09:25 T 8:35-09:25 F 8:35-09:25"
       }
+    ],
+    "ANTH 299": [
+      {
+        id: 5299,
+        semester: "F2019",
+        section: 1,
+        scheduled_time: "M 11:05-12:55 F 11:05-12:55"
+      }
+    ],
+    "ECSE 199": [
+      {
+        id: 1199,
+        semester: "F2020",
+        section: 1,
+        scheduled_time: "M 11:05-12:55 F 11:05-12:55"
+      }
     ]
   };
   // Student course Offering
@@ -838,16 +867,31 @@ describe("Test get student's data", () => {
     "ECSE 276": ["ECSE 279"]
   };
   //Student Desired Courses (COMP 499)
+  desiredCourses = ["COMP 499"];
   // Curriculum
-  // curriculum_core_classes
-  // curriculum_tech_comps
-  // curriculum_complementaries
+  majorCurriculumName = "Electrical Engineering Major-2015-2016-8-semester-curriculum";
+  majorCurriculumType = "Major";
+  majorDepartment = "Electrical Engineer"
+  majorNumOfElectives = 1;
+  majorCores = ["ECSE 276", "ECSE 279", "ECSE 379", "ECSE 479"];
+  majorTechComps = ["COMP 499"];
+  majorComps = ["ANTH 299"];
+
+  minorCurriculumName = "Software Engineering Minor-2015-2016-1-semester-curriculum";
+  minorCurriculumType = "Minor";
+  minorDepartment = "Software Engineer"
+  minorNumOfElectives = 0;
+  minorCore = "ECSE 199";
+  //minorTechComps = ["COMP 499"];
+  //minorComps = ["ANTH 299"];
+
+  // curriculum_core_classes / curriculum_tech_comps / curriculum_complementaries
   // student_majors
+
   // student_minors
   
 
   before(async () => {
-    // Setup:
     // users - students
     await users.insertStudentUser (username, password, email, student_id);
     // courses
@@ -856,6 +900,8 @@ describe("Test get student's data", () => {
     await courses.addCourse(courseCode_3, title_3, ecseDepartment, notPhasedOut, description_3, credits_3);
     await courses.addCourse(courseCode_4, title_4, ecseDepartment, notPhasedOut, description_4, credits_3);
     await courses.addCourse(courseCode_5, title_5, compDepartment, notPhasedOut, description_5, credits_3);
+    await courses.addCourse(courseCode_6, title_6, anthDepartment, notPhasedOut, description_6, credits_3);
+    await courses.addCourse(courseCode_7, title_7, ecseDepartment, notPhasedOut, description_7, credits_3);
     // course_offering
     await courses.addCourseOfferings(courseOffering);
     // student_course_offering (or use courses.addCompletedCourses())
@@ -865,13 +911,19 @@ describe("Test get student's data", () => {
     // course_coreqs
     await courses.addCoreq(coreqs);
     // student_desired_courses
-    await courses.saveUserPreferences(student_id, ["COMp 499"]);
-    // curriculums
-    // curriculum_core_classes
-    // curriculum_tech_comps
-    // curriculum_complementaries
+    await courses.saveUserPreferences(student_id, desiredCourses);
+    // curriculums / curriculum_core_classes / curriculum_tech_comps / curriculum_complementaries
+    await curriculums.createCurriculum (majorCurriculumName, majorCurriculumType, majorDepartment, majorNumOfElectives, majorCores, majorTechComps, majorComps);
+    await conn.query(`INSERT INTO curriculums (curriculum_name, type, department, numOfElectives) VALUES(?, ?, ?, ?);`,
+    [minorCurriculumName, minorCurriculumType, minorDepartment, minorNumOfElectives]);
+    await conn.query("INSERT INTO curriculum_core_classes (curriculum_name, course_code) VALUES(?, ?);",
+    [minorCurriculumName, minorCore]);
     // student_majors
+    await conn.query("INSERT INTO student_majors (student_id, curriculum_name) VALUES(?, ?);",
+    [student_id, majorCurriculumName]);
     // student_minors
+    await conn.query("INSERT INTO student_minors (student_id, curriculum_name) VALUES(?, ?);",
+    [student_id, minorCurriculumName]);
   });
 
 
@@ -879,13 +931,18 @@ describe("Test get student's data", () => {
 
 
   after(async () => {
-    // Tear down:
     // student_minors
+    await conn.query(`DELETE FROM student_minors WHERE student_id = ?;`,[student_id]);
     // student_majors
-    // curriculum_complementaries
-    // curriculum_tech_comps
-    // curriculum_core_classes
-    // curriculums
+    await conn.query(`DELETE FROM student_majors WHERE student_id = ?;`,[student_id]);
+    // curriculums / curriculum_core_classes / curriculum_tech_comps / curriculum_complementaries
+    await conn.query(`DELETE FROM curriculum_core_classes WHERE curriculum_name = ?;`,[minorCurriculumName]);
+    await conn.query(`DELETE FROM curriculums WHERE curriculum_name = ?;`,[minorCurriculumName]);
+
+    await conn.query(`DELETE FROM curriculum_complementaries WHERE curriculum_name = ?;`,[majorCurriculumName]);
+    await conn.query(`DELETE FROM curriculum_tech_comps WHERE curriculum_name = ?;`,[majorCurriculumName]);
+    await conn.query(`DELETE FROM curriculum_core_classes WHERE curriculum_name = ?;`,[majorCurriculumName]);
+    await conn.query(`DELETE FROM curriculums WHERE curriculum_name = ?;`,[majorCurriculumName]);
     // student_desired_courses
     await conn.query(`DELETE FROM student_desired_courses WHERE student_id = ?;`,[student_id]);
     // course_coreqs
@@ -922,6 +979,14 @@ describe("Test get student's data", () => {
     await conn.query(
       `DELETE FROM courses WHERE course_code = ?;`,
       [courseCode_5]
+    );
+    await conn.query(
+      `DELETE FROM courses WHERE course_code = ?;`,
+      [courseCode_6]
+    );
+    await conn.query(
+      `DELETE FROM courses WHERE course_code = ?;`,
+      [courseCode_7]
     );
     // users - students
     await users.deleteStudentUser(username);
