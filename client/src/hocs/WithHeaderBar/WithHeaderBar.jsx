@@ -3,7 +3,7 @@ import HeaderBar from '../../components/HeaderBar';
 
 export default Component => {
   class WithHeaderBar extends React.PureComponent {
-    componentWillReceiveProps(nextProps){
+    componentWillReceiveProps(nextProps) {
       console.log(this.props);
       console.log(nextProps);
     }
@@ -11,7 +11,7 @@ export default Component => {
     render() {
       return (
         <>
-          <HeaderBar email={this.props.responseEmail}/>
+          <HeaderBar email={this.props.responseEmail} />
           <Component {...this.props} />
         </>
       );

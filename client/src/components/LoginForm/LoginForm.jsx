@@ -24,7 +24,10 @@ class LoginForm extends Component {
     return (
       <Section>
         {this.state.loginForm ? (
-          <LoginContent handleChange={this.handleSwitchToSignup} setEmail={this.props.setEmail}/>
+          <LoginContent
+            handleChange={this.handleSwitchToSignup}
+            setEmail={this.props.setEmail}
+          />
         ) : (
           <SignupContent handleChange={this.handleSwitchToLogin} />
         )}
