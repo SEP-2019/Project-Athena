@@ -12,7 +12,7 @@ class CourseRegistration extends Component {
     this.state = {
       allCourses: [], // list of all courses to select
       semesters: [], // list of all semesters to select
-      selectedSearch: '', // selected course
+      selectedSearch: {}, // selected course (updates on hover)
       selectedSemester: '', // selected semester
       selectedCourses: [], // courses that have already been selected
     };
@@ -60,7 +60,7 @@ class CourseRegistration extends Component {
 
   // Called on click of a search suggestion, updates the selected course
   onSelectFromSearch(selection) {
-    this.setState({ selectedSearch: selection });
+    this.setState({ selectedSearch: selection }); // this is where the warning appears
   }
 
   // Removes the course from the selected courses list
@@ -94,16 +94,17 @@ class CourseRegistration extends Component {
     return semesters;
   }
 
-  // TODO: remove because the student data should be passed down from login
-  fetchUserData() {
-    return axios.get(
+  // TODO: remove harcoded student id
+  // TODO: get base URL by importing from a base instance
+  fetchUserData = async () => {
+    return await axios.get(
       'http://localhost:3001/users/getStudentData?studentID=999999999'
     );
-  }
+  };
 
-  fetchAllCourses() {
-    return axios.get('http://localhost:3001/courses/getAllCourses');
-  }
+  fetchAllCourses = async () => {
+    return await axios.get('http://localhost:3001/courses/getAllCourses');
+  };
 
   componentDidMount() {
     axios
@@ -125,8 +126,7 @@ class CourseRegistration extends Component {
   }
 
   render() {
-    const allCourses = this.state.allCourses;
-    const semesters = this.state.semesters;
+    const { allCourses, semesters } = this.state;
 
     return (
       <div className="course-registration">
