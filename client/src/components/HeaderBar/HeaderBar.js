@@ -7,15 +7,15 @@ const pages = [
   { label: 'Course Suggestions', path: '/home' },
   { label: 'Curriculum', path: '/curriculumdisplay' },
 ];
-const HeaderBar = () => (
+const HeaderBar = props => (
   <header className="HeaderBar">
     <nav className="HeaderBar_navigation">
       <div>
-        <LeftDrawer pages={pages} />
+        <LeftDrawer pages={pages} email={props.email} />
       </div>
       <div />
       <div className="HeaderBar_project_name">
-        <a href="/">James McGill</a>
+        <a href="/">{props.email}</a>
       </div>
       <div className="spaceFiller" />
       <div className="HeaderBar_logo" />
