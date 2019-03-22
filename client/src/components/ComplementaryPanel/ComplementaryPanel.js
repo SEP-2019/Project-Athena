@@ -8,66 +8,66 @@ import CourseSuggestionList from '../CourseSuggestionList/CourseSuggestionList';
 import './ComplementaryPanel.css';
 
 const TagListWithSnackBar = withSnackbar(TagList);
+const url = 'http://localhost:3001';
+const sid = '123456789';
 
 class ComplementaryPanel extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      tags: [],
-      tagsAreLoading: true,
-      tagError: null,
+  state = {
+    tags: [],
+    tagsAreLoading: true,
 
-      suggestions: [],
-      suggestionsAreLoading: false,
-      suggestionError: null,
-    };
-  }
+    suggestions: [],
+    suggestionsAreLoading: false,
+    loadedCourses: new Set(),
+  };
 
-  addCheckedProperty(json) {
-    return json.map(obj => {
+  addCheckedProperty(data) {
+    return data.map(obj => {
       obj.checked = false;
       return obj;
     });
   }
 
-  fetchTags() {
-    axios
-      .get('http://localhost:3001/tags/getAllTags')
-      .then(response =>
-        this.setState({
-          tags: this.addCheckedProperty(response.data),
-          tagsAreLoading: false,
-        })
-      )
-      .catch(tagError => this.setState({ tagError, tagsAreLoading: false }));
-  }
+  fetchTags = async () => {
+    const response = await axios.get(`${url}/tags/getAllTags`).catch(error => {
+      console.error(error);
+      this.setState({ tagsAreLoading: false });
+    });
+    if (response) {
+      this.setState({
+        tags: this.addCheckedProperty(response.data.Response),
+        tagsAreLoading: false,
+      });
+    }
+  };
 
-  fetchCourseSuggestions(newTag) {
-    axios
-      .get('http://localhost:3001/courses/getCourseByTag?tag=' + newTag)
-      .then(response => {
-        this.setState(prevState => ({
-          suggestions: [
-            ...prevState.suggestions,
-            {
-              name: newTag,
-              courses: this.addCheckedProperty(response.data),
-            },
-          ],
-          suggestionsAreLoading: false,
-        }));
-      })
-      .catch(suggestionError =>
-        this.setState({ suggestionError, suggestionsAreLoading: false })
-      );
-  }
+  fetchCourseSuggestions = async newTag => {
+    const response = await axios
+      .get(`${url}/courses/getCourseByTag?tag=${newTag}&studentID=${sid}`)
+      .catch(error => {
+        console.error(error);
+        this.setState({ suggestionsAreLoading: false });
+      });
+    if (response) {
+      this.setState(prevState => ({
+        suggestions: [
+          ...prevState.suggestions,
+          {
+            name: newTag,
+            courses: response.data.Response,
+          },
+        ],
+        suggestionsAreLoading: false,
+      }));
+    }
+  };
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.fetchTags();
-  }
+    // TODO: fetchUserData to get CompletedCourses
+  };
 
   componentWillMount = () => {
-    this.loadedCourses = new Set();
     this.checkedTags = new Set();
   };
 
@@ -77,12 +77,12 @@ class ComplementaryPanel extends Component {
       suggestionsAreLoading: true,
     });
 
-    var newSuggestions = [...this.state.suggestions];
+    let newSuggestions = [...this.state.suggestions];
     newTags.map(tag => {
       if (tag.checked && !newSuggestions.some(e => e.name === tag.name)) {
         this.fetchCourseSuggestions(tag.name);
       } else if (!tag.checked) {
-        var index = newSuggestions.findIndex(e => e.name === tag.name);
+        const index = newSuggestions.findIndex(e => e.name === tag.name);
         if (index !== -1) {
           newSuggestions.splice(index, 1);
           this.setState({ suggestions: newSuggestions });
@@ -92,49 +92,49 @@ class ComplementaryPanel extends Component {
     });
   };
 
-  updateCoursesCheckedState = (tagName, courseName, newCourses) => {
-    var newSuggestions = [...this.state.suggestions];
-    var tagIndex = newSuggestions.findIndex(e => e.name === tagName);
+  updateCoursesCheckedState = (tagName, newCourses) => {
+    let newSuggestions = [...this.state.suggestions];
+    const tagIndex = newSuggestions.findIndex(e => e.name === tagName);
     newSuggestions[tagIndex].courses = newCourses;
     this.setState({ suggestions: newSuggestions });
   };
 
-  clearSelection = e => {
-    e.preventDefault();
-    var newSuggestions = [...this.state.suggestions];
+  clearSelection = () => {
+    let newSuggestions = [...this.state.suggestions];
     newSuggestions.forEach(function(obj) {
       obj.courses.map(course => {
-        if (course.checked) {
-          course.checked = false;
+        if (course.desired) {
+          course.desired = false;
         }
         return null;
       });
     });
-    this.setState({ suggestions: newSuggestions });
+    const newSet = new Set();
+    this.setState({
+      suggestions: newSuggestions,
+      loadedCourses: newSet,
+    });
+  };
+
+  applySelection = () => {
+    console.log(this.state.suggestions);
+    // TODO: POST request to save
   };
 
   loadSuggestions = (tag, courses) => {
-    const { suggestionError } = this.state;
     return (
       <CourseSuggestionList
         key={tag}
         tag={tag}
         courses={courses}
-        loadedCourses={this.loadedCourses}
+        loadedCourses={this.state.loadedCourses}
         updateCoursesCheckedState={this.updateCoursesCheckedState}
-        errorMessage={content =>
-          suggestionError ? (
-            <p className="Error">{suggestionError.message}</p>
-          ) : (
-            content
-          )
-        }
       />
     );
   };
 
   render() {
-    const { tagsAreLoading, tags, tagError, suggestions } = this.state;
+    const { tagsAreLoading, tags, suggestions } = this.state;
     return (
       <div className="tab_content">
         <div className="spacer" />
@@ -144,15 +144,9 @@ class ComplementaryPanel extends Component {
               <TagListWithSnackBar
                 tags={tags}
                 clearSelection={this.clearSelection}
+                applySelection={this.applySelection}
                 checkedTags={this.checkedTags}
                 updateTagsCheckedState={this.updateTagsCheckedState}
-                errorMessage={content =>
-                  tagError ? (
-                    <p className="Error">{tagError.message}</p>
-                  ) : (
-                    content
-                  )
-                }
               />
             </SnackbarProvider>
           ) : (

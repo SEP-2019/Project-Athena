@@ -1,6 +1,26 @@
 const express = require("express");
 const curriculums = require("../logic/curriculums/curriculums");
 const router = express.Router();
+let customResponse = require("../validation/customResponse");
+let asyncMiddleware = require("./errorHandlingMiddleware");
+
+/**
+ * @api{get} /getAllCurriculumNames
+ * @apiDescription gets a list of all curriculum names
+ * @apiExample {curl} Example usage: GET /curriculums/getAllCurriculumNames
+ * @author Patrick Lai
+ * @returns :
+ * {
+ * }
+ */
+router.get("/getAllCurriculumNames", async (req, res, next) => {
+  try {
+    let result = await curriculums.getAllCurriculumNames();
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 /**
  * @api {get} /getCurriculum
@@ -18,15 +38,15 @@ const router = express.Router();
  *        "complementaries": [...]
  *    }
  */
-router.get("/getCurriculum", async (req, res, next) => {
-  try {
-    const name = req.query.name;
+router.get(
+  "/getCurriculum",
+  asyncMiddleware(async (req, res, next) => {
+    const name = unescape(req.query.name);
+    console.log(name);
     let result = await curriculums.getCurriculum(name);
-    res.status(200).send(result);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
+    res.send(customResponse(result));
+  })
+);
 
 /**
  * @api {post} /createCurriculum
@@ -64,22 +84,27 @@ router.get("/getCurriculum", async (req, res, next) => {
  *
  * @author: Gareth Peters
  */
-router.post("/createCurriculum", function(req, res) {
-  const name = req.body.name;
-  const type = req.body.type;
-  const department = req.body.department;
-  const numOfElectives = req.body.numOfElectives;
-  const cores = req.body.core;
-  const techComps = req.body.techComps;
-  const comps = req.body.comps;
-  curriculums
-    .createCurriculum(name, type, department, numOfElectives, cores, techComps, comps)
-    .then(val => {
-      res.send(val);
-    })
-    .catch(err => {
-      res.status(500).send(err.message);
-    });
-});
+router.post(
+  "/createCurriculum",
+  asyncMiddleware(async function(req, res, next) {
+    const name = req.body.name;
+    const type = req.body.type;
+    const department = req.body.department;
+    const numOfElectives = req.body.numOfElectives;
+    const cores = req.body.cores;
+    const techComps = req.body.techComps;
+    const comps = req.body.comps;
+    let result = await curriculums.createCurriculum(name, type, department, numOfElectives, cores, techComps, comps);
+    res.send(customResponse(result));
+  })
+);
+
+router.get(
+  "/getCurriculumYears",
+  asyncMiddleware(async function(req, res, next) {
+    let result = await curriculums.getCurriculumYears();
+    res.send(customResponse(result));
+  })
+);
 
 module.exports = router;

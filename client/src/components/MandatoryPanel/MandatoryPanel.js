@@ -4,40 +4,39 @@ import axios from 'axios';
 import CompleteCourseList from '../CompleteCourseList/CompleteCourseList';
 import './MandatoryPanel.css';
 
-class MandatoryPanel extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      courses: [],
-      coursesAreLoading: true,
-      courseError: null,
-    };
-  }
+const url = 'http://localhost:3001';
 
-  addCheckedProperty(json) {
-    return json.map(obj => {
+class MandatoryPanel extends Component {
+  state = {
+    courses: [],
+    coursesAreLoading: true,
+  };
+
+  addCheckedProperty = data => {
+    return data.map(obj => {
       obj.checked = false;
       return obj;
     });
-  }
+  };
 
-  fetchCourses() {
-    axios
-      .get('http://localhost:3001/courses/getAllCourses')
-      .then(response =>
-        this.setState({
-          courses: this.addCheckedProperty(response.data),
-          coursesAreLoading: false,
-        })
-      )
-      .catch(courseError =>
-        this.setState({ courseError, coursesAreLoading: false })
-      );
-  }
+  fetchCourses = async () => {
+    const response = await axios
+      .get(`${url}/courses/getAllCourses`)
+      .catch(error => {
+        console.error(error);
+        this.setState({ coursesAreLoading: false });
+      });
+    if (response) {
+      this.setState({
+        courses: this.addCheckedProperty(response.data.Response),
+        coursesAreLoading: false,
+      });
+    }
+  };
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.fetchCourses();
-  }
+  };
 
   componentWillMount = () => {
     this.selectedCourses = new Set();
@@ -50,7 +49,7 @@ class MandatoryPanel extends Component {
   };
 
   render() {
-    const { coursesAreLoading, courses, courseError } = this.state;
+    const { coursesAreLoading, courses } = this.state;
     return (
       <div className="tab_content">
         <div className="spacer" />
@@ -60,13 +59,6 @@ class MandatoryPanel extends Component {
               courses={courses}
               selectedCourses={this.selectedCourses}
               updateCoursesCheckedState={this.updateCoursesCheckedState}
-              errorMessage={content =>
-                courseError ? (
-                  <p className="Error">{courseError.message}</p>
-                ) : (
-                  content
-                )
-              }
             />
           ) : (
             <h3>Loading the courses...</h3>

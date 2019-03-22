@@ -39,14 +39,6 @@
   flex-grow: 1;
 }
 
-.selection-button {
-  margin-left: 20px;
-  padding: 10px 25px;
-  background-color: #b20007;
-  color: white;
-  border-radius: 5px;
-}
-
 .selected-side {
   list-style-type: none;
   padding: 0;
