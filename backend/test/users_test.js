@@ -738,17 +738,32 @@ describe("Test get student completed courses", () => {
 });
 
 describe("Testing Login", () => {
+
+  let username ="team";
+  let password = "primus1234";
+  let email =  "testing@gmail.com";
+  let studentId = 250502459
+
   before(async () => {
     await users.insertStudentUser(
-      "team",
-      "primus1234",
-      "testing@gmail.com",
-      250502459
+      username,
+      password,
+      email,
+      studentId
     );
   });
 
+  it(`Null username responds with ${expectedUsernameNotEmpty}`, function(done) {
+    users.login(null, password).catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedUsernameNotEmpty);
+        resolve();
+      }).then(done);
+    });
+  });
+
   it(`Empty username responds with ${expectedUsernameNotEmpty}`, function(done) {
-    users.login(null, "primus1234").catch(error => {
+    users.login("", password).catch(error => {
       return new Promise(function(resolve) {
         assert.equal(error.message, expectedUsernameNotEmpty);
         resolve();
@@ -757,7 +772,7 @@ describe("Testing Login", () => {
   });
 
   it(`Empty password responds with ${expectedPasswordNotEmpty}`, function(done) {
-    users.login("team", null).catch(error => {
+    users.login(username, "").catch(error => {
       return new Promise(function(resolve) {
         assert.equal(error.message, expectedPasswordNotEmpty);
         resolve();
@@ -765,7 +780,16 @@ describe("Testing Login", () => {
     });
   });
 
-  it(`Empty fields responds with ${expectedPasswordNotEmpty}`, function(done) {
+  it(`Null password responds with ${expectedPasswordNotEmpty}`, function(done) {
+    users.login(username, null).catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedPasswordNotEmpty);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`Empty fields responds with ${expectedUsernameNotEmpty}`, function(done) {
     users.login(null, null).catch(error => {
       return new Promise(function(resolve) {
         assert.equal(error.message, expectedUsernameNotEmpty);
@@ -775,7 +799,7 @@ describe("Testing Login", () => {
   });
 
   it(`Non existing Username responds with ${expectedNonExistentUser}`, function(done) {
-    users.login("teamm", "primus1234").catch(error => {
+    users.login("teamm", password).catch(error => {
       return new Promise(function(resolve) {
         assert.equal(error.message, expectedNonExistentUser);
         resolve();
@@ -784,7 +808,7 @@ describe("Testing Login", () => {
   });
 
   it(`Incorrect Password responds with ${expectedIncorrectPassword}`, function(done) {
-    users.login("team", "primus123456789").catch(error => {
+    users.login(username, "primus123456789").catch(error => {
       return new Promise(function(resolve) {
         assert.equal(error.message, expectedIncorrectPassword);
         resolve();
@@ -793,7 +817,7 @@ describe("Testing Login", () => {
   });
 
   it(`Random symbol username responds with ${expectedInvalidUsername}`, function(done) {
-    users.login("team!$", "primus1234").catch(error => {
+    users.login("team!$", password).catch(error => {
       return new Promise(function(resolve) {
         assert.equal(error.message, expectedInvalidUsername);
         resolve();
@@ -802,7 +826,7 @@ describe("Testing Login", () => {
   });
 
   it(`Long username greater than 64 length responds with ${expectedUsernameLessThan64}`, function(done) {
-    users.login("teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm", "primus").catch(error => {
+    users.login("teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm", password).catch(error => {
       return new Promise(function(resolve) {
         assert.equal(error.message, expectedUsernameLessThan64);
         resolve();
@@ -811,7 +835,7 @@ describe("Testing Login", () => {
   });
 
   it(`Short password less than 8 responds wth ${expectedPassword8To64}`, function(done) {
-    users.login("team", "primus").catch(error => {
+    users.login(username, "primus").catch(error => {
       return new Promise(function(resolve) {
         assert.equal(error.message, expectedPassword8To64);
         resolve();
@@ -820,7 +844,16 @@ describe("Testing Login", () => {
   });
 
   it(`Long password greater than 64 responds wth ${expectedPassword8To64}`, function(done) {
-    users.login("team", "teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm").catch(error => {
+    users.login(username, "teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm").catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedPassword8To64);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`Long password greater than 64 responds wth ${expectedPassword8To64}`, function(done) {
+    users.login(username, "teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm").catch(error => {
       return new Promise(function(resolve) {
         assert.equal(error.message, expectedPassword8To64);
         resolve();
