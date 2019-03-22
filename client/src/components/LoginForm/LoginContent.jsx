@@ -4,6 +4,7 @@ import EditText from '../EditText';
 import axios from 'axios';
 import './LoginForm.css';
 import * as validation from './Validation';
+import { customHistory as history } from '../../';
 
 const LOGIN_URL = 'http://localhost:3001/users/login';
 
@@ -13,6 +14,7 @@ class LoginContent extends Component {
     this.state = {
       username: '',
       password: '',
+      errorMessage: '',
       usernameError: false,
       passwordError: false,
     };
@@ -26,9 +28,9 @@ class LoginContent extends Component {
       {
         usernameError: false,
         passwordError: false,
+        errorMessagere: '',
       },
       () => {
-        this.setError('');
         this.sendRequest();
       }
     );
@@ -44,10 +46,7 @@ class LoginContent extends Component {
         .then(response => {
           // Save email & redirect
           console.log(response);
-          this.props.setEmail(response.data.Response);
-          this.setState({ responseEmail: response.data.Response }, () => {
-            // TODO remove: prints email
-            this.setError(this.state.responseEmail);
+          this.props.setEmail(response.data.Response, () => {
             this.redirect();
           });
         })
@@ -77,9 +76,9 @@ class LoginContent extends Component {
     }
   }
 
-  redirect() {
-    //TODO
-  }
+  redirect = () => {
+    history.push('/courseregistration');
+  };
 
   isInputValid() {
     var id = this.state.username;
@@ -108,7 +107,6 @@ class LoginContent extends Component {
         isValid = false;
       }
     }
-
     return isValid;
   }
 
@@ -119,7 +117,9 @@ class LoginContent extends Component {
   }
 
   setError(message) {
-    document.getElementById('error-msg').innerHTML = message;
+    this.setState({
+      errorMessage: message,
+    });
   }
 
   setInvalidCredentials() {
@@ -135,7 +135,9 @@ class LoginContent extends Component {
   render() {
     return (
       <Section className="form" flexDirection="column">
-        <text className="error" id="error-msg" />
+        <span className="error" id="error-msg">
+          {this.state.errorMessage}
+        </span>
         <EditText
           required
           label="Student ID"
