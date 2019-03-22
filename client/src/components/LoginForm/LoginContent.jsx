@@ -28,7 +28,7 @@ class LoginContent extends Component {
         passwordError: false,
       },
       () => {
-        validation.setError('');
+        this.setError('');
         this.sendRequest();
       }
     );
@@ -47,20 +47,33 @@ class LoginContent extends Component {
           this.props.setEmail(response.data.Response);
           this.setState({ responseEmail: response.data.Response }, () => {
             // TODO remove: prints email
-            validation.setError(this.state.responseEmail);
+            this.setError(this.state.responseEmail);
             this.redirect();
           });
         })
         .catch(loginError => {
           // Invalid login
           console.log(loginError);
-          var error = loginError.response.data.ErrorMessage;
-          if (validation.checkLoginError(error)) {
-            this.setInvalidCredentials();
+          if (validation.isEmpty(loginError.response)) {
+            this.setError(loginError);
           } else {
-            validation.setError(error);
+            this.displayLoginError(loginError.response.data.ErrorMessage);
           }
         });
+    }
+  }
+
+  displayLoginError(error) {
+    if (
+      error === 'Password length must be between 8 and 64' ||
+      error === 'User does not exist' ||
+      error === 'Username length must be less than 64' ||
+      error === 'Username must be alphanumeric' ||
+      error === 'Incorrect username or password.'
+    ) {
+      this.setInvalidCredentials();
+    } else {
+      this.setError(error);
     }
   }
 
@@ -75,21 +88,21 @@ class LoginContent extends Component {
 
     // Check if username & password are empty
     if (validation.isEmpty(password)) {
-      validation.setError('Password is required.');
+      this.setError('Password is required.');
       this.updateErrorState('passwordError', true);
       isValid = false;
     }
     if (validation.isEmpty(id)) {
-      validation.setError('Student ID is required.');
+      this.setError('Student ID is required.');
       this.updateErrorState('usernameError', true);
       isValid = false;
     }
 
     if (isValid === true) {
-      if (validation.isStudentId(id)) {
+      if (!validation.isStudentId(id)) {
         this.setInvalidCredentials();
         isValid = false;
-      } else if (validation.checkPassword(password)) {
+      } else if (!validation.isPassword(password)) {
         // Password length out of range
         this.setInvalidCredentials();
         isValid = false;
@@ -105,8 +118,12 @@ class LoginContent extends Component {
     });
   }
 
+  setError(message) {
+    document.getElementById('error-msg').innerHTML = message;
+  }
+
   setInvalidCredentials() {
-    validation.setError('Invalid crendentials. Please try again.');
+    this.setError('Invalid crendentials. Please try again.');
   }
 
   handleInputChange(event = {}) {
