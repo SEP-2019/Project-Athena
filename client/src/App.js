@@ -8,7 +8,6 @@ import {
 import CourseRegistration from './screens/CourseRegistration';
 import CourseSuggestion from './screens/CourseSuggestion';
 import Login from './screens/Login';
-import ApiExample from './screens/ApiExample';
 import './App.css';
 import CurriculumDisplay from './screens/CurriculumDisplay';
 
@@ -20,7 +19,6 @@ class App extends Component {
           <Route path="/login" component={Login} />
           <Route path="/courseregistration" component={CourseRegistration} />
           <Route path="/curriculumdisplay" component={CurriculumDisplay} />
-          <Route path="/api" component={ApiExample} />
           <Route path="/Home" component={CourseSuggestion} />
           <Redirect to="/login" />
         </Switch>

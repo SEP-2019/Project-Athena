@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './CurriculumDisplay.css';
+import Api from '../../services/Api'
 import WithHeaderBar from '../../hocs/WithHeaderBar';
 import CourseTable from '../../components/CourseTable';
 import DropDown from '../../components/DropDown/DropDown';
@@ -30,8 +31,8 @@ class CurriculumDisplay extends Component {
    * @param {int} studentid The id of the student
    */
   getStudentData(studentid) {
-    axios
-      .get('http://localhost:3001/users/getStudentData?studentID=' + studentid)
+    Api()
+      .get('users/getStudentData?studentID=' + studentid)
       .then(response => {
 
         let res = response.data.Response;
