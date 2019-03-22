@@ -42,8 +42,9 @@ class CustomizedInputs extends Component {
           id={this.props.id}
           label={this.props.label}
           type={this.props.type}
-          name={this.props.type}
+          name={this.props.name}
           autoComplete={this.props.type}
+          error={this.props.error}
           margin="normal"
           variant="outlined"
         />

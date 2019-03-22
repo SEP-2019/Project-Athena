@@ -26,11 +26,13 @@ class LoginContent extends Component {
           password: this.state.password,
         })
         .then(response => {
-          // Got good response
+          // Save email & redirect
           console.log(response);
-          // TODO: change page, save student ID and name when backend is done
-          // temp for testing
-          this.setError('login successful');
+          this.setState({ responseEmail: response.data.Response }, () => {
+            // TODO remove: prints email
+            this.setError(this.state.responseEmail);
+            this.redirect();
+          });
         })
         .catch(loginError => {
           // Invalid login
@@ -39,7 +41,9 @@ class LoginContent extends Component {
           if (
             error === 'Password length must be between 8 and 64' ||
             error === 'User does not exist' ||
-            error === 'Username must be alphanumeric'
+            error === 'Username length must be less than 64' ||
+            error === 'Username must be alphanumeric' ||
+            error === 'Incorrect username or password.'
           ) {
             this.setInvalidCredentials();
           } else {
@@ -47,6 +51,10 @@ class LoginContent extends Component {
           }
         });
     }
+  }
+
+  redirect() {
+    //TODO
   }
 
   isInputValid() {
@@ -59,7 +67,7 @@ class LoginContent extends Component {
     } else if (this.isEmpty(password)) {
       this.setError('Password is required.');
       return false;
-    } else if (!/^\d+$/.test(id)) {
+    } else if (!/^\d+$/.test(id) || id.length !== 9) {
       // Invalid Student ID (contains letters)
       this.setInvalidCredentials();
       return false;
@@ -101,6 +109,7 @@ class LoginContent extends Component {
           label="Student ID"
           id="username-input"
           type="username"
+          name="username"
           defaultValue={this.state.username}
           onChange={this.handleInputChange}
         />
@@ -109,6 +118,7 @@ class LoginContent extends Component {
           label="Password"
           id="password-input"
           type="password"
+          name="password"
           defaultValue={this.state.password}
           onChange={this.handleInputChange}
         />
