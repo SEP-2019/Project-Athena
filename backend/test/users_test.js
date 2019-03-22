@@ -56,6 +56,9 @@ const expectedInvalidEmail = "Invalid email format";
 const expectedInvalidIdLength = "Id length must be 9";
 const expectedIdNumeric = "Id must be numeric";
 const expectedIdSmallerThanMax = "Id too large";
+const expectedNonExistentUser = "User does not exist";
+const expectedIncorrectPassword = "Incorrect username or password.";
+
 const expectedTrue = true;
 
 describe("Tests add student user", function() {
@@ -734,3 +737,101 @@ describe("Test get student completed courses", () => {
   });
 });
 
+describe("Testing Login", () => {
+  before(async () => {
+    await users.insertStudentUser(
+      "team",
+      "primus1234",
+      "testing@gmail.com",
+      250502459
+    );
+  });
+
+  it(`Empty username responds with ${expectedUsernameNotEmpty}`, function(done) {
+    users.login(null, "primus1234").catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedUsernameNotEmpty);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`Empty password responds with ${expectedPasswordNotEmpty}`, function(done) {
+    users.login("team", null).catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedPasswordNotEmpty);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`Empty fields responds with ${expectedPasswordNotEmpty}`, function(done) {
+    users.login(null, null).catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedUsernameNotEmpty);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`Non existing Username responds with ${expectedNonExistentUser}`, function(done) {
+    users.login("teamm", "primus1234").catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedNonExistentUser);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`Incorrect Password responds with ${expectedIncorrectPassword}`, function(done) {
+    users.login("team", "primus123456789").catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedIncorrectPassword);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`Random symbol username responds with ${expectedInvalidUsername}`, function(done) {
+    users.login("team!$", "primus1234").catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedInvalidUsername);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`Long username greater than 64 length responds with ${expectedUsernameLessThan64}`, function(done) {
+    users.login("teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm", "primus").catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedUsernameLessThan64);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`Short password less than 8 responds wth ${expectedPassword8To64}`, function(done) {
+    users.login("team", "primus").catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedPassword8To64);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`Long password greater than 64 responds wth ${expectedPassword8To64}`, function(done) {
+    users.login("team", "teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm").catch(error => {
+      return new Promise(function(resolve) {
+        assert.equal(error.message, expectedPassword8To64);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  after(async()=>{
+    await users.deleteStudentUser("team");
+  })
+
+
+
+});
