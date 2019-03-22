@@ -738,19 +738,13 @@ describe("Test get student completed courses", () => {
 });
 
 describe("Testing Login", () => {
-
-  let username ="team";
+  let username = "team";
   let password = "primus1234";
-  let email =  "testing@gmail.com";
-  let studentId = 250502459
+  let email = "testing@gmail.com";
+  let studentId = 250502459;
 
   before(async () => {
-    await users.insertStudentUser(
-      username,
-      password,
-      email,
-      studentId
-    );
+    await users.insertStudentUser(username, password, email, studentId);
   });
 
   it(`Null username responds with ${expectedUsernameNotEmpty}`, function(done) {
@@ -826,12 +820,17 @@ describe("Testing Login", () => {
   });
 
   it(`Long username greater than 64 length responds with ${expectedUsernameLessThan64}`, function(done) {
-    users.login("teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm", password).catch(error => {
-      return new Promise(function(resolve) {
-        assert.equal(error.message, expectedUsernameLessThan64);
-        resolve();
-      }).then(done);
-    });
+    users
+      .login(
+        "teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+        password
+      )
+      .catch(error => {
+        return new Promise(function(resolve) {
+          assert.equal(error.message, expectedUsernameLessThan64);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`Short password less than 8 responds wth ${expectedPassword8To64}`, function(done) {
@@ -844,27 +843,29 @@ describe("Testing Login", () => {
   });
 
   it(`Long password greater than 64 responds wth ${expectedPassword8To64}`, function(done) {
-    users.login(username, "teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm").catch(error => {
+    users
+      .login(
+        username,
+        "teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+      )
+      .catch(error => {
+        return new Promise(function(resolve) {
+          assert.equal(error.message, expectedPassword8To64);
+          resolve();
+        }).then(done);
+      });
+  });
+
+  it(`Successful login responds with user email: ${email}`, function(done) {
+    users.login(username, password).then(response=> {
       return new Promise(function(resolve) {
-        assert.equal(error.message, expectedPassword8To64);
+        assert.equal(response, email);
         resolve();
       }).then(done);
     });
   });
 
-  it(`Long password greater than 64 responds wth ${expectedPassword8To64}`, function(done) {
-    users.login(username, "teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm").catch(error => {
-      return new Promise(function(resolve) {
-        assert.equal(error.message, expectedPassword8To64);
-        resolve();
-      }).then(done);
-    });
-  });
-
-  after(async()=>{
+  after(async () => {
     await users.deleteStudentUser("team");
-  })
-
-
-
+  });
 });
