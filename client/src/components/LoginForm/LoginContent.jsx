@@ -111,7 +111,7 @@ class LoginContent extends Component {
 
   updateErrorState(field, isError) {
     this.setState({
-      [field]: [isError],
+      [field]: isError,
     });
   }
 
