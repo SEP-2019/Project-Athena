@@ -325,7 +325,7 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedCurriculumYearLength4} 1`, function(done) {
     users
-      .insertStudentUser("username1", "password", "email@email.com", "222222222", "Software Engineering", "111", "7-semester-curriculum")
+      .insertStudentUser("username", "password", "email@email.com", "222222222", "Software Engineering", "111", "7-semester-curriculum")
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedCurriculumYearLength4);
@@ -336,7 +336,7 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedCurriculumYearLength4} 2`, function(done) {
     users
-      .insertStudentUser("username1", "password", "email@email.com", "222222222", "Software Engineering", "111111", "7-semester-curriculum")
+      .insertStudentUser("username", "password", "email@email.com", "222222222", "Software Engineering", "111111", "7-semester-curriculum")
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedCurriculumYearLength4);
