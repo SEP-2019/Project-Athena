@@ -51,7 +51,15 @@ router.post(
     const program = req.body.program;
     const year = req.body.year;
     const curr_type = req.body.curr_type;
-    let studentEmail = await users.insertStudentUser(username, password, email, id, program, year, curr_type);
+    let studentEmail = await users.insertStudentUser(
+      username,
+      password,
+      email,
+      id,
+      program,
+      year,
+      curr_type
+    );
     res.send(customResponse(studentEmail));
   })
 );
@@ -236,6 +244,15 @@ router.post(
     const curr_type = req.body.curr_type;
     let result = await users.updateStudentMajor(student_id, program, year, curr_type);
     res.send(customResponse(result));
+  })
+);
+
+router.get(
+  "/getRemainingCourses",
+  asyncMiddleware(async (req, res, next) => {
+    let studentId = req.query.studentId;
+    let response = await users.getRemainingCourses(studentId);
+    res.send(customResponse(response));
   })
 );
 
