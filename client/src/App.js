@@ -26,42 +26,40 @@ class App extends Component {
     cookies.set('studentId', 123321123, { path: '/' });
 
     return (
-      <StudentProvider>
-        <Switch>
-          <Route
-            path="/login"
-            render={props => <Login setEmail={this.setEmail} {...props} />}
-          />
-          <Route
-            path="/courseregistration"
-            render={props => (
-              <CourseRegistration
-                responseEmail={this.state.responseEmail}
-                {...props}
-              />
-            )}
-          />
-          <Route
-            path="/curriculumdisplay"
-            render={props => (
-              <CurriculumDisplay
-                responseEmail={this.state.responseEmail}
-                {...props}
-              />
-            )}
-          />
-          <Route
-            path="/Home"
-            render={props => (
-              <CourseSuggestion
-                responseEmail={this.state.responseEmail}
-                {...props}
-              />
-            )}
-          />
-          <Redirect to="/login" />
-        </Switch>
-      </StudentProvider>
+      <Switch>
+        <Route
+          path="/login"
+          render={props => <Login setEmail={this.setEmail} {...props} />}
+        />
+        <Route
+          path="/courseregistration"
+          render={props => (
+            <CourseRegistration
+              responseEmail={this.state.responseEmail}
+              {...props}
+            />
+          )}
+        />
+        <Route
+          path="/curriculumdisplay"
+          render={props => (
+            <CurriculumDisplay
+              responseEmail={this.state.responseEmail}
+              {...props}
+            />
+          )}
+        />
+        <Route
+          path="/Home"
+          render={props => (
+            <CourseSuggestion
+              responseEmail={this.state.responseEmail}
+              {...props}
+            />
+          )}
+        />
+        <Redirect to="/login" />
+      </Switch>
     );
   }
 }
