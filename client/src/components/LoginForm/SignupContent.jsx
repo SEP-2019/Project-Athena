@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Section from '../Section';
 import EditText from '../EditText';
 import DropDown from '../DropDownOutlined/DropDown';
-import axios from 'axios';
+import Api from '../../services/Api';
 import * as validation from './Validation';
 import { customHistory as history } from '../../';
 
@@ -10,7 +10,7 @@ const tempYears = ['2014', '2015', '2016', '2017', '2018', '2019'];
 const tempCurriculum = ['7 semesters', '8 semesters'];
 const tempMajors = ['Computer', 'Electrical', 'Software'];
 
-const SIGNUP_URL = 'http://localhost:3001/users/addStudentUser';
+const SIGNUP_URL = 'users/addStudentUser';
 
 class SignupContent extends Component {
   //call get years request
@@ -57,7 +57,7 @@ class SignupContent extends Component {
     if (this.isInputValid(id, email, password, confirmPassword)) {
       console.log(id);
       // Send Request
-      axios
+      Api()
         .post(SIGNUP_URL, {
           username: id,
           password: password,
@@ -69,7 +69,7 @@ class SignupContent extends Component {
           console.log(response);
           // TODO: change page, save email when backend is done
           // this.props.setEmail(response.data.Response);
-          this.redirect();
+          // this.redirect();
         })
         .catch(loginError => {
           console.log(loginError);
@@ -115,6 +115,7 @@ class SignupContent extends Component {
       this.updateErrorState('usernameError', true);
       isValid = false;
     }
+
     //TODO, add curiculum validation
 
     return isValid;

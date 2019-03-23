@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import Section from '../Section';
 import EditText from '../EditText';
-import axios from 'axios';
+import Api from '../../services/Api';
 import './LoginForm.css';
 import * as validation from './Validation';
 import { customHistory as history } from '../../';
 
-const LOGIN_URL = 'http://localhost:3001/users/login';
+const LOGIN_URL = 'users/login';
 
 class LoginContent extends Component {
   constructor(props) {
@@ -38,7 +38,7 @@ class LoginContent extends Component {
 
   sendRequest() {
     if (this.isInputValid()) {
-      axios
+      Api()
         .post(LOGIN_URL, {
           username: this.state.username,
           password: this.state.password,
