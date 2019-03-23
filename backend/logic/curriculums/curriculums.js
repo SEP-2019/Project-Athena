@@ -10,20 +10,17 @@ var getAllCurriculumNames = async function() {
   let connection = await mysql.getNewConnection();
 
   try {
-    let curriculumNames = await connection.query(
-      "SELECT curriculum_name FROM curriculums;"
-    );
-    
+    let curriculumNames = await connection.query("SELECT curriculum_name FROM curriculums;");
+
     // strip all the properties and just return the names
     return curriculumNames.map(c => c["curriculum_name"]);
-  }
-  catch (err){
+  } catch (err) {
     console.error(err);
     throw Error("Internal server error");
   } finally {
     connection.release();
   }
-}
+};
 
 /**
  * @Returns a curriculum and its associated courses from the database
@@ -37,25 +34,13 @@ var getCurriculum = async function(name) {
   let connection = await mysql.getNewConnection();
 
   try {
-    let curriculum = await connection.query(
-      "SELECT * FROM curriculums WHERE curriculum_name=?;",
-      name
-    );
+    let curriculum = await connection.query("SELECT * FROM curriculums WHERE curriculum_name=?;", name);
 
-    let core_classes = await connection.query(
-      "SELECT course_code FROM curriculum_core_classes WHERE curriculum_name=?;",
-      name
-    );
+    let core_classes = await connection.query("SELECT course_code FROM curriculum_core_classes WHERE curriculum_name=?;", name);
 
-    let tech_comps = await connection.query(
-      "SELECT course_code FROM curriculum_tech_comps WHERE curriculum_name=?;",
-      name
-    );
+    let tech_comps = await connection.query("SELECT course_code FROM curriculum_tech_comps WHERE curriculum_name=?;", name);
 
-    let complementaries = await connection.query(
-      "SELECT course_code FROM curriculum_complementaries WHERE curriculum_name=?;",
-      name
-    );
+    let complementaries = await connection.query("SELECT course_code FROM curriculum_complementaries WHERE curriculum_name=?;", name);
 
     curriculum = JSON.parse(JSON.stringify(curriculum));
     core_classes = JSON.parse(JSON.stringify(core_classes));
@@ -74,15 +59,7 @@ var getCurriculum = async function(name) {
   }
 };
 
-var createCurriculum = async (
-  name,
-  type,
-  department,
-  numOfElectives,
-  cores,
-  techComps,
-  comps
-) => {
+var createCurriculum = async (name, type, department, numOfElectives, cores, techComps, comps) => {
   format.verifyCurriculumName(name);
   format.verifyCurrType(type);
   format.verifyDepartmentName(department);
@@ -95,55 +72,39 @@ var createCurriculum = async (
 
   try {
     await connection.beginTransaction();
-    await connection.query(
-      "INSERT INTO curriculums (curriculum_name, type, department, numOfElectives) VALUES(?, ?, ?, ?);",
-      [name, type, department, numOfElectives]
-    );
+    await connection.query("INSERT INTO curriculums (curriculum_name, type, department, numOfElectives) VALUES(?, ?, ?, ?);", [
+      name,
+      type,
+      department,
+      numOfElectives
+    ]);
     for (let i = 0, len = cores.length; i < len; i++) {
       let core = cores[i];
-      let course_count = await connection.query(
-        "SELECT COUNT(*) FROM courses WHERE course_code = ?;",
-        [core]
-      );
+      let course_count = await connection.query("SELECT COUNT(*) FROM courses WHERE course_code = ?;", [core]);
 
       if (course_count) {
-        await connection.query(
-          "INSERT INTO curriculum_core_classes (curriculum_name, course_code) VALUES(?, ?);",
-          [name, core]
-        );
+        await connection.query("INSERT INTO curriculum_core_classes (curriculum_name, course_code) VALUES(?, ?);", [name, core]);
       } else {
-        throw new Error("Course ${core} does not exist");
+        throw new Error("Course ${cores[i]} does not exist\n");
       }
     }
     for (let i = 0, len = techComps.length; i < len; i++) {
       techComp = techComps[i];
-      let course_count = await connection.query(
-        "SELECT COUNT(*) FROM courses WHERE course_code = ?;",
-        [techComp]
-      );
+      let course_count = await connection.query("SELECT COUNT(*) FROM courses WHERE course_code = ?;", [techComp]);
 
       if (course_count) {
-        await connection.query(
-          "INSERT INTO curriculum_tech_comps (curriculum_name, course_code) VALUES(?, ?);",
-          [name, techComp]
-        );
+        await connection.query("INSERT INTO curriculum_tech_comps (curriculum_name, course_code) VALUES(?, ?);", [name, techComp]);
       } else {
-        throw new Error("Course ${techComp} does not exist");
+        throw new Error("Course ${techComps[i]} does not exist\n");
       }
     }
     for (let i = 0, len = comps.length; i < len; i++) {
       let comp = comps[i];
-      let course_count = await connection.query(
-        "SELECT COUNT(*) FROM courses WHERE course_code = ?;",
-        [comp]
-      );
+      let course_count = await connection.query("SELECT COUNT(*) FROM courses WHERE course_code = ?;", [comp]);
       if (course_count) {
-        await connection.query(
-          "INSERT INTO curriculum_complementaries (curriculum_name, course_code) VALUES(?, ?);",
-          [name, comp]
-        );
+        await connection.query("INSERT INTO curriculum_complementaries (curriculum_name, course_code) VALUES(?, ?);", [name, comps[i]]);
       } else {
-        throw new Error("Course ${comp} does not exist");
+        throw new Error("Course ${comps[i]} does not exist\n");
       }
     }
     await connection.commit();
@@ -159,14 +120,12 @@ var createCurriculum = async (
 var getCurriculumYears = async () => {
   let connection = await mysql.getNewConnection();
   let years = [];
-  let curriculumNames = await connection.query(
-    "SELECT curriculum_name FROM curriculums;"
-  );
+  let curriculumNames = await connection.query("SELECT curriculum_name FROM curriculums;");
   for (let i = 0; i < curriculumNames.length; i++) {
     let name = curriculumNames[i].curriculum_name;
-    arrName = name.split('|');
-    console.log(arrName)
-    if(!(arrName[1] == undefined || arrName[2] == undefined)){
+    arrName = name.split("|");
+    console.log(arrName);
+    if (!(arrName[1] == undefined || arrName[2] == undefined)) {
       let curriculumYear = arrName[1] + "|" + arrName[2];
       years.push(curriculumYear);
     }
