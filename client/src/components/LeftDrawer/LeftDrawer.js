@@ -40,7 +40,7 @@ class LeftDrawer extends React.Component {
             src="https://static.myfigurecollection.net/pics/figure/big/105649.jpg"
             style={{ width: 60, height: 60 }}
           />
-          <p className="Temporary_Drawer_User_Name">James McGill</p>
+          <p className="Temporary_Drawer_User_Name">{this.props.email}</p>
         </div>
         <Divider />
         <List>

@@ -3,7 +3,6 @@ import './CurriculumDisplay.css';
 import Api from '../../services/Api'
 import WithHeaderBar from '../../hocs/WithHeaderBar';
 import CourseTable from '../../components/CourseTable';
-import DropDown from '../../components/DropDown/DropDown';
 import axios from 'axios';
 import _ from 'lodash';
 import Cookies from 'universal-cookie';
