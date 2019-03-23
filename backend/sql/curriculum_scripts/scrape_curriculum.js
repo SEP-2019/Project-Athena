@@ -108,11 +108,18 @@ async function store_curriculum(curriculum) {
         ]
       );
 
-      //Links the courses to the current curriculum
-      await connection.query(
-        "INSERT INTO curriculum_core_classes (curriculum_name,course_code) VALUES(?,?);",
+      let curriculum_core_classes = await connection.query(
+        "SELECT * FROM curriculum_core_classes WHERE curriculum_name = ? AND course_code = ?;",
         [curriculum_name, course.course_code]
       );
+
+      if (curriculum_core_classes.length == 0) {
+        //Links the courses to the current curriculum
+        await connection.query(
+          "INSERT INTO curriculum_core_classes (curriculum_name,course_code) VALUES(?,?);",
+          [curriculum_name, course.course_code]
+        );
+      }
 
       //Links the corresponding prereqs with the main courses
       course.prereqs.forEach(async prereq => {
@@ -140,10 +147,22 @@ async function store_curriculum(curriculum) {
       // Create course offerings
       for (let year = 2010; year < 2020; year++) {
         for (let i = 0; i < course.semesters.length; i++) {
-          await connection.query(
-            "INSERT INTO course_offerings (semester, scheduled_time, course_code, section) VALUES (?, ?, ?, ?);",
-            [course.semesters[i] + year, "Not available", course.course_code, 1]
+          let result = await connection.query(
+            "SELECT * FROM course_offerings WHERE course_code = ? AND semester = ?;",
+            [course.course_code, course.semesters[i] + year]
           );
+          if (result.length == 0) {
+            await connection.query(
+              "INSERT INTO course_offerings (semester, scheduled_time, course_code, section) VALUES (?, ?, ?, ?);",
+              [
+                course.semesters[i] + year,
+                "Not available",
+                course.course_code,
+                1,
+                course.course_code
+              ]
+            );
+          }
         }
       }
     });
@@ -156,11 +175,17 @@ async function store_curriculum(curriculum) {
         [tech_comp.course_code, tech_comp.course_title, tech_comp.department]
       );
 
-      //Associate the tech comps with a certain curriculum
-      await connection.query(
-        "INSERT INTO curriculum_tech_comps (curriculum_name,course_code) VALUES(?,?);",
+      let curriculum_tech_comps = await connection.query(
+        "SELECT * FROM curriculum_tech_comps WHERE curriculum_name = ? AND course_code = ?;",
         [curriculum_name, tech_comp.course_code]
       );
+      if (curriculum_tech_comps.length == 0) {
+        //Associate the tech comps with a certain curriculum
+        await connection.query(
+          "INSERT INTO curriculum_tech_comps (curriculum_name,course_code) VALUES(?,?);",
+          [curriculum_name, tech_comp.course_code]
+        );
+      }
 
       //Links the corresponding prereqs with the tech comps
       tech_comp.prereqs.forEach(async prereq => {
