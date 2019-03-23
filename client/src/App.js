@@ -18,7 +18,6 @@ class App extends Component {
 
   setEmail(email) {
     this.setState({ responseEmail: email });
-    console.log('THE EMAIL WAS SET: ', email);
   }
 
   render() {

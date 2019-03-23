@@ -22,6 +22,7 @@ class SignupContent extends Component {
       email: '',
       password: '',
       confirmPassword: '',
+      errorMessage: '',
       usernameError: false,
       emailError: false,
       passwordError: false,
@@ -39,15 +40,15 @@ class SignupContent extends Component {
         emailError: false,
         passwordError: false,
         confirmError: false,
+        errorMessagere: '',
       },
       () => {
-        this.setError('');
-        this.sendRequest();
+        this.sendSignUpRequest();
       }
     );
   }
 
-  sendRequest() {
+  sendSignUpRequest() {
     var id = this.state.username.replace(/\s/g, '');
     var email = this.state.email;
     var password = this.state.password;
@@ -67,6 +68,7 @@ class SignupContent extends Component {
           // Got response
           console.log(response);
           // TODO: change page, save email when backend is done
+          // this.props.setEmail(response.data.Response);
           this.redirect();
         })
         .catch(loginError => {
@@ -133,7 +135,9 @@ class SignupContent extends Component {
   }
 
   setError(message) {
-    document.getElementById('error-msg').innerHTML = message;
+    this.setState({
+      errorMessage: message,
+    });
   }
 
   handleInputChange(event = {}) {
@@ -145,7 +149,9 @@ class SignupContent extends Component {
   render() {
     return (
       <Section className="form" flexDirection="column">
-        <text className="error" id="error-msg" />
+        <span className="error" id="error-msg">
+          {this.state.errorMessage}
+        </span>
         <EditText
           required
           label="Student ID"
@@ -196,9 +202,9 @@ class SignupContent extends Component {
           &nbsp;
           <DropDown label="Start year *" menuList={tempYears} />
         </Section>
-        <text className="note">
+        <span className="note">
           Note. Your student ID will be your username.
-        </text>
+        </span>
 
         {/* Buttons */}
         <button className="primary-button" onClick={this.onSignUp}>
@@ -209,14 +215,14 @@ class SignupContent extends Component {
           justifyContent="flex-end"
           style={{ margin: '1vh' }}
         >
-          <text>Have an account? </text>
-          <text
+          <span>Have an account? </span>
+          <span
             className="link"
             id="redirect-login"
             onClick={this.props.handleChange}
           >
             Log in.
-          </text>
+          </span>
         </Section>
       </Section>
     );
