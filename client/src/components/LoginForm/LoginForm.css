@@ -5,7 +5,6 @@
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
 
   font-weight: 600;
-  text-transform: uppercase;
 }
 
 .secondary-button {
@@ -14,4 +13,21 @@
   color: #b20007;
 
   font-weight: 400;
+}
+
+.error {
+  margin-bottom: 0.75vh;
+  color: red;
+}
+
+.link {
+  margin-inline-start: 1vh;
+  color: blue;
+  text-decoration: underline;
+}
+
+.note {
+  font-weight: 480;
+  margin-top: 0.5vh;
+  margin-bottom: 1.5vh;
 }

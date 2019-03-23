@@ -28,8 +28,8 @@ const styles = theme => ({
   },
   formControl: {
     margin: '5px 0 5px 0',
-    minWidth: 150,
-    width: 190,
+    width: 125,
+
     background: 'white',
     height: '54px',
   },
