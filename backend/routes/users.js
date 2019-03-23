@@ -8,7 +8,7 @@ let customResponse = require("../validation/customResponse");
 /**
  * @api {post} /addStudentUser
  * @apiDescription This endpoint will add a student and an associated user
- * @apiParam (body) {string} username, {string} password, {string} email, {int} student_id
+ * @apiParam (body) {string} username, {string} password, {string} email, {int} student_id, {string} program, {int} year, {string} curr_type
  * @apiExample {curl} Example usage:
  * Http:
  *	POST /users/addStudentUser HTTP/1.1
@@ -18,7 +18,10 @@ let customResponse = require("../validation/customResponse");
  *		"username": "alex1234",
  *		"password": "test1234:",
  *		"email" : "alex@email.com",
- *		"student_id" : 123456789
+ *		"student_id" : 123456789,
+ *		"program": "Electrical Engineering",
+ *		"year" : 2019,
+ *		"curr_type" : 7-semester-curriculum
  *	}
  * Curl:
  *	curl -X POST \
@@ -28,12 +31,15 @@ let customResponse = require("../validation/customResponse");
  *		"username": "alex1234",
  *		"password": "test1234:",
  *		"email" : "alex@email.com",
- *		"student_id" : 123456789
+ *		"student_id" : 123456789,
+ *		"program": "Electrical Engineering",
+ *		"year" : 2019,
+ *		"curr_type" : 7-semester-curriculum
  *	}'
  *
- * @returns true if student was added successfully or false if not
+ * @returns The student's email if the insertion was successful
  *
- * @author: Steven Li + Alex Lam
+ * @author: Steven Li + Alex Lam + Gareth Peters
  */
 router.post(
   "/addStudentUser",
@@ -42,8 +48,11 @@ router.post(
     const password = req.body.password;
     const email = req.body.email;
     const id = req.body.student_id;
-    let result = await users.insertStudentUser(username, password, email, id);
-    res.send(customResponse(result));
+    const program = req.body.program;
+    const year = req.body.year;
+    const curr_type = req.body.curr_type;
+    let studentEmail = await users.insertStudentUser(username, password, email, id, program, year, curr_type);
+    res.send(customResponse(studentEmail));
   })
 );
 
@@ -163,5 +172,42 @@ router.get(
     res.send(customResponse(result));
   })
 );
+
+/**
+ *
+ * @api {post} /assignStudentMinor
+ * @apiDescription assign or update a Minor curriculum to a student
+ * @apiParam (body) {Integer} studentID, {string} minor
+ * @apiExample {curl} Example usage:
+ *	curl -X POST \
+ *  -H 'Content-Type: application/json' \
+ *  -d '{"studentID": 260678788, "minor": "Software Engineering"}' \
+ *  http://localhost:3001/courses/assignStudentMinor
+ *
+ * @returns True on success
+ *          invalid student ID
+ *          invalid curriculum name
+ *          student does not exist
+ *          curriculum does not exist
+ *          student already assigned minor
+ *
+ * @author: Gareth Peters
+ *
+ */
+
+router.post("/assignStudentMinor", async (req, res) => {
+  const studentID = req.query.studentID;
+  const minor = req.query.minor;
+  try {
+    await users.assignStudentMinor(studentID, minor);
+    res.status(200).send(true);
+  } catch (error) {
+    if (err.message === "Internal Server Error!\n") {
+      res.status(500).send(err.message);
+    } else {
+      res.status(400).send(err.message);
+    }
+  }
+});
 
 module.exports = router;

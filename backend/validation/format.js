@@ -9,6 +9,7 @@ const MAX_EMAIL_LENGTH = 384;
 const ID_LENGTH = 9;
 const MAX_ID = 2147483647;
 const MAX_DESCRIPTION_LENGTH = 1000;
+const YEAR_LENGTH = 4;
 
 /**
  * Verifies that the input only contains alphanumeric values
@@ -29,7 +30,7 @@ function isAlteredAlphanumeric(str) {
   if (!str) {
     return false;
   }
-  return String(str).match(/^([a-z0-9 ]|[-]|[:]|[|])+$/i);
+  return String(str).match(/^([a-zA-Z0-9:| \-])+$/i);
 }
 
 /**
@@ -65,9 +66,7 @@ var verifyUsername = username => {
   }
 
   if (String(username).length > MAX_USERNAME_LENGTH) {
-    throw new FormatError(
-      `Username length must be less than ${MAX_USERNAME_LENGTH}`
-    );
+    throw new FormatError(`Username length must be less than ${MAX_USERNAME_LENGTH}`);
   }
 
   if (!isAlphanumeric(username)) {
@@ -85,13 +84,8 @@ var verifyPassword = password => {
   if (!password) {
     throw new FormatError("Password cannot be empty");
   }
-  if (
-    String(password).length > MAX_PASSWORD_LENGTH ||
-    String(password).length < MIN_PASSWORD_LENGTH
-  ) {
-    throw new FormatError(
-      `Password length must be between ${MIN_PASSWORD_LENGTH} and ${MAX_PASSWORD_LENGTH}`
-    );
+  if (String(password).length > MAX_PASSWORD_LENGTH || String(password).length < MIN_PASSWORD_LENGTH) {
+    throw new FormatError(`Password length must be between ${MIN_PASSWORD_LENGTH} and ${MAX_PASSWORD_LENGTH}`);
   }
   return true;
 };
@@ -155,9 +149,7 @@ var verifyCurriculumName = curriculum => {
     throw new FormatError("Curriculum name cannot be empty");
   }
   if (String(curriculum).length > MAX_CURR_NAME_LENGTH) {
-    throw new FormatError(
-      `Curriculum name length must be less than ${MAX_CURR_NAME_LENGTH}`
-    );
+    throw new FormatError(`Curriculum name length must be less than ${MAX_CURR_NAME_LENGTH}`);
   }
   if (!isAlteredAlphanumeric(curriculum)) {
     throw new FormatError("Curriculum name must be alphanumeric");
@@ -189,9 +181,7 @@ var verifyDepartmentName = department => {
     throw new FormatError("Department name cannot be empty");
   }
   if (String(department).length > MAX_DEPARTMENT_LENGTH) {
-    throw new FormatError(
-      `Department name length must be less than ${MAX_DEPARTMENT_LENGTH}`
-    );
+    throw new FormatError(`Department name length must be less than ${MAX_DEPARTMENT_LENGTH}`);
   }
   if (!isAlteredAlphanumeric(department)) {
     throw new FormatError("Department name must be alphanumeric");
@@ -235,11 +225,7 @@ var verifyCourses = async courses => {
     }
     courses[course].forEach(row => {
       if (!isMcGillSemester(row.semester) || !isNumeric(row.section)) {
-        throw new FormatError(
-          `Invalid semester format for semester ${
-            row.semester
-          } for course ${course}`
-        );
+        throw new FormatError(`Invalid semester format for semester ${row.semester} for course ${course}`);
       }
     });
   }
@@ -285,21 +271,33 @@ var verifyCourseOffering = async courseOfferings => {
     }
 
     courseOfferings[course].forEach(row => {
-      if (
-        !isNumeric(row.id) ||
-        !isMcGillSemester(row.semester) ||
-        !isNumeric(row.section)
-      ) {
-        throw new FormatError(
-          `Invalid offering format for semester ${
-            row.semester
-          } for course ${course}`
-        );
+      if (!isNumeric(row.id) || !isMcGillSemester(row.semester) || !isNumeric(row.section)) {
+        throw new FormatError(`Invalid offering format for semester ${row.semester} for course ${course}`);
       }
     });
   }
 };
 
+/**
+ * Verifies that the year is in the following format: 1234
+ * @param {String} semester
+ */
+var verifyYear = year => {
+  if (!year) {
+    throw new FormatError("Curriculum year cannot be empty");
+  }
+  if (!/^\d{4}$/.test(year)) {
+    throw new FormatError("Curriculum year must be an integer of length 4");
+  }
+  return true;
+};
+
+function isMcGillSemester(semester) {
+  if (!/^[WSF]{1}\d{4}$/i.test(semester)) {
+    return false;
+  }
+  return true;
+}
 /**
  * Verifies that a list of course corequisistes is valid
  * @param {JSON} coreqs
@@ -317,9 +315,7 @@ var verifyCoreq = async coreqs => {
 
     coreqs[course].forEach(coreqCourse => {
       if (!isMcGillCourse(coreqCourse)) {
-        throw new FormatError(
-          `Invalid coreq course format for coreq course ${coreqCourse}`
-        );
+        throw new FormatError(`Invalid coreq course format for coreq course ${coreqCourse}`);
       }
     });
   }
@@ -342,9 +338,7 @@ var verifyPrereq = async prereqs => {
 
     prereqs[course].forEach(prereqCourse => {
       if (!isMcGillCourse(prereqCourse)) {
-        throw new FormatError(
-          `Invalid prereq course format for prereq course ${prereqCourse}`
-        );
+        throw new FormatError(`Invalid prereq course format for prereq course ${prereqCourse}`);
       }
     });
   }
@@ -357,9 +351,7 @@ var verifyPrereq = async prereqs => {
  */
 var verifyCourseCode = courseCode => {
   if (!isMcGillCourse(courseCode)) {
-    throw new FormatError(
-      `Invalid format course code for course ${courseCode}`
-    );
+    throw new FormatError(`Invalid format course code for course ${courseCode}`);
   }
 };
 
@@ -387,9 +379,7 @@ var verifyDepartmentSubName = department => {
     throw new FormatError("Department name must be alphabetical");
   }
   if (String(department).length !== MAX_DEPARTMENTSUBNAME_LENGTH) {
-    throw new FormatError(
-      `Department name length must be ${MAX_DEPARTMENTSUBNAME_LENGTH}`
-    );
+    throw new FormatError(`Department name length must be ${MAX_DEPARTMENTSUBNAME_LENGTH}`);
   }
 };
 
@@ -420,7 +410,7 @@ var verifyDescription = description => {
   }
 };
 
- /**
+/**
  * Verifies that the tag is not null
  * @param {String} tag
  */
@@ -461,7 +451,8 @@ module.exports = {
   verifyDepartmentSubName: verifyDepartmentSubName,
   verifyPhaseOut: verifyPhaseOut,
   verifyCourseCodeList: verifyCourseCodeList,
-  verifyCredits:verifyCredits,
-  verifyDescription:verifyDescription,
-  verifyTag:verifyTag
+  verifyCredits: verifyCredits,
+  verifyDescription: verifyDescription,
+  verifyTag: verifyTag,
+  verifyYear: verifyYear
 };

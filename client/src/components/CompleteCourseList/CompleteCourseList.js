@@ -15,16 +15,14 @@ class CompleteCourseList extends Component {
     return (
       <div className="course-list">
         <div>
-          {this.props.errorMessage(
-            this.props.courses.map((course, index) => (
-              <ExpandableCourse
-                key={index}
-                index={index}
-                course_code={course.course_code + ' ー ' + course.title}
-                description={course.description}
-              />
-            ))
-          )}
+          {this.props.courses.map((course, index) => (
+            <ExpandableCourse
+              key={index}
+              index={index}
+              course_code={course.course_code + ' ー ' + course.title}
+              description={course.description}
+            />
+          ))}
         </div>
       </div>
     );

@@ -1,28 +1,40 @@
 import React, { Component } from 'react';
 import './CurriculumDisplay.css';
+import Api from '../../services/Api'
 import WithHeaderBar from '../../hocs/WithHeaderBar';
 import CourseTable from '../../components/CourseTable';
 import DropDown from '../../components/DropDown/DropDown';
 import axios from 'axios';
 import _ from 'lodash';
+import Cookies from 'universal-cookie';
 
 class CurriculumDisplay extends Component {
+
   constructor(props) {
+
     super(props);
     this.getStudentData = this.getStudentData.bind(this);
     this.parseCourseData = this.parseCourseData.bind(this);
     this.getCourseTable = this.getCourseTable.bind(this);
     this.state = {
-      studentId: 123321123, // placeholder student id until sessions/persistance are implemented
+      studentId: null, // placeholder student id until sessions/persistance are implemented
       curriculumName: 'View ECSE Curriculums',
       completedCourses: [],
       incompleteCourses: [],
       desiredTechComps: [],
       studentDataError: null,
     };
-    this.getStudentData(this.state.studentId);
+
+    this.cookies = new Cookies();
   }
 
+  componentDidMount(){
+    this.setState({
+        studentId : this.cookies.get('studentId'),
+    },
+    () => this.getStudentData(this.state.studentId));
+  }
+  
   /**
    * Fetches the data of a student from the backend, this includes their major, minor,
    * completed courses, and incomplete semesters and courses
@@ -30,11 +42,12 @@ class CurriculumDisplay extends Component {
    * @param {int} studentid The id of the student
    */
   getStudentData(studentid) {
-    axios
-      .get('http://localhost:3001/users/getStudentData?studentID=' + studentid)
+    Api()
+      .get('users/getStudentData?studentID=' + studentid)
       .then(response => {
-        let res = response.data;
 
+        let res = response.data.Response;
+        
         this.setState({
           curriculumName: res.major[0].curriculum_name,
           completedCourses: this.parseCourseData(
