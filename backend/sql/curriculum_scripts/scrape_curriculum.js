@@ -158,8 +158,7 @@ async function store_curriculum(curriculum) {
                 course.semesters[i] + year,
                 "Not available",
                 course.course_code,
-                1,
-                course.course_code
+                1
               ]
             );
           }
