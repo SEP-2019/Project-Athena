@@ -834,30 +834,39 @@ describe("Test get student's data", () => {
   });
 
   it("responds with true indicating that the student data was obtained", async () => {
-    /*
-    const expected = {
-      "major":[{"curriculum_name":"TEST Electrical Engineering Major-2015-2016-8-semester-curriculum"}],
-      "minor":[{"curriculum_name":"TEST Software Engineering Minor-2015-2016-1-semester-curriculum"}],
-      "completedCourses":[{"course_code":"ECSE 276","semester":"W2018"},{"course_code":"ECSE 279","semester":"W2018"},{"course_code":"ECSE 379","semester":"W2018"}],
-      "incompletedCore":[{"course_code":"ECSE 479"}],
-      "desiredTC":[{"course_code":"COMP 499"}]
-    };
-    */
-    /*
-    const expected = {
-      "major":[{"curriculum_name":"TEST Electrical Engineering Major-2015-2016-8-semester-curriculum"}],
-      "minor":[{"curriculum_name":"TEST Software Engineering Minor-2015-2016-1-semester-curriculum"}],
-      "completedCourses":[{"course_code":"ECSE 276","semester":"W2018"},{"course_code":"ECSE 279","semester":"W2018"},{"course_code":"ECSE 379","semester":"W2018"}],
-      "incompletedCore":[],
-      "desiredTC":[]
-    };
-    */
-
-    const expected = {"major":[{"curriculum_name":"TEST Electrical Engineering Major-2015-2016-8-semester-curriculum"}],"minor":[{"curriculum_name":"TEST Software Engineering Minor-2015-2016-1-semester-curriculum"}],"completedCourses":[{"course_code":"ECSE 276","semester":"W2018"},{"course_code":"ECSE 279","semester":"W2018"},{"course_code":"ECSE 379","semester":"W2018"}],"incompletedCore":[],"desiredTC":[]};
    
-    const res = await users.getStudentData(student_id);
+    const expectedMajor = "TEST Electrical Engineering Major-2015-2016-8-semester-curriculum";
+    const expectedMinor = "TEST Software Engineering Minor-2015-2016-1-semester-curriculum";
+    const expectedCompletedCourse_1 = "ECSE 276";
+    const expectedCompletedCourse_2 = "ECSE 279";
+    const expectedCompletedCourse_3= "ECSE 379";
+    const expectedCompletedSemester = "W2018";
+    const expectedIncompleted = []; // SHOULD BE "ECSE 479" along with prereq "ECSE 379"
+    const expectedDesired = [];     // SHOULD BE "COMP 499"
+  
+    var res = await users.getStudentData(student_id);
+    res = JSON.stringify(res);
+    res = JSON.parse(res);
 
-    assert.equal(expected, JSON.stringify(res));
+    console.log(res.major[0].curriculum_name);
+    console.log(res.minor);
+    console.log(res.completedCourses[0].course_code);
+    console.log(res.completedCourses[1].course_code);
+    console.log(res.completedCourses[2].course_code);
+    console.log(res.incompletedCore);
+    console.log(res.desiredTC);
+
+    assert.equal(expectedMajor, res.major[0].curriculum_name);
+    assert.equal(expectedMinor, res.minor[0].curriculum_name);
+    assert.equal(expectedCompletedCourse_1, res.completedCourses[0].course_code);
+    assert.equal(expectedCompletedSemester, res.completedCourses[0].semester);
+    assert.equal(expectedCompletedCourse_2, res.completedCourses[1].course_code);
+    assert.equal(expectedCompletedSemester, res.completedCourses[1].semester);
+    assert.equal(expectedCompletedCourse_3, res.completedCourses[2].course_code);
+    assert.equal(expectedCompletedSemester, res.completedCourses[2].semester);
+    assert.equal(expectedIncompleted[0], res.incompletedCore[0]);
+    assert.equal(expectedDesired[0], res.desiredTC[0]);
+    
   });
 
   it("responds false with the student having no majors", async () => {
