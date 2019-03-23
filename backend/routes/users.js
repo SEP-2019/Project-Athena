@@ -195,19 +195,48 @@ router.get(
  *
  */
 
-router.post("/assignStudentMinor", async (req, res) => {
-  const studentID = req.query.studentID;
-  const minor = req.query.minor;
-  try {
-    await users.assignStudentMinor(studentID, minor);
-    res.status(200).send(true);
-  } catch (error) {
-    if (err.message === "Internal Server Error!\n") {
-      res.status(500).send(err.message);
-    } else {
-      res.status(400).send(err.message);
-    }
-  }
-});
+router.post(
+  "/assignStudentMinor",
+  asyncMiddleware(async (req, res) => {
+    const studentID = req.body.studentID;
+    const minor = req.body.minor;
+    let result = users.assignStudentMinor(studentID, minor);
+    res.send(customResponse(result));
+  })
+);
+
+/**
+ *
+ * @api {post} /updateStudentMajor
+ * @apiDescription update a student's major curriculum
+ * @apiParam (body) {Integer} studentID, {string} program, {Integer} year, {string} curr_type
+ * @apiExample {curl} Example usage:
+ *	curl -X POST \
+ *  -H 'Content-Type: application/json' \
+ *  -d '{"studentID": 260678788, "program": "Software Engineering", "year": 2017, "curr_type": "7-semester-curriculum"}' \
+ *  http://localhost:3001/courses/updateStudentMajor
+ *
+ * @returns True on success
+ *          invalid student ID
+ *          invalid curriculum name
+ *          invalid year
+ *          student does not exist
+ *          curriculum does not exist
+ *
+ * @author: Gareth Peters
+ *
+ */
+
+router.post(
+  "/updateStudentMajor",
+  asyncMiddleware(async (req, res, next) => {
+    const student_id = req.body.studentID;
+    const program = req.body.program;
+    const year = req.body.year;
+    const curr_type = req.body.curr_type;
+    let result = await users.updateStudentMajor(student_id, program, year, curr_type);
+    res.send(customResponse(result));
+  })
+);
 
 module.exports = router;
