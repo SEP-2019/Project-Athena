@@ -45,7 +45,6 @@ class CourseSuggestion extends Component {
       'beforeunload',
       this.saveStateToLocalStorage.bind(this)
     );
-    // saves if component has a chance to unmount
     this.saveStateToLocalStorage();
   }
 
@@ -60,8 +59,8 @@ class CourseSuggestion extends Component {
       <div>
         <div className="main_page_message">
           Here are your remaining mandatory courses and suggested complementary
-          courses by tags. You can select the suggested courses and apply them
-          as desired courses.
+          courses that can be filtered by tags. You can select the desired
+          courses and apply them.
         </div>
         <Tabs
           defaultTab={this.state.currentTab}

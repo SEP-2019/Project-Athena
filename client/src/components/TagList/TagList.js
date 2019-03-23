@@ -88,10 +88,10 @@ class TagList extends Component {
           </div>
           <div className="btn_container">
             <button className="btn" onClick={this.onClearAll}>
-              CLEAR ALL
+              CLEAR FILTERS
             </button>
             <button className="btn" onClick={this.onApply}>
-              APPLY
+              APPLY COURSES
             </button>
           </div>
         </div>
