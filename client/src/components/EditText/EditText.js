@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import TextField from '@material-ui/core/TextField';
 import PropTypes from 'prop-types';
 import {
@@ -26,27 +26,38 @@ const theme = createMuiTheme({
   typography: { useNextVariants: true },
 });
 
-function CustomizedInputs(props) {
-  const { classes } = props;
-  return (
-    <MuiThemeProvider theme={theme}>
-      <TextField
-        required={props.required}
-        className={classes.root}
-        id={props.id}
-        label={props.label}
-        type={props.type}
-        name={props.type}
-        autoComplete={props.type}
-        margin="normal"
-        variant="outlined"
-      />
-    </MuiThemeProvider>
-  );
+class CustomizedInputs extends Component {
+  handleChange(event) {
+    this.props.onChange(event);
+  }
+
+  render() {
+    return (
+      <MuiThemeProvider theme={theme}>
+        <TextField
+          value={this.props.defaultValue}
+          onChange={e => this.handleChange(e)}
+          required={this.props.required}
+          className={this.props.classes.root}
+          id={this.props.id}
+          label={this.props.label}
+          type={this.props.type}
+          name={this.props.name}
+          autoComplete={this.props.type}
+          error={this.props.error}
+          margin="normal"
+          variant="outlined"
+        />
+      </MuiThemeProvider>
+    );
+  }
 }
 
 CustomizedInputs.propTypes = {
-  classes: PropTypes.object.isRequired,
+  // Propagate change to parent
+  onChange: PropTypes.func,
+  // Initial default value for the EditText
+  defaultValue: PropTypes.string,
 };
 
 export default withStyles(styles)(CustomizedInputs);

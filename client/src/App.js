@@ -1,28 +1,65 @@
 import React, { Component } from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  Redirect,
-} from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import CourseRegistration from './screens/CourseRegistration';
 import CourseSuggestion from './screens/CourseSuggestion';
 import Login from './screens/Login';
-import './App.css';
 import CurriculumDisplay from './screens/CurriculumDisplay';
+import Cookies from 'universal-cookie';
+import './App.css';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      responseEmail: 'test',
+    };
+    this.setEmail = this.setEmail.bind(this);
+  }
+
+  setEmail(email) {
+    this.setState({ responseEmail: email });
+  }
+
   render() {
+    // TEMPORARY place to set student id, move this inside the login functionality
+    const cookies = new Cookies();
+    cookies.set('studentId', 123321123, { path: '/' });
+
     return (
-      <Router>
-        <Switch>
-          <Route path="/login" component={Login} />
-          <Route path="/courseregistration" component={CourseRegistration} />
-          <Route path="/curriculumdisplay" component={CurriculumDisplay} />
-          <Route path="/Home" component={CourseSuggestion} />
-          <Redirect to="/login" />
-        </Switch>
-      </Router>
+      <Switch>
+        <Route
+          path="/login"
+          render={props => <Login setEmail={this.setEmail} {...props} />}
+        />
+        <Route
+          path="/courseregistration"
+          render={props => (
+            <CourseRegistration
+              responseEmail={this.state.responseEmail}
+              {...props}
+            />
+          )}
+        />
+        <Route
+          path="/curriculumdisplay"
+          render={props => (
+            <CurriculumDisplay
+              responseEmail={this.state.responseEmail}
+              {...props}
+            />
+          )}
+        />
+        <Route
+          path="/Home"
+          render={props => (
+            <CourseSuggestion
+              responseEmail={this.state.responseEmail}
+              {...props}
+            />
+          )}
+        />
+        <Redirect to="/login" />
+      </Switch>
     );
   }
 }
