@@ -14,8 +14,10 @@ class CurriculumDisplay extends Component {
     super(props);
     this.getStudentData = this.getStudentData.bind(this);
     this.parseCourseData = this.parseCourseData.bind(this);
-    this.getCourseTable = this.getCourseTable.bind(this);
+    this.renderCourseTable = this.renderCourseTable.bind(this);
+    this.renderLoadingMessage = this.renderLoadingMessage.bind(this);
     this.state = {
+      loadingMessage: "Loading curriculum information...",
       studentId: null, // placeholder student id until sessions/persistance are implemented
       curriculumName: 'View ECSE Curriculums',
       completedCourses: [],
@@ -56,6 +58,7 @@ class CurriculumDisplay extends Component {
             'semester'
           ),
           desiredTechComps: res.desiredTC,
+          loadingMessage: "",
         });
       })
       .catch(studentDataError => this.setState({ studentDataError }));
@@ -83,12 +86,21 @@ class CurriculumDisplay extends Component {
    *
    * @param {Object} props properties to pass in. Should be in the form of {details: {semester: "W2019", courses: []}, mapFunction: f}
    */
-  getCourseTable(props) {
+  renderCourseTable(props) {
     // nothing is selected
     if (!props.details || props.details.length === 0)
       return <div>No courses found</div>;
 
     return <CourseTable courses={props.mapFunction(props.details.courses)} />;
+  }
+
+  /**
+   * Renders the loading message while the courses are being fetched
+   * 
+   * @param {Object} props 
+   */
+  renderLoadingMessage(props){
+    return props.message ? <div>{props.message}</div> : (null)
   }
 
   render() {
@@ -98,6 +110,7 @@ class CurriculumDisplay extends Component {
           <div className="page-header">
             {'Current Curriculum: ' + this.state.curriculumName}
           </div>
+          <this.renderLoadingMessage message = {this.state.loadingMessage}/>
           <div className="curriculum-content">
             <div className="semester-course-display" key="Completed Courses">
               {this.state.completedCourses.map(completedSemester => (
@@ -106,7 +119,7 @@ class CurriculumDisplay extends Component {
                     {completedSemester.semester}
                   </div>
                   <div className="semester-course-table" style={{ width: 512 }}>
-                    <this.getCourseTable
+                    <this.renderCourseTable
                       details={completedSemester}
                       typeOfCourses={'completedCourses'}
                       mapFunction={courses => courses}
@@ -123,7 +136,7 @@ class CurriculumDisplay extends Component {
                     {incompleteSemester.semester}
                   </div>
                   <div className="semester-course-table" style={{ width: 512 }}>
-                    <this.getCourseTable
+                    <this.renderCourseTable
                       details={incompleteSemester}
                       typeOfCourses={'incompleteCourses'}
                       mapFunction={courses => courses}
