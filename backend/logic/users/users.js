@@ -146,9 +146,11 @@ var getStudentData = async studentID => {
   let completedCourses, major, minors;
   try {
     completedCourses = await conn.query(
-      `SELECT course_code, semester
+    `SELECT course_offerings.course_code, course_offerings.semester, 
+            courses.title, courses.description, courses.credits
     FROM course_offerings
-    WHERE (id, semester)
+    JOIN courses ON (course_offerings.course_code = courses.course_code)
+    WHERE (course_offerings.id, course_offerings.semester)
     IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`,
       [studentID]
     );
@@ -223,7 +225,7 @@ var getStudentData = async studentID => {
         [c.course_code]
       );
       c.description = await conn.query(
-        `SELECT description
+        `SELECT description, title, credits
         FROM courses
         WHERE course_code = ?;`,
         [c.course_code]
@@ -245,7 +247,7 @@ var getStudentData = async studentID => {
         [c.course_code]
       );
       c.description = await conn.query(
-        `SELECT description
+        `SELECT description, title, credits
         FROM courses
         WHERE course_code = ?;`,
         [c.course_code]
