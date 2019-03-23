@@ -14,7 +14,6 @@ class SearchBar extends Component {
     this.getSuggestionValue = this.getSuggestionValue.bind(this);
     this.onClickSuggestion = this.onClickSuggestion.bind(this);
     this.renderSuggestion = this.renderSuggestion.bind(this);
-    this.onClickSelect = this.onClickSelect.bind(this);
   }
 
   // Teach Autosuggest how to calculate suggestions for any given input value.
@@ -76,12 +75,6 @@ class SearchBar extends Component {
     );
   }
 
-  onClickSelect() {
-    // clear input
-    this.setState({ value: '' });
-    this.props.onClickSelect();
-  }
-
   render() {
     const { value, suggestions } = this.state;
 
@@ -101,9 +94,6 @@ class SearchBar extends Component {
           renderSuggestion={this.renderSuggestion}
           inputProps={inputProps}
         />
-        <button className="selection-button" onClick={this.onClickSelect}>
-          Select
-        </button>
       </div>
     );
   }

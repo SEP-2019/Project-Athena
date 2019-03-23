@@ -13,25 +13,28 @@ class CourseRegistration extends Component {
       allCourses: [], // list of all courses to select
       semesters: [], // list of all semesters to select
       selectedSearch: {}, // selected course (updates on hover)
-      selectedSemester: '', // selected semester
+      selectedSemester: 'semester', // selected semester
       selectedCourses: [], // courses that have already been selected
+      disabledButton: false,
     };
     this.updateSelectedSemester = this.updateSelectedSemester.bind(this);
-    this.onClickSelect = this.onClickSelect.bind(this);
+    this.onSelectCourse = this.onSelectCourse.bind(this);
     this.onSelectFromSearch = this.onSelectFromSearch.bind(this);
     this.removeCourse = this.removeCourse.bind(this);
     this.findSemesters = this.findSemesters.bind(this);
     this.fetchAllCourses = this.fetchAllCourses.bind(this);
     this.fetchUserData = this.fetchUserData.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
   }
 
   // Updates the selected semester in the dropdown
   updateSelectedSemester(selection) {
     this.setState({ selectedSemester: selection });
+    this.onSelectCourse();
   }
 
-  // Called on click of Select button, adds the course to list of selected courses
-  onClickSelect() {
+  // Adds the course to list of selected courses
+  onSelectCourse() {
     this.setState(prevState => {
       // Prevents adding the same course twice
       if (
@@ -42,8 +45,8 @@ class CourseRegistration extends Component {
         return null;
       }
 
-      // Prevents adding course without selecting a semester
-      if (!prevState.selectedSemester) {
+      // Prevents adding course without selecting a course
+      if (Object.keys(prevState.selectedSearch).length === 0) {
         return null;
       }
 
@@ -61,6 +64,8 @@ class CourseRegistration extends Component {
   // Called on click of a search suggestion, updates the selected course
   onSelectFromSearch(selection) {
     this.setState({ selectedSearch: selection }); // this is where the warning appears
+
+    // TODO: generate the semesters
   }
 
   // Removes the course from the selected courses list
@@ -80,15 +85,15 @@ class CourseRegistration extends Component {
     let semesters = [];
     for (year; year <= currentYear; year++) {
       if (year === startYear) {
-        semesters.push('Fall ' + year.toString());
+        semesters.push('F' + year.toString());
       } else if (year === currentYear) {
-        semesters.push('Winter ' + year.toString());
+        semesters.push('W' + year.toString());
         if (today.getMonth() > 8) {
-          semesters.push('Fall ' + year.toString());
+          semesters.push('F' + year.toString());
         }
       } else {
-        semesters.push('Winter ' + year.toString());
-        semesters.push('Fall ' + year.toString());
+        semesters.push('W' + year.toString());
+        semesters.push('F' + year.toString());
       }
     }
     return semesters;
@@ -125,18 +130,51 @@ class CourseRegistration extends Component {
       .catch(error => console.log('ERROR', error));
   }
 
+  // Formats the courses for the POST request
+  formatCompletedCourses(completedCourses) {
+    let courses = {};
+    completedCourses.forEach(course => {
+      courses[course.course_code] = [{ semester: course.semester, section: 1 }];
+    });
+    return courses;
+  }
+
+  // POST request to save the completed courses
+  onClickSave() {
+    let completedCourses = {
+      courses: this.formatCompletedCourses(this.state.selectedCourses),
+      student_id: 260485294,
+    };
+
+    console.log(completedCourses);
+
+    axios
+      .post('http://localhost:3001/courses/addCompletedCourses', {
+        completedCourses,
+      })
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+      });
+  }
+
   render() {
     const { allCourses, semesters } = this.state;
 
     return (
       <div className="course-registration">
         <div className="instruction">
-          Select the courses that you have already taken.
+          Select the courses that you have already taken. These courses will
+          then appear in the Curriculum page.
         </div>
         <div className="content">
           <div className="selection-side">
-            <div className="selection-semester">
-              <div>Choose the semester: </div>
+            <div className="selection-course">
+              <SearchBar
+                className="selection-search"
+                data={allCourses}
+                getValue={this.onSelectFromSearch}
+              />
               <DropDown
                 defaultValue={this.state.selectedSemester}
                 getValue={this.updateSelectedSemester}
@@ -144,25 +182,28 @@ class CourseRegistration extends Component {
                 className="select"
               />
             </div>
-            <div className="selection-course">
-              <SearchBar
-                className="selection-search"
-                data={allCourses}
-                getValue={this.onSelectFromSearch}
-                onClickSelect={this.onClickSelect}
-              />
+          </div>
+          <div className="selected-size-frame">
+            <ul className="selected-side">
+              {this.state.selectedCourses.map((el, index) => (
+                <CourseRegistrationItem
+                  key={index}
+                  course={el}
+                  index={index}
+                  onCancel={this.removeCourse}
+                />
+              ))}
+            </ul>
+            <div className="selection-save">
+              <button
+                className="save-button"
+                onClick={this.onClickSave}
+                disabled={this.state.disabledButton}
+              >
+                Save
+              </button>
             </div>
           </div>
-          <ul className="selected-side">
-            {this.state.selectedCourses.map((el, index) => (
-              <CourseRegistrationItem
-                key={index}
-                course={el}
-                index={index}
-                onCancel={this.removeCourse}
-              />
-            ))}
-          </ul>
         </div>
       </div>
     );
