@@ -170,8 +170,14 @@ async function store_curriculum(curriculum) {
     tech_comps.forEach(async tech_comp => {
       //Insert tech comps into courses
       await connection.query(
-        "INSERT INTO courses (course_code,title,department) VALUES(?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-        [tech_comp.course_code, tech_comp.course_title, tech_comp.department]
+        "INSERT INTO courses (course_code, title, department, description, credits) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
+        [
+          tech_comp.course_code,
+          tech_comp.course_title,
+          tech_comp.department,
+          tech_comp.description,
+          tech_comp.credits
+        ]
       );
 
       let curriculum_tech_comps = await connection.query(
