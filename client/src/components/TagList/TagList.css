@@ -6,11 +6,11 @@
 
 .interest-list {
   padding: 1rem 1.5rem;
-  /* height: 350px; */
+  height: 325px;
   border: 1px solid rgb(0, 0, 0, 0.2);
   flex: 1;
   margin-bottom: 25px;
-  /* overflow-y: scroll; */
+  overflow-y: scroll;
 }
 
 .btn_container {

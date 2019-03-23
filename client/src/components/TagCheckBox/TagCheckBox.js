@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 import './TagCheckBox.css';
 
 class TagCheckBox extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
       <div className="checkbox_area">

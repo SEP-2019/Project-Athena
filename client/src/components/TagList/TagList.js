@@ -39,7 +39,6 @@ class TagList extends Component {
     let isCleared = false;
     for (const checkbox of this.selectedTags) {
       this.selectedTags.delete(checkbox);
-      console.log(checkbox, 'is Cleared');
       isCleared = true;
       this.props.updateTagsCheckedState(tags);
     }
@@ -55,24 +54,24 @@ class TagList extends Component {
 
   onClearAll = e => {
     e.preventDefault();
-    this.props.clearSelection();
     this.uncheckAll();
   };
 
   onApply = e => {
     e.preventDefault();
-    this.props.applySelection();
-    this.props.enqueueSnackbar('Your selections have been applied', {
-      variant: 'success',
-      action: <Button size="small">{'Dismiss'}</Button>,
-      autoHideDuration: 1500,
-    });
+    if (this.props.applySelection()) {
+      this.props.enqueueSnackbar('Your selections have been applied', {
+        variant: 'success',
+        action: <Button size="small">{'Dismiss'}</Button>,
+        autoHideDuration: 1500,
+      });
+    }
   };
 
   render() {
     return (
       <form className="interest_selection">
-        <h4>My Interests</h4>
+        <h4>Filters:</h4>
         <div>
           <div className="interest-list">
             {this.props.tags.map((interest, index) => (

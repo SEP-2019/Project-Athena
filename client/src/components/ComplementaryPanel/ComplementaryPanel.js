@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { SnackbarProvider, withSnackbar } from 'notistack';
 
+import Api from '../../services/Api';
 import TagList from '../TagList/TagList';
 import CourseSuggestionList from '../CourseSuggestionList/CourseSuggestionList';
 import './ComplementaryPanel.css';
 
 const TagListWithSnackBar = withSnackbar(TagList);
-const url = 'http://localhost:3001';
+// Hardcoded student id for now
 const sid = '123456789';
 
 class ComplementaryPanel extends Component {
@@ -17,8 +17,7 @@ class ComplementaryPanel extends Component {
     tagsAreLoading: true,
 
     suggestions: [],
-    suggestionsAreLoading: false,
-    loadedCourses: new Set(),
+    selectedCourses: new Set(),
   };
 
   addCheckedProperty(data) {
@@ -28,11 +27,24 @@ class ComplementaryPanel extends Component {
     });
   }
 
+  addDesiredCourses = async courses => {
+    await Api()
+      .post(`/courses/updateDesiredCourse`, {
+        student_id: sid,
+        courses: courses,
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
   fetchTags = async () => {
-    const response = await axios.get(`${url}/tags/getAllTags`).catch(error => {
-      console.error(error);
-      this.setState({ tagsAreLoading: false });
-    });
+    const response = await Api()
+      .get(`tags/getAllTags`)
+      .catch(error => {
+        console.error(error);
+        this.setState({ tagsAreLoading: false });
+      });
     if (response) {
       this.setState({
         tags: this.addCheckedProperty(response.data.Response),
@@ -42,41 +54,34 @@ class ComplementaryPanel extends Component {
   };
 
   fetchCourseSuggestions = async newTag => {
-    const response = await axios
-      .get(`${url}/courses/getCourseByTag?tag=${newTag}&studentID=${sid}`)
+    const response = await Api()
+      .get(`courses/getCourseByTag?tag=${newTag}&studentID=${sid}`)
       .catch(error => {
         console.error(error);
-        this.setState({ suggestionsAreLoading: false });
       });
     if (response) {
+      const courses = response.data.Response;
+      courses.forEach(this.populateDesiredCourses);
       this.setState(prevState => ({
         suggestions: [
           ...prevState.suggestions,
-          {
-            name: newTag,
-            courses: response.data.Response,
-          },
+          { name: newTag, courses: courses },
         ],
-        suggestionsAreLoading: false,
       }));
     }
   };
 
   componentDidMount = () => {
     this.fetchTags();
-    // TODO: fetchUserData to get CompletedCourses
   };
 
   componentWillMount = () => {
     this.checkedTags = new Set();
+    this.loadedCourses = new Set();
   };
 
   updateTagsCheckedState = newTags => {
-    this.setState({
-      tags: newTags,
-      suggestionsAreLoading: true,
-    });
-
+    this.setState({ tags: newTags });
     let newSuggestions = [...this.state.suggestions];
     newTags.map(tag => {
       if (tag.checked && !newSuggestions.some(e => e.name === tag.name)) {
@@ -92,33 +97,32 @@ class ComplementaryPanel extends Component {
     });
   };
 
-  updateCoursesCheckedState = (tagName, newCourses) => {
-    let newSuggestions = [...this.state.suggestions];
-    const tagIndex = newSuggestions.findIndex(e => e.name === tagName);
-    newSuggestions[tagIndex].courses = newCourses;
-    this.setState({ suggestions: newSuggestions });
+  populateDesiredCourses = course => {
+    const code = course.course_code;
+    if (course.desired === 1) {
+      this.loadedCourses.add(code);
+    } else if (this.loadedCourses.has(code)) {
+      this.loadedCourses.delete(code);
+    }
+    this.setState({ selectedCourses: new Set(this.loadedCourses) });
   };
 
-  clearSelection = () => {
-    let newSuggestions = [...this.state.suggestions];
-    newSuggestions.forEach(function(obj) {
-      obj.courses.map(course => {
-        if (course.desired) {
-          course.desired = false;
-        }
-        return null;
-      });
-    });
-    const newSet = new Set();
-    this.setState({
-      suggestions: newSuggestions,
-      loadedCourses: newSet,
-    });
+  hasChange = () => {
+    let as = this.loadedCourses;
+    let bs = this.state.selectedCourses;
+    if (as.size !== bs.size) return true;
+    for (var a of as) if (!bs.has(a)) return true;
+    return false;
   };
 
   applySelection = () => {
-    console.log(this.state.suggestions);
-    // TODO: POST request to save
+    if (this.hasChange()) {
+      this.loadedCourses = new Set(this.state.selectedCourses);
+      let course_array = [...this.loadedCourses];
+      this.addDesiredCourses(course_array);
+      return true;
+    }
+    return false;
   };
 
   loadSuggestions = (tag, courses) => {
@@ -127,8 +131,7 @@ class ComplementaryPanel extends Component {
         key={tag}
         tag={tag}
         courses={courses}
-        loadedCourses={this.state.loadedCourses}
-        updateCoursesCheckedState={this.updateCoursesCheckedState}
+        selectedCourses={this.state.selectedCourses}
       />
     );
   };
@@ -143,14 +146,13 @@ class ComplementaryPanel extends Component {
             <SnackbarProvider maxSnack={3}>
               <TagListWithSnackBar
                 tags={tags}
-                clearSelection={this.clearSelection}
                 applySelection={this.applySelection}
                 checkedTags={this.checkedTags}
                 updateTagsCheckedState={this.updateTagsCheckedState}
               />
             </SnackbarProvider>
           ) : (
-            <h3>Loading the tags...</h3>
+            <h3>Loading filter tags...</h3>
           )}
         </div>
         <div className="spacer" />
@@ -161,8 +163,8 @@ class ComplementaryPanel extends Component {
             )
           ) : (
             <p>
-              You did not select any interest. Please select at least one
-              interest from the list.
+              You did not select any filter. Please select a filter to see the
+              courses.
             </p>
           )}
         </div>

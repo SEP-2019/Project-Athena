@@ -13,25 +13,22 @@ class CourseSuggestionList extends Component {
   }
 
   componentWillMount = () => {
-    this.selectedCheckboxes = this.props.loadedCourses;
+    this.selectedCheckboxes = this.props.selectedCourses;
   };
 
   handleChange = (index, checked, checkbox) => {
     if (typeof checkbox === 'undefined') {
       return;
     }
-    const { tag, courses } = this.state;
-    courses[index].checked = checked;
+    const { courses } = this.state;
+    courses[index].desired = checked | 0;
     this.setState({ courses });
 
     if (this.selectedCheckboxes.has(checkbox)) {
       this.selectedCheckboxes.delete(checkbox);
-      console.log(checkbox, 'is unselected');
     } else {
       this.selectedCheckboxes.add(checkbox);
-      console.log(checkbox, 'is selected');
     }
-    this.props.updateCoursesCheckedState(tag, courses);
   };
 
   createCourseList = (course_label, index) => (

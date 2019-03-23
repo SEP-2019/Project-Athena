@@ -59,8 +59,9 @@ class CourseSuggestion extends Component {
     return (
       <div>
         <div className="main_page_message">
-          Here are your remaining mandatory courses and suggestions for your
-          complementary courses. You can add them to your curriculum.
+          Here are your remaining mandatory courses and suggested complementary
+          courses by tags. You can select the suggested courses and apply them
+          as desired courses.
         </div>
         <Tabs
           defaultTab={this.state.currentTab}
