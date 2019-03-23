@@ -9,7 +9,7 @@ const format = require("../../validation/format");
  * @throws Undefined tag if tag is null
  *         error if MySQL connection failed
  */
-var getCourseByTag = async function getCourseByTag(tag,studentID) {
+var getCourseByTag = async function getCourseByTag(tag, studentID) {
   format.verifyTag(tag);
   format.verifyStudentId(studentID);
 
@@ -68,10 +68,10 @@ var addCourse = async (
   // Connect to database
   let connection = await mysql.getNewConnection();
 
-    await connection.query(
-      "INSERT INTO courses (course_code, title, department, phased_out, description, credits) VALUES(?, ?, ?, ?, ?, ?);",
-      [courseCode, title, departement, phasedOut, description, credits]
-    );
+  await connection.query(
+    "INSERT INTO courses (course_code, title, department, phased_out, description, credits) VALUES(?, ?, ?, ?, ?, ?);",
+    [courseCode, title, departement, phasedOut, description, credits]
+  );
   connection.release();
   return true;
 };
@@ -141,6 +141,37 @@ var getAllCourses = async () => {
     "SELECT * FROM courses WHERE phased_out = FALSE;"
   );
   connection.release();
+  return result;
+};
+
+/**
+ * Returns all course offerings
+ * @author Steven Li
+ * @returns a list of course offerings
+ * @throws error if MySQL connection failed
+ */
+var getAllCourseOfferings = async () => {
+  let connection = await mysql.getNewConnection();
+  let result = {};
+  let courses = await connection.query(
+    "SELECT course_code, title FROM courses WHERE phased_out = FALSE;"
+  );
+
+  let course_offerings = await connection.query(
+    "SELECT course_code, semester FROM course_offerings"
+  );
+
+  for (let i = 0; i < courses.length; i++) {
+    result[courses[i].course_code] = {};
+    result[courses[i].course_code].title = courses[i].title;
+    result[courses[i].course_code].semesters = [];
+  }
+
+  for (let i = 0; i < course_offerings.length; i++) {
+    result[course_offerings[i].course_code].semesters.push(
+      course_offerings[i].semester
+    );
+  }
   return result;
 };
 
@@ -457,6 +488,7 @@ module.exports = {
   addCompletedCourses,
   addCourseOfferings,
   getAllCourses,
+  getAllCourseOfferings,
   addCoreq,
   addPrereq,
   updateCourse,

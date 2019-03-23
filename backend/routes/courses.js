@@ -59,13 +59,20 @@ router.get(
 router.post(
   "/createCourse",
   asyncMiddleware(async function(req, res, next) {
-  const courseCode = req.body.courseCode;
-  const title = req.body.title;
-  const departement = req.body.departement;
-  const phasedOut = req.body.phasedOut;
-  const description = req.body.description;
-  const credits = req.body.credits;
-    let result = await courses.addCourse(courseCode, title, departement, phasedOut, description, credits)
+    const courseCode = req.body.courseCode;
+    const title = req.body.title;
+    const departement = req.body.departement;
+    const phasedOut = req.body.phasedOut;
+    const description = req.body.description;
+    const credits = req.body.credits;
+    let result = await courses.addCourse(
+      courseCode,
+      title,
+      departement,
+      phasedOut,
+      description,
+      credits
+    );
     res.send(customResponse(result));
   })
 );
@@ -174,6 +181,20 @@ router.get(
   "/getAllCourses",
   asyncMiddleware(async (req, res, next) => {
     let result = await courses.getAllCourses();
+    res.send(customResponse(result));
+  })
+);
+
+/**
+ * @api {get} /getAllCourseOfferings
+ * @apiDescription gets all course offerings stored within the database
+ * @apiExample {curl} Example usage: GET /courses/getAllCourseOfferings
+ * @author: Steven Li
+ */
+router.get(
+  "/getAllCourseOfferings",
+  asyncMiddleware(async (req, res, next) => {
+    let result = await courses.getAllCourseOfferings();
     res.send(customResponse(result));
   })
 );
