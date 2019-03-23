@@ -788,7 +788,7 @@ describe("Tests assign student a minor", () => {
     assert.equal(assigned[0].curriculum_name, "Electrical Engineering|2015|2016|7-semester-curriculum");
     conn.release();
   });
-  it("responds with {expectedIdNumeric}", async () => {
+  it(`responds with ${expectedIdNumeric}`, async () => {
     try {
       await users.assignStudentMinor("ABCDEFG", "Electrical Engineering|2015|2016|7-semester-curriculum");
     } catch (error) {
@@ -806,14 +806,14 @@ describe("Tests assign student a minor", () => {
     try {
       await users.assignStudentMinor("100000000", "Electrical Engineering|2015|2016|7-semester-curriculum");
     } catch (error) {
-      assert.equal(error.message, `Student user with student ID 100000000 does not exist!\n`);
+      assert.equal(error.message, `Student user with student ID 100000000 does not exist!`);
     }
   });
   it("responds with curriculum does not exist", async () => {
     try {
       await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|10-semester-curriculum");
     } catch (error) {
-      assert.equal(error.message, `Curriculum with name Electrical Engineering|2015|2016|10-semester-curriculum does not exist!\n`);
+      assert.equal(error.message, `Curriculum with name Electrical Engineering|2015|2016|10-semester-curriculum does not exist!`);
     }
   });
   it("responds with student is already assigned to minor", async () => {
@@ -821,7 +821,7 @@ describe("Tests assign student a minor", () => {
     try {
       await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|7-semester-curriculum");
     } catch (error) {
-      assert.equal(error.message, `Student is already assigned to Electrical Engineering|2015|2016|7-semester-curriculum as a minor\n`);
+      assert.equal(error.message, `Student is already assigned to Electrical Engineering|2015|2016|7-semester-curriculum as a minor`);
     }
   });
   after(async () => {
@@ -956,5 +956,133 @@ describe("Testing Login", () => {
 
   after(async () => {
     await users.deleteStudentUser("team");
+  });
+});
+
+describe("Update student Major", () => {
+  let username = "testuser1";
+  let password = "primus1234";
+  let email = "testing100@gmail.com";
+  let studentId = 250502400;
+  let program = "Software Engineering";
+  let year = "2017";
+  let curr_type = "7-semester-curriculum";
+
+  before(async () => {
+    await users.insertStudentUser(username, password, email, studentId, "Electrical Engineering", 2015, "7-semester-curriculum");
+  });
+
+  it(`responds with ${expectedInvalidIdLength}`, function(done) {
+    users.updateStudentMajor("1234", program, year, curr_type).catch(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response.message, expectedInvalidIdLength);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`responds with ${expectedIdNumeric} 1`, function(done) {
+    users.updateStudentMajor("1234ABDS2", program, year, curr_type).catch(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response.message, expectedIdNumeric);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`responds with ${expectedIdNumeric} 2`, function(done) {
+    users.updateStudentMajor("ab#%@a141", program, year, curr_type).catch(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response.message, expectedIdNumeric);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`responds with ${expectedCurriculumNameEmpty} 1`, function(done) {
+    users.updateStudentMajor(studentId, null, year, curr_type).catch(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response.message, expectedCurriculumNameEmpty);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`responds with ${expectedCurriculumNameEmpty} 2`, function(done) {
+    users.updateStudentMajor(studentId, program, year, null).catch(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response.message, expectedCurriculumNameEmpty);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`responds with ${expectedCurriculumAlphanumeric} 1`, function(done) {
+    users.updateStudentMajor(studentId, "####%%% Engineering", year, curr_type).catch(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response.message, expectedCurriculumAlphanumeric);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`responds with ${expectedCurriculumAlphanumeric} 2`, function(done) {
+    users.updateStudentMajor(studentId, program, year, "**##$%%^ curriculum").catch(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response.message, expectedCurriculumAlphanumeric);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`responds with ${expectedCurriculumYearLength4} 1`, function(done) {
+    users.updateStudentMajor(studentId, program, "111", curr_type).catch(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response.message, expectedCurriculumYearLength4);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`responds with ${expectedCurriculumYearLength4} 2`, function(done) {
+    users.updateStudentMajor(studentId, program, "111111", curr_type).catch(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response.message, expectedCurriculumYearLength4);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`responds with curriculum does not exist 1`, function(done) {
+    let major = "Liberal Arts|2017|2018|7-semester-curriculum";
+    users.updateStudentMajor(studentId, "Liberal Arts", year, curr_type).catch(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response.message, `Curriculum with name ${major} does not exist!`);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`responds with user does not exist 1`, function(done) {
+    let test_id = 299999999;
+    users.updateStudentMajor(test_id, program, year, curr_type).catch(response => {
+      return new Promise(function(resolve) {
+        assert.equal(response.message, `Student user with student ID ${test_id} does not exist!`);
+        resolve();
+      }).then(done);
+    });
+  });
+
+  it(`responds with ${expectedTrue} 1`, async () => {
+    let response = await users.updateStudentMajor(studentId, program, year, curr_type);
+    let results = await users.getStudentData(studentId);
+    let nextYear = (parseInt(year, 10) + 1).toString(10);
+    let major = results.major[0].curriculum_name;
+    assert.equal(major, program.concat("|", year, "|", nextYear, "|", curr_type));
+    assert.equal(response, expectedTrue);
+  });
+
+  after(async () => {
+    await users.deleteStudentUser(username);
   });
 });
