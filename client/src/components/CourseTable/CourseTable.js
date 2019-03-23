@@ -1,3 +1,4 @@
+ /* eslint-disable */
 import React, { Component } from 'react';
 import ExpandableCourse from '../ExpandableCourse/ExpandableCourse';
 import DropDown from '../DropDown/DropDown';
@@ -16,32 +17,73 @@ class CourseTable extends Component {
     super(props);
 
     this.renderCourseTable = this.renderCourseTable.bind(this);
+    this.updateSelectedCourse = this.updateSelectedCourse.bind(this);
+    this.getUniqueCoursesByCode = this.getUniqueCoursesByCode.bind(this);
 
     this.state = {
       useDropdown: props.useDropdown,
-      courses: props.courses,
+      courses: this.getUniqueCoursesByCode(props.courses),
       selectedCourses: [],
+      selectedThing: "",
     };
   }
 
   componentDidMount(){
     this.setState({
-      selectedCourses: Array(this.state.courses.length)
+      selectedCourses: Array(this.state.courses.length).fill("no course selected")
     })
   }
 
-  updateSelectedCourse(selection){
+  getUniqueCoursesByCode(courses){
+    let codes = {}
+    let uniqueCourses = []
+    for(var i = 0; i < courses.length; i++){
+      if (!codes[courses[i].course_code]){
+        uniqueCourses.push(courses[i])
+        codes[courses[i].course_code] = true
+      }
+    }
 
+    return uniqueCourses
+  }
+
+  updateSelectedCourse(selection, index, metaData){ 
+    console.log(metaData)
+
+    let prevSelectedValue = this.state.selectedCourses[index]
+    console.log(prevSelectedValue)
+
+    let newSelection = this.state.selectedCourses
+    newSelection[index] = selection
+    
+    let selectableCourses = this.state.courses
+
+    // make the previously selected value available for selection again
+    // there shouldn't be duplicate courses, so filtering by course code shouldn't be a problem
+    selectableCourses.filter(c => c.course_code === prevSelectedValue).map(course => course.isDisabled = false)
+
+    // make the selected course not selectable anymore to avoid duplicate selection.
+    // if the same value is selected again, it should overwrite the reset operation
+    selectableCourses[parseInt(metaData.key)].isDisabled = true
+   
+
+    this.setState({
+      courses: selectableCourses,
+      selectedCourses: newSelection,
+    })
+
+    
   }
 
   renderCourseTable(props){
     return props.useDropdown
     ?
     <DropDown
-      defaultValue={"fuck"}
-      getValue={() => console.log("s")}
+      defaultValue={this.state.selectedCourses[props.index]}
+      getValueWithIndex={this.updateSelectedCourse}
       menuList={this.state.courses.map(c => c.course_code)}
       className="select"
+      associatedIndex={props.index}
       disabledItems = {this.state.courses.map(c => c.isDisabled)}
     />
     :

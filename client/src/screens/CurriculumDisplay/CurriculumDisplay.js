@@ -49,6 +49,8 @@ class CurriculumDisplay extends Component {
 
         let res = response.data.Response;
         
+        console.log(res)
+
         this.setState({
           curriculumName: res.major[0].curriculum_name,
           completedCourses: this.parseCourseData(
