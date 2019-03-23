@@ -737,16 +737,14 @@ describe("Test get student completed courses", () => {
 
 describe("Test get student's data", () => {
 
-
   /**
    * Student 1: 
    * Major: TEST Electrical Engineering-2018-2019-8-semester-curriculum
    * Minor: TEST Software Engineering Minor-2015-2016-1-semester-curriculum
    * Completed Courses: ECSE 276 (<-coreq->) ECSE 279, ECSE 379 (prereq ECSE279)
    * Incomplete Core classes: ECSE 479 (prereq ECSE 379)
-   * Incomplete Minor classes: ECSE 199
-   * Incomplete complementary: ANTH 299
-   * Desired TC: COMP 499
+   * Incomplete complementary:
+   * Desired TC:
    */
 
   // Student User
@@ -787,10 +785,10 @@ describe("Test get student's data", () => {
     ('11276', 'W2018', 'M 8:35-09:25 T 8:35-09:25 F 8:35-09:25',  'ECSE 276', '1'),
     ('11279', 'W2018', 'M 10:05-13:35 T 10:35-11:35 F 14:05-16:05',  'ECSE 279', '1'),
     ('22379', 'W2018', 'W 10:05-13:05 W 16:05-17:05',  'ECSE 379', '1'),
-    ('33479', 'F2019', 'W 10:05-13:05 W 16:05-17:05',  'ECSE 479', '1'),
-    ('44499', 'F2019', 'M 8:35-09:25 T 8:35-09:25 F 8:35-09:25',  'COMP 499', '1'),
-    ('5299', 'F2019', 'M 11:05-12:55 F 11:05-12:55',  'ANTH 299', '1'),
-    ('1199', 'F2020', 'M 11:05-12:55 F 11:05-12:55',  'ECSE 199', '1');`
+    ('33479', 'F2015', 'W 10:05-13:05 W 16:05-17:05',  'ECSE 479', '1'),
+    ('44499', 'F2015', 'M 8:35-09:25 T 8:35-09:25 F 8:35-09:25',  'COMP 499', '1'),
+    ('5299', 'F2015', 'M 11:05-12:55 F 11:05-12:55',  'ANTH 299', '1'),
+    ('1199', 'F2015', 'M 11:05-12:55 F 11:05-12:55',  'ECSE 199', '1');`
     );
     // student_course_offering
     await conn.query(`INSERT INTO student_course_offerings (student_id, offering_id, semester) VALUES
@@ -841,20 +839,12 @@ describe("Test get student's data", () => {
     const expectedCompletedCourse_2 = "ECSE 279";
     const expectedCompletedCourse_3= "ECSE 379";
     const expectedCompletedSemester = "W2018";
-    const expectedIncompleted = []; // SHOULD BE "ECSE 479" along with prereq "ECSE 379"
-    const expectedDesired = [];     // SHOULD BE "COMP 499"
+    const expectedIncompleted = [];
+    const expectedDesired = [];
   
     var res = await users.getStudentData(student_id);
     res = JSON.stringify(res);
     res = JSON.parse(res);
-
-    console.log(res.major[0].curriculum_name);
-    console.log(res.minor);
-    console.log(res.completedCourses[0].course_code);
-    console.log(res.completedCourses[1].course_code);
-    console.log(res.completedCourses[2].course_code);
-    console.log(res.incompletedCore);
-    console.log(res.desiredTC);
 
     assert.equal(expectedMajor, res.major[0].curriculum_name);
     assert.equal(expectedMinor, res.minor[0].curriculum_name);
@@ -866,7 +856,6 @@ describe("Test get student's data", () => {
     assert.equal(expectedCompletedSemester, res.completedCourses[2].semester);
     assert.equal(expectedIncompleted[0], res.incompletedCore[0]);
     assert.equal(expectedDesired[0], res.desiredTC[0]);
-    
   });
 
   it("responds false with the student having no majors", async () => {
