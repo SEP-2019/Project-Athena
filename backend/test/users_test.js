@@ -737,131 +737,21 @@ describe("Test get student completed courses", () => {
 
 describe("Test get student's data", () => {
 
+
   /**
    * Student 1: 
-   * Major: Electrical Engineering-2018-2019-8-semester-curriculum
-   * Minor: Software Engineering Minor-2015-2016-1-semester-curriculum
+   * Major: TEST Electrical Engineering-2018-2019-8-semester-curriculum
+   * Minor: TEST Software Engineering Minor-2015-2016-1-semester-curriculum
    * Completed Courses: ECSE 276 (<-coreq->) ECSE 279, ECSE 379 (prereq ECSE279)
    * Incomplete Core classes: ECSE 479 (prereq ECSE 379)
    * Incomplete Minor classes: ECSE 199
    * Incomplete complementary: ANTH 299
    * Desired TC: COMP 499
-   * 
-   * Question --> why IncompletedCoreClass + desiredTC have a semester associated to them? (see getStudentData Route)
    */
-  // initialize test data:
 
   // Student User
-  username = "MathieuTest";
-  password = "Mat123!@#";
-  email = "mat.test@mcgill.ca";
-  student_id = "192837465";
+  student_id = "111117465";
 
-  // Courses
-  // ECSE 276 (Coreq with ECSE 279)
-  courseCode_1 = "ECSE 276";
-  title_1 = "Software Design";
-  ecseDepartment = "ECSE";
-  notPhasedOut = 0;
-  description_1 = "Software design and intro on automation testing";
-  credits_3 = 3;
-  // ECSE 279 (Coreq with ECSE 276)
-  courseCode_2 = "ECSE 279";
-  title_2 = "Software Unit Test 1";
-  description_2 = "Test automation continuation";
-  // ECSE 379 - prereq ECSE 279
-  courseCode_3 = "ECSE 379";
-  title_3 = "Software Unit Test 2";
-  description_3 = "Test the integrity of varioud dependent functions";
-  // ECSE 479 (prereq ECSE 379)
-  courseCode_4 = "ECSE 479";
-  title_4 = "Deployement Methodologies";
-  description_4 = "Learning deployement methodologies and practices";
-  // ECSE 499
-  courseCode_5 = "COMP 499";
-  compDepartment = "COMP";
-  title_5 = "Software Techical Complementary";
-  description_5 = "Threads and more";
-  // ANTH 299
-  courseCode_6 = "ANTH 299";
-  anthDepartment = "ANTH";
-  title_6 = "Anthropology development";
-  description_6 = "Anthropology focused on societies";
-  // ECSE 199
-  courseCode_7 = "ECSE 199";
-  title_7 = "Software minor for Electrical";
-  description_7  = "Software Stuff";
-
-  // Course Offering
-  courseOffering = {
-    "ECSE 276": [
-      {
-        id: 11276,
-        semester: "W2018",
-        section: 1,
-        scheduled_time: "M 8:35-09:25 T 8:35-09:25 F 8:35-09:25"
-      }
-    ],
-    "ECSE 279": [
-      {
-        id: 11279,
-        semester: "W2018",
-        section: 1,
-        scheduled_time: "M 10:05-13:35 T 10:35-11:35 F 14:05-16:05"
-      }
-    ],
-    "ECSE 379": [
-      {
-        id: 22379,
-        semester: "W2018",
-        section: 1,
-        scheduled_time: "W 10:05-13:05 W 16:05-17:05"
-      }
-    ],
-    "ECSE 479": [
-      {
-        id: 33479,
-        semester: "F2019",
-        section: 1,
-        scheduled_time: "W 10:05-13:05 W 16:05-17:05"
-      }
-    ],
-    "ECSE 499": [
-      {
-        id: 44499,
-        semester: "F2019",
-        section: 1,
-        scheduled_time: "M 8:35-09:25 T 8:35-09:25 F 8:35-09:25"
-      }
-    ],
-    "ANTH 299": [
-      {
-        id: 5299,
-        semester: "F2019",
-        section: 1,
-        scheduled_time: "M 11:05-12:55 F 11:05-12:55"
-      }
-    ],
-    "ECSE 199": [
-      {
-        id: 1199,
-        semester: "F2020",
-        section: 1,
-        scheduled_time: "M 11:05-12:55 F 11:05-12:55"
-      }
-    ]
-  };
-  // Student course Offering
-  completedCourses = {
-    "ECSE 276": [{"semester": "W2018", "section": 1}],
-    "ECSE 279": [{"semester": "W2018", "section": 1}],
-    "ECSE 379": [{"semester": "W2018", "section": 1}]
-  };
-  // Prereqs
-  prereqs = {
-    "ECSE 379": ["ECSE 279"],
-    "ECSE 479": ["ECSE 379"]
-  };
   // Coreqs
   coreqs = {
     "ECSE 276": ["ECSE 279"]
@@ -869,55 +759,72 @@ describe("Test get student's data", () => {
   //Student Desired Courses (COMP 499)
   desiredCourses = ["COMP 499"];
   // Curriculum
-  majorCurriculumName = "Electrical Engineering Major-2015-2016-8-semester-curriculum";
-  majorCurriculumType = "Major";
-  majorDepartment = "Electrical Engineer"
-  majorNumOfElectives = 1;
-  majorCores = ["ECSE 276", "ECSE 279", "ECSE 379", "ECSE 479"];
-  majorTechComps = ["COMP 499"];
-  majorComps = ["ANTH 299"];
-
-  minorCurriculumName = "Software Engineering Minor-2015-2016-1-semester-curriculum";
-  minorCurriculumType = "Minor";
-  minorDepartment = "Software Engineer"
-  minorNumOfElectives = 0;
-  minorCore = "ECSE 199";
-  //minorTechComps = ["COMP 499"];
-  //minorComps = ["ANTH 299"];
-
-  // curriculum_core_classes / curriculum_tech_comps / curriculum_complementaries
-  // student_majors
-
-  // student_minors
-  
+  majorCurriculumName = "TEST Electrical Engineering Major-2015-2016-8-semester-curriculum";
+  minorCurriculumName = "TEST Software Engineering Minor-2015-2016-1-semester-curriculum"; 
 
   before(async () => {
     // users - students
-    await users.insertStudentUser (username, password, email, student_id);
+    await conn.query(`INSERT INTO users (username, email, password) VALUES
+    ('MatTESTER', 'mat111.test111@mcgill.ca', 'Mat!@#111'),
+    ('noDataTESTER', 'noData11@hotmail.com', 'noData123!@#');`
+    );
+    await conn.query(`INSERT INTO students (student_id, username) VALUES
+    ('111117465', 'MatTESTER'),
+    ('101010101', 'noDataTESTER');`
+    );
     // courses
-    await courses.addCourse(courseCode_1, title_1, ecseDepartment, notPhasedOut, description_1, credits_3);
-    await courses.addCourse(courseCode_2, title_2, ecseDepartment, notPhasedOut, description_2, credits_3);
-    await courses.addCourse(courseCode_3, title_3, ecseDepartment, notPhasedOut, description_3, credits_3);
-    await courses.addCourse(courseCode_4, title_4, ecseDepartment, notPhasedOut, description_4, credits_3);
-    await courses.addCourse(courseCode_5, title_5, compDepartment, notPhasedOut, description_5, credits_3);
-    await courses.addCourse(courseCode_6, title_6, anthDepartment, notPhasedOut, description_6, credits_3);
-    await courses.addCourse(courseCode_7, title_7, ecseDepartment, notPhasedOut, description_7, credits_3);
+    await conn.query(`INSERT INTO courses (course_code, title, department, phased_out, description, credits) VALUES
+    ('ECSE 276', 'Software Design', 'ECSE', '0', 'Software design and intro on automation testing', '3'),
+    ('ECSE 279', 'Software Unit Test 1', 'ECSE', '0', 'Test automation continuation', '3'),
+    ('ECSE 379', 'Software Unit Test 2', 'ECSE', '0', 'Test the integrity of varioud dependent functions', '3'),
+    ('ECSE 479', 'Deployement Methodologies', 'ECSE', '0', 'Learning deployement methodologies and practices', '3'),
+    ('COMP 499', 'Software Techical Complementary', 'COMP', '0', 'Threads and more', '3'),
+    ('ANTH 299', 'Anthropology development', 'ANTH', '0', 'Anthropology focused on societies', '3'),
+    ('ECSE 199', 'Software minor for Electrical', 'ECSE', '0', 'Software Stuff', '3');`
+    );
     // course_offering
-    await courses.addCourseOfferings(courseOffering);
-    // student_course_offering (or use courses.addCompletedCourses())
-    await courses.addCompletedCourses(student_id, completedCourses);
+    await conn.query(`INSERT INTO course_offerings (id, semester, scheduled_time, course_code, section) VALUES
+    ('11276', 'W2018', 'M 8:35-09:25 T 8:35-09:25 F 8:35-09:25',  'ECSE 276', '1'),
+    ('11279', 'W2018', 'M 10:05-13:35 T 10:35-11:35 F 14:05-16:05',  'ECSE 279', '1'),
+    ('22379', 'W2018', 'W 10:05-13:05 W 16:05-17:05',  'ECSE 379', '1'),
+    ('33479', 'F2019', 'W 10:05-13:05 W 16:05-17:05',  'ECSE 479', '1'),
+    ('44499', 'F2019', 'M 8:35-09:25 T 8:35-09:25 F 8:35-09:25',  'COMP 499', '1'),
+    ('5299', 'F2019', 'M 11:05-12:55 F 11:05-12:55',  'ANTH 299', '1'),
+    ('1199', 'F2020', 'M 11:05-12:55 F 11:05-12:55',  'ECSE 199', '1');`
+    );
+    // student_course_offering
+    await conn.query(`INSERT INTO student_course_offerings (student_id, offering_id, semester) VALUES
+    ('111117465', '11276', 'W2018'),
+    ('111117465', '11279', 'W2018'),
+    ('111117465', '22379', 'W2018');`
+    );
     // course_prereqs
-    await courses.addPrereq(prereqs);
+    await conn.query(`INSERT INTO course_prereqs (course_code, prereq_course_code) VALUES
+    ('ECSE 379', 'ECSE 279'),
+    ('ECSE 479', 'ECSE 379');`
+    );    
     // course_coreqs
     await courses.addCoreq(coreqs);
     // student_desired_courses
     await courses.saveUserPreferences(student_id, desiredCourses);
     // curriculums / curriculum_core_classes / curriculum_tech_comps / curriculum_complementaries
-    await curriculums.createCurriculum (majorCurriculumName, majorCurriculumType, majorDepartment, majorNumOfElectives, majorCores, majorTechComps, majorComps);
-    await conn.query(`INSERT INTO curriculums (curriculum_name, type, department, numOfElectives) VALUES(?, ?, ?, ?);`,
-    [minorCurriculumName, minorCurriculumType, minorDepartment, minorNumOfElectives]);
-    await conn.query("INSERT INTO curriculum_core_classes (curriculum_name, course_code) VALUES(?, ?);",
-    [minorCurriculumName, minorCore]);
+    await conn.query(`INSERT INTO curriculums (curriculum_name, type, department, numOfElectives) VALUES
+    ('TEST Electrical Engineering Major-2015-2016-8-semester-curriculum', 'Major', 'ee', '1'),
+    ('TEST Software Engineering Minor-2015-2016-1-semester-curriculum', 'Minor', 'se', '0');`
+    );
+    await conn.query(`INSERT INTO curriculum_core_classes (curriculum_name, course_code) VALUES
+    ('TEST Electrical Engineering Major-2015-2016-8-semester-curriculum', 'ECSE 276'),
+    ('TEST Electrical Engineering Major-2015-2016-8-semester-curriculum', 'ECSE 279'),
+    ('TEST Electrical Engineering Major-2015-2016-8-semester-curriculum', 'ECSE 379'),
+    ('TEST Electrical Engineering Major-2015-2016-8-semester-curriculum', 'ECSE 479'),
+    ('TEST Software Engineering Minor-2015-2016-1-semester-curriculum', 'ECSE 199');`
+    );
+    await conn.query(`INSERT INTO curriculum_tech_comps (curriculum_name, course_code) VALUES
+    ('TEST Electrical Engineering Major-2015-2016-8-semester-curriculum', 'COMP 499');`
+    );
+    await conn.query(`INSERT INTO curriculum_complementaries (curriculum_name, course_code) VALUES
+    ('TEST Electrical Engineering Major-2015-2016-8-semester-curriculum', 'ANTH 299');`
+    );
     // student_majors
     await conn.query("INSERT INTO student_majors (student_id, curriculum_name) VALUES(?, ?);",
     [student_id, majorCurriculumName]);
@@ -926,70 +833,82 @@ describe("Test get student's data", () => {
     [student_id, minorCurriculumName]);
   });
 
+  it("responds with true indicating that the student data was obtained", async () => {
+    /*
+    const expected = {
+      "major":[{"curriculum_name":"TEST Electrical Engineering Major-2015-2016-8-semester-curriculum"}],
+      "minor":[{"curriculum_name":"TEST Software Engineering Minor-2015-2016-1-semester-curriculum"}],
+      "completedCourses":[{"course_code":"ECSE 276","semester":"W2018"},{"course_code":"ECSE 279","semester":"W2018"},{"course_code":"ECSE 379","semester":"W2018"}],
+      "incompletedCore":[{"course_code":"ECSE 479"}],
+      "desiredTC":[{"course_code":"COMP 499"}]
+    };
+    */
+    /*
+    const expected = {
+      "major":[{"curriculum_name":"TEST Electrical Engineering Major-2015-2016-8-semester-curriculum"}],
+      "minor":[{"curriculum_name":"TEST Software Engineering Minor-2015-2016-1-semester-curriculum"}],
+      "completedCourses":[{"course_code":"ECSE 276","semester":"W2018"},{"course_code":"ECSE 279","semester":"W2018"},{"course_code":"ECSE 379","semester":"W2018"}],
+      "incompletedCore":[],
+      "desiredTC":[]
+    };
+    */
 
-  // --- TESTS ---
+    const expected = {"major":[{"curriculum_name":"TEST Electrical Engineering Major-2015-2016-8-semester-curriculum"}],"minor":[{"curriculum_name":"TEST Software Engineering Minor-2015-2016-1-semester-curriculum"}],"completedCourses":[{"course_code":"ECSE 276","semester":"W2018"},{"course_code":"ECSE 279","semester":"W2018"},{"course_code":"ECSE 379","semester":"W2018"}],"incompletedCore":[],"desiredTC":[]};
+   
+    const res = await users.getStudentData(student_id);
 
+    assert.equal(expected, JSON.stringify(res));
+  });
+
+  it("responds false with the student having no majors", async () => {
+    const expected = "Error: Student does not have any majors";
+    try {
+      await users.getStudentData(student_id);
+    } catch (err) {
+      res = err;
+      assert.equal(res, expected);
+    }
+  });
 
   after(async () => {
     // student_minors
-    await conn.query(`DELETE FROM student_minors WHERE student_id = ?;`,[student_id]);
+    await conn.query(`DELETE FROM student_minors WHERE student_id = ?;`, [student_id]);
     // student_majors
-    await conn.query(`DELETE FROM student_majors WHERE student_id = ?;`,[student_id]);
+    await conn.query(`DELETE FROM student_majors WHERE student_id = ?;`, [student_id]);
     // curriculums / curriculum_core_classes / curriculum_tech_comps / curriculum_complementaries
-    await conn.query(`DELETE FROM curriculum_core_classes WHERE curriculum_name = ?;`,[minorCurriculumName]);
-    await conn.query(`DELETE FROM curriculums WHERE curriculum_name = ?;`,[minorCurriculumName]);
-
-    await conn.query(`DELETE FROM curriculum_complementaries WHERE curriculum_name = ?;`,[majorCurriculumName]);
-    await conn.query(`DELETE FROM curriculum_tech_comps WHERE curriculum_name = ?;`,[majorCurriculumName]);
-    await conn.query(`DELETE FROM curriculum_core_classes WHERE curriculum_name = ?;`,[majorCurriculumName]);
-    await conn.query(`DELETE FROM curriculums WHERE curriculum_name = ?;`,[majorCurriculumName]);
+    await conn.query(`DELETE FROM curriculum_complementaries WHERE curriculum_name = ?;`, [majorCurriculumName]);
+    await conn.query(`DELETE FROM curriculum_tech_comps WHERE curriculum_name = ?;`, [majorCurriculumName]);
+    await conn.query(`DELETE FROM curriculum_core_classes WHERE curriculum_name IN 
+    ('TEST Software Engineering Minor-2015-2016-1-semester-curriculum', 'TEST Electrical Engineering Major-2015-2016-8-semester-curriculum');`
+    );
+    await conn.query(`DELETE FROM curriculums WHERE curriculum_name IN 
+    ('TEST Software Engineering Minor-2015-2016-1-semester-curriculum', 'TEST Electrical Engineering Major-2015-2016-8-semester-curriculum');`
+    );
     // student_desired_courses
     await conn.query(`DELETE FROM student_desired_courses WHERE student_id = ?;`,[student_id]);
     // course_coreqs
     await conn.query(`DELETE FROM course_coreqs WHERE course_code = ?;`, ["ECSE 276"]);
-    //await conn.query(`DELETE FROM course_coreqs WHERE course_code = ?;`, ["ECSE 279"]); (not sure if needed)
     // course_prereqs
-    await conn.query(`DELETE FROM course_prereqs WHERE course_code = ?;`, ["ECSE 379"]);
-    await conn.query(`DELETE FROM course_prereqs WHERE course_code = ?;`, ["ECSE 479"]);
+    await conn.query(`DELETE FROM course_prereqs WHERE course_code IN 
+    ('ECSE 379', 'ECSE 479');`
+    );
     // student_course_offering
     await conn.query(`DELETE FROM student_course_offerings WHERE student_id = ?;`, [student_id]);
     // course_offerings
-    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [11276]);
-    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [11279]);
-    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [22379]);
-    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [33479]);
-    await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [44499]);
+    await conn.query(`DELETE FROM course_offerings WHERE id IN 
+    ('11276', '11279', '22379', '33479', '44499', '5299', '1199');`
+    );
     // courses
-    await conn.query(
-      `DELETE FROM courses WHERE course_code = ?;`,
-      [courseCode_1]
-    );
-    await conn.query(
-      `DELETE FROM courses WHERE course_code = ?;`,
-      [courseCode_2]
-    );
-    await conn.query(
-      `DELETE FROM courses WHERE course_code = ?;`,
-      [courseCode_3]
-    );
-    await conn.query(
-      `DELETE FROM courses WHERE course_code = ?;`,
-      [courseCode_4]
-    );
-    await conn.query(
-      `DELETE FROM courses WHERE course_code = ?;`,
-      [courseCode_5]
-    );
-    await conn.query(
-      `DELETE FROM courses WHERE course_code = ?;`,
-      [courseCode_6]
-    );
-    await conn.query(
-      `DELETE FROM courses WHERE course_code = ?;`,
-      [courseCode_7]
+    await conn.query(`DELETE FROM courses WHERE course_code IN 
+    ('ECSE 276', 'ECSE 279', 'ECSE 379', 'ECSE 479', 'COMP 499', 'ANTH 299', 'ECSE 199');`
     );
     // users - students
-    await users.deleteStudentUser(username);
+    await conn.query(`DELETE FROM students WHERE student_id IN 
+    ('111117465', '101010101');`
+    );
+
+    await conn.query(`DELETE FROM users WHERE username IN 
+    ('MatTESTER', 'noDataTESTER');`
+    );
   });
 });
-
