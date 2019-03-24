@@ -315,7 +315,8 @@ var updateCourse = async (
   newTitle,
   newDescription,
   newCredits,
-  newTags
+  newTags,
+  phasedOut
 ) => {
   format.verifyCourseCode(course);
   format.verifyCredits(newCredits);
@@ -336,8 +337,8 @@ var updateCourse = async (
     }
 
     await connection.query(
-      "UPDATE courses SET title = ?, description = ?, credits = ? WHERE course_code = ?;",
-      [newTitle, newDescription, newCredits, course]
+      "UPDATE courses SET title = ?, description = ?, credits = ?,phased_out=? WHERE course_code = ?;",
+      [newTitle, newDescription, newCredits, phasedOut, course]
     );
     await connection.commit();
     return true;
