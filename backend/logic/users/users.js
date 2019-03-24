@@ -146,7 +146,7 @@ var getStudentData = async studentID => {
   let completedCourses, major, minors;
   try {
     completedCourses = await conn.query(
-    `SELECT course_offerings.course_code, course_offerings.semester, 
+      `SELECT course_offerings.course_code, course_offerings.semester, 
             courses.title, courses.description, courses.credits
     FROM course_offerings
     JOIN courses ON (course_offerings.course_code = courses.course_code)
@@ -224,12 +224,15 @@ var getStudentData = async studentID => {
         WHERE course_code = ?;`,
         [c.course_code]
       );
-      c.description = await conn.query(
+      let course_info = await conn.query(
         `SELECT description, title, credits
         FROM courses
         WHERE course_code = ?;`,
         [c.course_code]
       );
+      c.description = course_info[0].description;
+      c.title = course_info[0].title;
+      c.credits = course_info[0].credits;
     }
 
     for (let i = 0; i < desiredTC.length; i++) {
@@ -246,12 +249,15 @@ var getStudentData = async studentID => {
         WHERE course_code = ?;`,
         [c.course_code]
       );
-      c.description = await conn.query(
+      let course_info = await conn.query(
         `SELECT description, title, credits
         FROM courses
         WHERE course_code = ?;`,
         [c.course_code]
       );
+      c.description = course_info[0].description;
+      c.title = course_info[0].title;
+      c.credits = course_info[0].credits;
     }
 
     conn.release();
@@ -301,15 +307,8 @@ var login = async (username, password) => {
 };
 
 var assignStudentMinor = async (studentID, minor) => {
-  let error = false;
-
   format.verifyStudentId(studentID);
   format.verifyCurriculumName(minor);
-
-  if (!error == false) {
-    console.error(error);
-    throw new Error(error);
-  }
 
   let ifUserExist;
   let ifMinorExist;
@@ -328,11 +327,11 @@ var assignStudentMinor = async (studentID, minor) => {
   }
 
   if (ifUserExist[0].count === 0) {
-    throw Error(`Student user with student ID ${studentID} does not exist!\n`);
+    throw Error(`Student user with student ID ${studentID} does not exist!`);
   } else if (ifMinorExist[0].count === 0) {
-    throw Error(`Curriculum with name ${minor} does not exist!\n`);
+    throw Error(`Curriculum with name ${minor} does not exist!`);
   } else if (existingMinor[0].count !== 0 && existingMinor[0].curriculum_name === minor) {
-    throw Error(`Student is already assigned to ${minor} as a minor\n`);
+    throw Error(`Student is already assigned to ${minor} as a minor`);
   }
 
   conn = await mysql.getNewConnection();
@@ -344,12 +343,54 @@ var assignStudentMinor = async (studentID, minor) => {
       await conn.query("UPDATE student_minors SET curriculum_name = ? WHERE student_id = ?", [minor, studentID]);
     }
     await conn.commit();
+    return true;
   } catch (err) {
     await conn.rollback();
     console.log(err);
     throw new Error("Internal Server Error!\n");
   } finally {
     conn.release();
+  }
+};
+
+var updateStudentMajor = async (student_id, program, year, curr_type) => {
+  format.verifyStudentId(student_id);
+  format.verifyCurriculumName(program);
+  format.verifyYear(year);
+  format.verifyCurriculumName(curr_type);
+
+  let nextYear = (parseInt(year, 10) + 1).toString(10);
+  let major = program.concat("|", year, "|", nextYear, "|", curr_type);
+
+  let conn = await mysql.getNewConnection();
+  let ifUserExist;
+  let ifMajorExist;
+  try {
+    ifUserExist = await conn.query(`SELECT COUNT(*) AS count FROM students WHERE student_id = ?;`, [student_id]);
+    ifMajorExist = await conn.query(`SELECT COUNT(*) AS count FROM curriculums WHERE curriculum_name = ?;`, [major]);
+  } catch (err) {
+    console.log(err);
+    throw Error("Internal Server Error!\n");
+  } finally {
+    conn.release();
+  }
+
+  if (ifUserExist[0].count === 0) {
+    throw Error(`Student user with student ID ${student_id} does not exist!`);
+  } else if (ifMajorExist[0].count === 0) {
+    throw Error(`Curriculum with name ${major} does not exist!`);
+  }
+  let connection = await mysql.getNewConnection();
+  try {
+    await connection.beginTransaction();
+    await connection.query("UPDATE student_majors SET curriculum_name = ? WHERE student_id = ?", [major, student_id]);
+    await connection.commit();
+    return true;
+  } catch (error) {
+    connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
   }
 };
 
@@ -361,5 +402,6 @@ module.exports = {
   getCompletedCourses,
   login,
   getStudentData,
-  assignStudentMinor
+  assignStudentMinor,
+  updateStudentMajor
 };

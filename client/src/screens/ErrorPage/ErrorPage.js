@@ -9,7 +9,11 @@ class ErrorPage extends Component {
     const code = this.props.location.state.error_code;
     return (
       <div className="error_div">
-        <img className="error_cat" src={'https://http.cat/' + code} />
+        <img
+          className="error_cat"
+          alt={code + ' Error Page'}
+          src={'https://http.cat/' + code}
+        />
       </div>
     );
   }

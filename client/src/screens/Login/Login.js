@@ -6,7 +6,7 @@ import LoginForm from '../../components/LoginForm';
 class Login extends Component {
   state = {
     text:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
+      'Project Athena is an ECSE course recommendation system to help ECSE students determine which courses they are eligible to register for based on their current status or search criteria. The goal is to help create a guide on which courses to take according to the current pre/co-requisites the student has and the desired career path they would like to pursue.',
   };
 
   render() {
@@ -27,7 +27,7 @@ class Login extends Component {
         >
           <Section className="description">{this.state.text}</Section>
           <Section className="form">
-            <LoginForm />
+            <LoginForm setEmail={this.props.setEmail} />
           </Section>
         </Section>
         <Section className="footer" />

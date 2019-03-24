@@ -186,6 +186,20 @@ router.get(
 );
 
 /**
+ * @api {get} /getAllCourseOfferings
+ * @apiDescription gets all course offerings stored within the database
+ * @apiExample {curl} Example usage: GET /courses/getAllCourseOfferings
+ * @author: Steven Li
+ */
+router.get(
+  "/getAllCourseOfferings",
+  asyncMiddleware(async (req, res, next) => {
+    let result = await courses.getAllCourseOfferings();
+    res.send(customResponse(result));
+  })
+);
+
+/**
  * @api {post} /addCoreq
  * @apiDescription This endpoint will add coreqs
  * @apiExample {curl} Example usage:

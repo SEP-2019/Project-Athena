@@ -159,7 +159,44 @@ router.post(
  * 		curl -X GET -H "Content-Type: application/json" 'http://localhost:3000/users/getStudentData?studentID=12345'
  *
  * @returns An json of major, minors, completed courses, incompleted core classes and desired tech comps offered next semester,
- *  e.g {"major":[{"curriculum_name":"eeElectrical Engineering-2018-2019-8-semester-curriculum"}],"minor":[],"completedCourses":[{"course_code":"ECSE 428","semester":"winter"}],"incompletedCore":[{"course_code":"ECSE 202","prereqs":[],"coreqs":[],"semester":""}],"desiredTC":[{"course_code":"ECSE 403","prereqs":[{"prereq_course_code":"ECSE 307"}],"coreqs":[],"semester":""}]}
+ * e.g: "major": [
+            {
+                "curriculum_name": "Electrical Engineering|2017|2018|7-semester-curriculum"
+            }
+        ],
+        "minor": [],
+        "completedCourses": [],
+        "incompletedCore": [
+            {
+                "course_code": "CCOM 206",
+                "semester": "W2019",
+                "prereqs": [],
+                "coreqs": [],
+                "description": "Communication (SCS): Written and oral communication in Engineering (in English): strategies for generating, developing, organizing, and presenting ideas in a technical setting; problem-solving; communicating to different audiences; editing and revising; and public speaking. Course work based on academic, technical, and professional writing in engineering.       Offered by: McGill Writing Centre",
+                "title": "Communication in Engineering",
+                "credits": 3
+            }],
+        "desiredTC": [
+            {
+                "course_code": "ECSE 310",
+                "semester": "W2019",
+                "prereqs": [
+                    {
+                        "prereq_course_code": "ECSE 200"
+                    },
+                    {
+                        "prereq_course_code": "ECSE 205"
+                    },
+                    {
+                        "prereq_course_code": "ECSE 222"
+                    }
+                ],
+                "coreqs": [],
+                "description": "Electrical Engineering: An introduction to thermodynamics from the perspective of computer engineering. The first and second laws of thermodynamics; elementary information theory (bits, entropy); energy storage and dissipation in electrical circuits; effects of noise in switching circuits; the fluctuation-dissipation theorem; Landauer’s principle; reversible and irreversible computation; energy costs of communication; thermal resistance, heat sinking, and cooling technologies for computing circuits.       Offered by: Electrical & Computer Engr",
+                "title": "Thermodynamics of Computing",
+                "credits": 3
+            }]
+
  *
  * @author: Feras Al Taha
  *
@@ -195,19 +232,48 @@ router.get(
  *
  */
 
-router.post("/assignStudentMinor", async (req, res) => {
-  const studentID = req.query.studentID;
-  const minor = req.query.minor;
-  try {
-    await users.assignStudentMinor(studentID, minor);
-    res.status(200).send(true);
-  } catch (error) {
-    if (err.message === "Internal Server Error!\n") {
-      res.status(500).send(err.message);
-    } else {
-      res.status(400).send(err.message);
-    }
-  }
-});
+router.post(
+  "/assignStudentMinor",
+  asyncMiddleware(async (req, res) => {
+    const studentID = req.body.studentID;
+    const minor = req.body.minor;
+    let result = users.assignStudentMinor(studentID, minor);
+    res.send(customResponse(result));
+  })
+);
+
+/**
+ *
+ * @api {post} /updateStudentMajor
+ * @apiDescription update a student's major curriculum
+ * @apiParam (body) {Integer} studentID, {string} program, {Integer} year, {string} curr_type
+ * @apiExample {curl} Example usage:
+ *	curl -X POST \
+ *  -H 'Content-Type: application/json' \
+ *  -d '{"studentID": 260678788, "program": "Software Engineering", "year": 2017, "curr_type": "7-semester-curriculum"}' \
+ *  http://localhost:3001/courses/updateStudentMajor
+ *
+ * @returns True on success
+ *          invalid student ID
+ *          invalid curriculum name
+ *          invalid year
+ *          student does not exist
+ *          curriculum does not exist
+ *
+ * @author: Gareth Peters
+ *
+ */
+
+router.post(
+  "/updateStudentMajor",
+  asyncMiddleware(async (req, res, next) => {
+    const student_id = req.body.studentID;
+    const program = req.body.program;
+    const year = req.body.year;
+    const curr_type = req.body.curr_type;
+    let result = await users.updateStudentMajor(student_id, program, year, curr_type);
+    res.send(customResponse(result));
+  })
+);
 
 module.exports = router;

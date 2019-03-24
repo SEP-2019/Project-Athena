@@ -8,6 +8,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { Link } from 'react-router-dom';
+
 import MenuButton from '../MenuButton/MenuButton';
 import './LeftDrawer.css';
 
@@ -40,12 +41,12 @@ class LeftDrawer extends React.Component {
             src="https://static.myfigurecollection.net/pics/figure/big/105649.jpg"
             style={{ width: 60, height: 60 }}
           />
-          <p className="Temporary_Drawer_User_Name">James McGill</p>
+          <p className="Temporary_Drawer_User_Name">{this.props.email}</p>
         </div>
         <Divider />
         <List>
           {this.props.pages.map((page, i) => (
-            <Link to={page.path} key={i} className="link">
+            <Link to={page.path} key={i} style={{ textDecoration: 'none' }}>
               <ListItem button>
                 <ListItemIcon>
                   <img
