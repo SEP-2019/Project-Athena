@@ -6,7 +6,6 @@ import Api from '../../services/Api';
 import * as validation from './Validation';
 import history from '../../history';
 
-const tempYears = ['2014', '2015', '2016', '2017', '2018', '2019'];
 const tempCurriculum = ['7 semesters', '8 semesters'];
 const tempMajors = ['Computer', 'Electrical', 'Software'];
 
@@ -25,7 +24,9 @@ class SignupContent extends Component {
       selectedMajor: '',
       selectedYear: '',
       selectedCurriculum: '',
+      startYear: '',
       errorMessage: '',
+      years: [],
       usernameError: false,
       emailError: false,
       passwordError: false,
@@ -51,6 +52,21 @@ class SignupContent extends Component {
         this.setError('MAJOR' + this.state.selectedMajor);
       }
     );
+  }
+
+  async getYears() {
+    try {
+      let url = 'curriculums/getCurriculumData';
+      let r = await Api().get(url);
+      let response = r.data.Response;
+      this.setState({
+        years: response,
+      });
+    } catch (e) {
+      alert(
+        'There has been an error while loading your page \nPlease try again later.'
+      );
+    }
   }
 
   sendSignUpRequest() {
@@ -152,6 +168,10 @@ class SignupContent extends Component {
     this.setState({ [name]: value });
   }
 
+  componentDidMount() {
+    this.getYears();
+  }
+
   render() {
     return (
       <Section className="form" flexDirection="column">
@@ -220,7 +240,7 @@ class SignupContent extends Component {
           &nbsp;
           <DropDown
             label="Start year *"
-            menuList={tempYears}
+            menuList={this.state.years}
             name="selectedYear"
             defaultValue={this.state.selectedYear}
             onChange={this.handleInputChange}

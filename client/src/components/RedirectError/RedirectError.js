@@ -13,7 +13,10 @@ function RedirectError(error) {
   } else {
     return history.push({
       pathname: '/Error',
-      state: { error_code: '500', error_message: error.message },
+      state: {
+        error_code: '500',
+        error_message: error.message,
+      },
     });
   }
 }
