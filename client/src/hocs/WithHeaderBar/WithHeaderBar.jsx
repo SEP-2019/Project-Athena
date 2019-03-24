@@ -1,7 +1,7 @@
 import * as React from 'react';
 import HeaderBar from '../../components/HeaderBar';
 import Cookies from 'universal-cookie';
-import { customHistory as history } from '../../';
+import history from '../../history';
 
 export default Component => {
   class WithHeaderBar extends React.PureComponent {

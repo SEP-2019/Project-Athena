@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
+
 import CourseRegistration from './screens/CourseRegistration';
 import CourseSuggestion from './screens/CourseSuggestion';
 import Login from './screens/Login';
+import ErrorPage from './screens/ErrorPage';
 import CurriculumDisplay from './screens/CurriculumDisplay';
 import './App.css';
 
@@ -15,7 +17,7 @@ class App extends Component {
           // render={props => <Login setEmail={this.setEmail} {...props} />}
           render={props => <Login {...props} />}
         />
-        <Route
+        {/* <Route
           path="/courseregistration"
           render={props => (
             <CourseRegistration
@@ -41,7 +43,11 @@ class App extends Component {
               {...props}
             />
           )}
-        />
+        /> */}
+        <Route path="/courseregistration" component={CourseRegistration} />
+        <Route path="/curriculumdisplay" component={CurriculumDisplay} />
+        <Route path="/Home" component={CourseSuggestion} />
+        <Route path="/Error" component={ErrorPage} />
         <Redirect to="/login" />
       </Switch>
     );

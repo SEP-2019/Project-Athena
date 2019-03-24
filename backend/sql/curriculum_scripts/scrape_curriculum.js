@@ -25,7 +25,7 @@ const curriculum_URL = String(process.argv[2]);
 const tech_comps_URL = String(process.argv[3]);
 
 /*
-Example input 
+Example input
 curriculum: 2018-2019-electrical-engineering-7-semester-curriculum
 tech comps: 2018-2019-electrical-eng-technical-complementaries
 */
@@ -98,21 +98,30 @@ async function store_curriculum(curriculum) {
     courses.forEach(async course => {
       //Stores the courses
       await connection.query(
-        "INSERT INTO courses (course_code,title,department,description,credits) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
+        "INSERT INTO courses (course_code,title,department,description,credits) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE description=?,credits=?;",
         [
           course.course_code,
           course.course_title,
           course.department,
           course.course_description,
+          course.credits,
+          course.course_description,
           course.credits
         ]
       );
 
-      //Links the courses to the current curriculum
-      await connection.query(
-        "INSERT INTO curriculum_core_classes (curriculum_name,course_code) VALUES(?,?);",
+      let curriculum_core_classes = await connection.query(
+        "SELECT COUNT(*) AS count FROM curriculum_core_classes WHERE curriculum_name = ? AND course_code = ?;",
         [curriculum_name, course.course_code]
       );
+
+      if (curriculum_core_classes[0].count == 0) {
+        //Links the courses to the current curriculum
+        await connection.query(
+          "INSERT INTO curriculum_core_classes (curriculum_name,course_code) VALUES(?,?);",
+          [curriculum_name, course.course_code]
+        );
+      }
 
       //Links the corresponding prereqs with the main courses
       course.prereqs.forEach(async prereq => {
@@ -140,10 +149,21 @@ async function store_curriculum(curriculum) {
       // Create course offerings
       for (let year = 2010; year < 2020; year++) {
         for (let i = 0; i < course.semesters.length; i++) {
-          await connection.query(
-            "INSERT INTO course_offerings (semester, scheduled_time, course_code, section) VALUES (?, ?, ?, ?);",
-            [course.semesters[i] + year, "Not available", course.course_code, 1]
+          let result = await connection.query(
+            "SELECT COUNT(*) AS count FROM course_offerings WHERE course_code = ? AND semester = ?;",
+            [course.course_code, course.semesters[i] + year]
           );
+          if (result[0].count == 0) {
+            await connection.query(
+              "INSERT INTO course_offerings (semester, scheduled_time, course_code, section) VALUES (?, ?, ?, ?);",
+              [
+                course.semesters[i] + year,
+                "Not available",
+                course.course_code,
+                1
+              ]
+            );
+          }
         }
       }
     });
@@ -152,15 +172,29 @@ async function store_curriculum(curriculum) {
     tech_comps.forEach(async tech_comp => {
       //Insert tech comps into courses
       await connection.query(
-        "INSERT INTO courses (course_code,title,department) VALUES(?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-        [tech_comp.course_code, tech_comp.course_title, tech_comp.department]
+        "INSERT INTO courses (course_code, title, department, description, credits) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE description=?,credits=?;",
+        [
+          tech_comp.course_code,
+          tech_comp.course_title,
+          tech_comp.department,
+          tech_comp.description,
+          tech_comp.credits,
+          tech_comp.description,
+          tech_comp.credits
+        ]
       );
 
-      //Associate the tech comps with a certain curriculum
-      await connection.query(
-        "INSERT INTO curriculum_tech_comps (curriculum_name,course_code) VALUES(?,?);",
+      let curriculum_tech_comps = await connection.query(
+        "SELECT COUNT(*) AS count FROM curriculum_tech_comps WHERE curriculum_name = ? AND course_code = ?;",
         [curriculum_name, tech_comp.course_code]
       );
+      if (curriculum_tech_comps[0].count == 0) {
+        //Associate the tech comps with a certain curriculum
+        await connection.query(
+          "INSERT INTO curriculum_tech_comps (curriculum_name,course_code) VALUES(?,?);",
+          [curriculum_name, tech_comp.course_code]
+        );
+      }
 
       //Links the corresponding prereqs with the tech comps
       tech_comp.prereqs.forEach(async prereq => {
@@ -254,14 +288,15 @@ async function parse_courses(url, property) {
               .find(".course_number")
               .text()
               .replace(/\s\d*/g, ""),
-            credits: $(course_element).find(".course_credits")
-              ? parseInt(
-                  $(course_element)
-                    .find(".course_credits")
-                    .text()
-                    .match(/[0-9]{1}/g)
-                )
-              : 0,
+            credits:
+              $(course_element).find(".course_credits").length != 0
+                ? parseInt(
+                    $(course_element)
+                      .find(".course_credits")
+                      .text()
+                      .match(/[0-9]{1}/g)
+                  )
+                : 0,
             semesters: parse_semester(
               $(course_element).find("li.course_terms > ul > li")
             )

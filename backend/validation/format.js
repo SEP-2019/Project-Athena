@@ -9,7 +9,6 @@ const MAX_EMAIL_LENGTH = 384;
 const ID_LENGTH = 9;
 const MAX_ID = 2147483647;
 const MAX_DESCRIPTION_LENGTH = 1000;
-const YEAR_LENGTH = 4;
 
 /**
  * Verifies that the input only contains alphanumeric values

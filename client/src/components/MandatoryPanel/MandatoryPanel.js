@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 
 import CompleteCourseList from '../CompleteCourseList/CompleteCourseList';
+import RedirectError from '../RedirectError/RedirectError';
+import Api from '../../services/Api';
 import './MandatoryPanel.css';
-
-const url = 'http://localhost:3001';
 
 class MandatoryPanel extends Component {
   state = {
@@ -20,11 +19,10 @@ class MandatoryPanel extends Component {
   };
 
   fetchCourses = async () => {
-    const response = await axios
-      .get(`${url}/courses/getAllCourses`)
+    const response = await Api()
+      .get(`courses/getAllCourses`)
       .catch(error => {
-        console.error(error);
-        this.setState({ coursesAreLoading: false });
+        RedirectError(error);
       });
     if (response) {
       this.setState({
