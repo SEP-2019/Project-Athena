@@ -9,6 +9,7 @@ class TagList extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      hasButtons: props.hasButtons !== undefined ? props.hasButtons : true,
       tags: props.tags.slice(),
     };
   }
@@ -68,6 +69,20 @@ class TagList extends Component {
     }
   };
 
+  renderButtons = () => {
+    if (this.state.hasButtons){
+      return <div className="btn_container">
+        <button className="btn" onClick={this.onClearAll}>
+          CLEAR FILTERS
+        </button>
+        <button className="btn" onClick={this.onApply}>
+          APPLY COURSES
+        </button>
+      </div>
+    }
+    return null
+  }
+
   render() {
     return (
       <form className="interest_selection">
@@ -86,14 +101,7 @@ class TagList extends Component {
               />
             ))}
           </div>
-          <div className="btn_container">
-            <button className="btn" onClick={this.onClearAll}>
-              CLEAR FILTERS
-            </button>
-            <button className="btn" onClick={this.onApply}>
-              APPLY COURSES
-            </button>
-          </div>
+          <this.renderButtons/>
         </div>
       </form>
     );
