@@ -108,11 +108,11 @@ class CurriculumDisplay extends Component {
           hasPrereqs =
             group[k][i].prereqs === undefined || group[k][i].prereqs.length <= 0
               ? true
-              : group[k][i].prereqs.every(prereq => {
+              : group[k][i].prereqs.every(prereq => 
                   completedCourses.some(
                     c => c.course_code === prereq.prereq_course_code
-                  );
-                });
+                  )
+                )
         } catch (error) {
           console.log(error);
         }
@@ -182,10 +182,11 @@ class CurriculumDisplay extends Component {
           <this.renderLoadingMessage message={this.state.loadingMessage} />
           <this.renderInstructions message={this.state.instructions} />
           <div className="curriculum-content">
-            <div className="semester-course-display" key="Completed Courses">
+            <div className="semester-course-display row" key="Completed Courses">
               {this.state.completedCourses.map((completedSemester, index) => (
-                <div key={'Complete__' + index}>
-                  <div className="semester-name" key={'Completed_' + index}>
+                <div key={"Complete__" + index} className="column">
+                  <div className="semester-name" key={"Completed_" + index}>
+
                     {completedSemester.semester}
                   </div>
                   <div
@@ -204,11 +205,11 @@ class CurriculumDisplay extends Component {
               ))}
             </div>
 
-            <div className="semester-course-display" key="Incomplete Courses">
-              {/* make the selectable courses for then incomplete semesters the union of incomplete courses and desired TCs */}
+            <div className="semester-course-display row" key="Incomplete Courses">
+            {/* make the selectable courses for then incomplete semesters the union of incomplete courses and desired TCs */}
               {this.state.incompleteCourses.map((incompleteSemester, index) => (
-                <div key={'Incomplete__' + index}>
-                  <div className="semester-name" key={'Incomplete_' + index}>
+                <div key={"Incomplete__" + index} className="column">
+                  <div className="semester-name" key={"Incomplete_" + index}>
                     {incompleteSemester.semester}
                   </div>
                   <div

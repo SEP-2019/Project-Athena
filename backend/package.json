@@ -5,26 +5,20 @@
   "scripts": {
     "start": "node ./bin/www",
     "start-server": "npm start",
-    "test": "mocha",
-    "ci": "start-server-and-test start-server http://localhost:3001 test"
+    "test": "mocha"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
-    "chai": "^4.2.0",
     "cheerio": "^1.0.0-rc.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
-    "jest": "^24.1.0",
     "mocha": "^5.2.0",
     "morgan": "~1.9.0",
     "mysql": "^2.16.0",
-    "nock": "^10.0.6",
     "nodemon": "^1.18.10",
     "request": "^2.88.0",
-    "request-promise": "^4.2.4",
-    "start-server-and-test": "^1.7.11",
-    "supertest": "^3.4.2"
+    "request-promise": "^4.2.4"
   }
 }
