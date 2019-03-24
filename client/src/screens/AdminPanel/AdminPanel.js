@@ -166,12 +166,19 @@ class AdminPanel extends Component {
   onEdit() {
     console.log(this.state.courseToEdit);
     //TODO
-    // Api()
-    //   .post('/courses/addCompletedCourses', completedCourses)
-    //   .then(res => {
-    //     console.log(res);
-    //   })
-    //   .catch(error => console.log('ERROR', error));
+
+    let updatedCourse = {
+      course: this.state.courseToEdit.course_code,
+      new_title: this.state.courseToEdit.title,
+      new_description: this.state.courseToEdit.description,
+      new_credits: this.state.courseToEdit.credits,
+      //new_tags: ['Software', 'Engineering'], //TODO
+    };
+
+    Api()
+      .post('/courses/updateCourse', updatedCourse)
+      .then(res => console.log(res))
+      .catch(error => console.log('ERROR', error));
   }
 
   onAdd() {
@@ -181,21 +188,28 @@ class AdminPanel extends Component {
       console.log('invalid course code');
     }
 
-    //TODO
     let newCourse = {
-      courseCode: 'ECSE 428',
-      title: 'Software Engineering Practice',
-      departement: 'ECSE',
-      phasedOut: '0',
-      description: 'Practice in software',
-      credits: 3,
+      courseCode: this.state.courseToEdit.course_code,
+      title: this.state.courseToEdit.title,
+      departement: this.state.courseToEdit.course_code.substring(0, 4),
+      phasedOut: '0', //TODO checkbox
+      description: this.state.courseToEdit.description,
+      credits: this.state.courseToEdit.credits,
     };
 
     Api()
       .post('/courses/createCourse', newCourse)
-      .then(res => {
-        console.log(res);
-      })
+      .then(res => console.log(res))
+      .catch(error => console.log('ERROR', error));
+
+    let newTags = {
+      courseCode: this.state.courseToEdit.course_code,
+      //tags: //TODO
+    };
+
+    Api()
+      .post('/courses/assignTagsToCourse', newTags)
+      .then(res => console.log(res))
       .catch(error => console.log('ERROR', error));
   }
 
