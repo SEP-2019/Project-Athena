@@ -5,11 +5,13 @@ import WithHeaderBar from '../../hocs/WithHeaderBar';
 import CourseRegistrationItem from './CourseRegistrationItem/CourseRegistrationItem';
 import DropDown from '../../components/DropDown';
 import SearchBar from '../../components/SearchBar';
+import Loading from '../../components/Loading';
 
 class CourseRegistration extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      studentId: 444444444,
       allCourses: [], // list of all courses to select
       semesters: [], // list of all semesters to select
       selectedSearch: {}, // selected course (updates on hover)
@@ -22,7 +24,6 @@ class CourseRegistration extends Component {
     this.onSelectCourse = this.onSelectCourse.bind(this);
     this.onSelectFromSearch = this.onSelectFromSearch.bind(this);
     this.removeCourse = this.removeCourse.bind(this);
-    this.findSemesters = this.findSemesters.bind(this);
     this.fetchAllCourses = this.fetchAllCourses.bind(this);
     this.fetchUserData = this.fetchUserData.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
@@ -58,15 +59,23 @@ class CourseRegistration extends Component {
       };
       return {
         selectedCourses: [...prevState.selectedCourses, selection],
+        disabledButton: false,
       };
     });
   }
 
   // Called on click of a search suggestion, updates the selected course
   onSelectFromSearch(selection) {
-    this.setState({ selectedSearch: selection }); // this is where the warning appears
+    // Sorts the semesters
+    let sortedSemesters = selection.semesters;
+    sortedSemesters.sort((a, b) => {
+      return a.charAt(1).localeCompare(b.charAt(1));
+    });
 
-    // TODO: generate the semesters
+    this.setState({
+      selectedSearch: selection,
+      semesters: sortedSemesters,
+    }); // this is where the warning appears :(
   }
 
   // Removes the course from the selected courses list
@@ -75,36 +84,16 @@ class CourseRegistration extends Component {
       selectedCourses: prevState.selectedCourses.filter(
         (_, i) => i !== courseIndex
       ),
+      disabledButton: false,
     }));
-  }
-
-  // Returns the semesters displayed in the drop down
-  findSemesters(startYear) {
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    let year = startYear;
-    let semesters = [];
-    for (year; year <= currentYear; year++) {
-      if (year === startYear) {
-        semesters.push('F' + year.toString());
-      } else if (year === currentYear) {
-        semesters.push('W' + year.toString());
-        if (today.getMonth() > 8) {
-          semesters.push('F' + year.toString());
-        }
-      } else {
-        semesters.push('W' + year.toString());
-        semesters.push('F' + year.toString());
-      }
-    }
-    this.setState({ loading: false });
-    return semesters;
   }
 
   // TODO: remove harcoded student id
   // TODO: get base URL by importing from a base instance
   fetchUserData = async () => {
-    return await Api().get('/users/getStudentData?studentID=999999999');
+    return await Api().get(
+      `/users/getStudentData?studentID=${this.state.studentId}`
+    );
   };
 
   fetchAllCourses = async () => {
@@ -115,20 +104,31 @@ class CourseRegistration extends Component {
     this.fetchUserData()
       .then(response => {
         let userData = response.data.Response;
-        const major = userData.major[0].curriculum_name;
-        // find start year of the student
-        const year = parseInt(major.split('|')[1]);
-        this.setState({ semesters: this.findSemesters(year) });
-        //TODO: Save the completedCourses and display them
+        // Sets the already previously selected completed courses
+        this.setState({
+          selectedCourses: userData.completedCourses,
+          loading: false,
+        });
       })
       .catch(error => console.log('ERROR', error));
 
-    // this.fetchAllCourses()
-    //   .then(response => {
-    //     let courseData = response.data.Response;
-    //     this.setState({ allCourses: courseData });
-    //   })
-    //   .catch(error => console.log('ERROR', error));
+    this.fetchAllCourses()
+      .then(response => {
+        let courseData = response.data.Response;
+
+        // convert course list to array
+        let courseArray = [];
+        for (var key in courseData) {
+          const course = {
+            course_code: key,
+            title: courseData[key].title,
+            semesters: courseData[key].semesters,
+          };
+          courseArray.push(course);
+        }
+        this.setState({ allCourses: courseArray });
+      })
+      .catch(error => console.log('ERROR', error));
   }
 
   // Formats the courses for the POST request
@@ -142,21 +142,20 @@ class CourseRegistration extends Component {
 
   // POST request to save the completed courses
   onClickSave() {
+    this.setState({ disabledButton: true });
     let completedCourses = {
       courses: this.formatCompletedCourses(this.state.selectedCourses),
-      student_id: 260485294,
+      student_id: this.state.studentId,
     };
 
-    console.log(completedCourses);
+    console.log(JSON.stringify(completedCourses));
 
     Api()
-      .post('/courses/addCompletedCourses', {
-        completedCourses,
-      })
+      .post('/courses/addCompletedCourses', completedCourses)
       .then(res => {
         console.log(res);
-        console.log(res.data);
-      });
+      })
+      .catch(error => console.log('ERROR', error));
   }
 
   render() {
@@ -176,35 +175,32 @@ class CourseRegistration extends Component {
                 data={allCourses}
                 getValue={this.onSelectFromSearch}
               />
-              {this.state.loading ? (
-                <div className="animation-wrapper">
-                  <div className="lds-ellipsis">
-                    <div />
-                    <div />
-                    <div />
-                    <div />
-                  </div>
-                </div>
-              ) : (
-                <DropDown
-                  defaultValue={this.state.selectedSemester}
-                  getValue={this.updateSelectedSemester}
-                  menuList={semesters}
-                  className="select"
-                />
-              )}
+              <DropDown
+                defaultValue={this.state.selectedSemester}
+                getValue={this.updateSelectedSemester}
+                menuList={semesters}
+                className="select"
+              />
             </div>
           </div>
           <div className="selected-size-frame">
             <ul className="selected-side">
-              {this.state.selectedCourses.map((el, index) => (
-                <CourseRegistrationItem
-                  key={index}
-                  course={el}
-                  index={index}
-                  onCancel={this.removeCourse}
-                />
-              ))}
+              {this.state.loading ? (
+                <div className="animation-wrapper">
+                  <Loading />
+                </div>
+              ) : (
+                <>
+                  {this.state.selectedCourses.map((el, index) => (
+                    <CourseRegistrationItem
+                      key={index}
+                      course={el}
+                      index={index}
+                      onCancel={this.removeCourse}
+                    />
+                  ))}
+                </>
+              )}
             </ul>
             <div className="selection-save">
               <button
