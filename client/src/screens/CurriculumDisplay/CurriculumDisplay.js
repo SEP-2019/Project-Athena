@@ -48,8 +48,6 @@ class CurriculumDisplay extends Component {
 
         let res = response.data.Response;
         
-        console.log(res)
-
         this.setState({
           curriculumName: res.major[0].curriculum_name,
           completedCourses: this.parseCourseData(
@@ -87,8 +85,6 @@ class CurriculumDisplay extends Component {
   parseCourseData(data, key, completedCourses = []) {
     let group = _.groupBy(data, key);
 
-    console.log(completedCourses)
-
     let courses = Object.keys(group).map(function(k) {
       for(var i = 0; i < group[k].length; i++){
         let hasPrereqs = false
@@ -111,10 +107,7 @@ class CurriculumDisplay extends Component {
         group[k][i].isDisabled = !hasPrereqs
       }
 
-      console.log(group[k])
       group[k].map(course => course.displayMember = course.course_code + " - " + course.description[0].title)
-
-      console.log(group[k])
 
       return { semester: k, courses: group[k] };
     });
