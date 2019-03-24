@@ -158,7 +158,7 @@ var getAllCourseOfferings = async () => {
   );
 
   let course_offerings = await connection.query(
-    "SELECT course_code, semester FROM course_offerings"
+    "SELECT course_code, semester FROM course_offerings;"
   );
 
   for (let i = 0; i < courses.length; i++) {
@@ -168,10 +168,14 @@ var getAllCourseOfferings = async () => {
   }
 
   for (let i = 0; i < course_offerings.length; i++) {
-    result[course_offerings[i].course_code].semesters.push(
-      course_offerings[i].semester
-    );
+    try {
+      result[course_offerings[i].course_code].semesters.push(
+        course_offerings[i].semester
+      );
+    } catch (e) {}
   }
+
+  connection.release();
   return result;
 };
 
