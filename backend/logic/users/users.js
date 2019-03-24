@@ -224,12 +224,15 @@ var getStudentData = async studentID => {
         WHERE course_code = ?;`,
         [c.course_code]
       );
-      c.description = await conn.query(
+      let course_info = await conn.query(
         `SELECT description, title, credits
         FROM courses
         WHERE course_code = ?;`,
         [c.course_code]
       );
+      c.description = course_info[0].description;
+      c.title = course_info[0].title;
+      c.credits = course_info[0].credits;
     }
 
     for (let i = 0; i < desiredTC.length; i++) {
@@ -246,12 +249,15 @@ var getStudentData = async studentID => {
         WHERE course_code = ?;`,
         [c.course_code]
       );
-      c.description = await conn.query(
+      let course_info = await conn.query(
         `SELECT description, title, credits
         FROM courses
         WHERE course_code = ?;`,
         [c.course_code]
       );
+      c.description = course_info[0].description;
+      c.title = course_info[0].title;
+      c.credits = course_info[0].credits;
     }
 
     conn.release();
