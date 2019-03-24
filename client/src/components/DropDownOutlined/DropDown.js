@@ -38,9 +38,8 @@ const styles = theme => ({
   },
 });
 
-class NativeSelects extends React.Component {
+class DropDown extends React.Component {
   state = {
-    age: '',
     labelWidth: 0,
   };
 
@@ -50,9 +49,9 @@ class NativeSelects extends React.Component {
     });
   }
 
-  handleChange = name => event => {
-    this.setState({ [name]: event.target.value });
-  };
+  handleChange(event) {
+    this.props.onChange(event);
+  }
 
   render() {
     const { classes } = this.props;
@@ -70,11 +69,11 @@ class NativeSelects extends React.Component {
               {this.props.label}
             </InputLabel>
             <Select
-              value={this.state.age}
-              onChange={this.handleChange('age')}
+              value={this.props.defaultValue}
+              onChange={e => this.handleChange(e)}
+              name={this.props.name}
               input={
                 <OutlinedInput
-                  name="age"
                   labelWidth={this.state.labelWidth}
                   id="outlined-age-native-simple"
                 />
@@ -93,9 +92,13 @@ class NativeSelects extends React.Component {
   }
 }
 
-NativeSelects.propTypes = {
-  classes: PropTypes.object.isRequired,
+DropDown.propTypes = {
+  // Array of strings to appear in the menu of the drop down
   menuList: PropTypes.arrayOf(PropTypes.string),
+  // Passes the value to the parent
+  onChange: PropTypes.func,
+  // Initial default value of the dropdown
+  defaultValue: PropTypes.string,
 };
 
-export default withStyles(styles)(NativeSelects);
+export default withStyles(styles)(DropDown);

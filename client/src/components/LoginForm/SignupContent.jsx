@@ -22,12 +22,16 @@ class SignupContent extends Component {
       email: '',
       password: '',
       confirmPassword: '',
+      selectedMajor: '',
+      selectedYear: '',
+      selectedCurriculum: '',
       errorMessage: '',
       usernameError: false,
       emailError: false,
       passwordError: false,
       confirmError: false,
     };
+
     this.handleInputChange = this.handleInputChange.bind(this);
     this.onSignUp = this.onSignUp.bind(this);
   }
@@ -43,7 +47,8 @@ class SignupContent extends Component {
         errorMessagere: '',
       },
       () => {
-        this.sendSignUpRequest();
+        // this.sendSignUpRequest();
+        this.setError('MAJOR' + this.state.selectedMajor);
       }
     );
   }
@@ -197,11 +202,29 @@ class SignupContent extends Component {
           />
         </Section>
         <Section className="subform" flexDirection="row">
-          <DropDown label="ECSE major *" menuList={tempMajors} />
+          <DropDown
+            label="ECSE major *"
+            menuList={tempMajors}
+            name="selectedMajor"
+            defaultValue={this.state.selectedMajor}
+            onChange={this.handleInputChange}
+          />
           &nbsp;
-          <DropDown label="Curriculum *" menuList={tempCurriculum} />
+          <DropDown
+            label="Curriculum *"
+            menuList={tempCurriculum}
+            name="selectedCurriculum"
+            defaultValue={this.state.selectedCurriculum}
+            onChange={this.handleInputChange}
+          />
           &nbsp;
-          <DropDown label="Start year *" menuList={tempYears} />
+          <DropDown
+            label="Start year *"
+            menuList={tempYears}
+            name="selectedYear"
+            defaultValue={this.state.selectedYear}
+            onChange={this.handleInputChange}
+          />
         </Section>
         <span className="note">
           Note. Your student ID will be your username.
