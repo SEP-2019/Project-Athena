@@ -23,6 +23,9 @@ class AdminPanel extends Component {
       selectedSearch: {}, // selected course (updates on hover)
       loading: true,
       tags: [],
+      inc: 0,
+      tagsAreLoading: true,
+      checkedTagsSet: new Set(),
       placeHolder: 'Type a course number',
     };
 
@@ -32,6 +35,8 @@ class AdminPanel extends Component {
     this.handleSwitchView = this.handleSwitchView.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.fetchTags = this.fetchTags.bind(this);
+    this.fetchTagsByCourse = this.fetchTagsByCourse.bind(this);
+    this.renderTagsBox = this.renderTagsBox.bind(this);
   }
 
   // Called on click of a search suggestion, updates the selected course
@@ -70,6 +75,9 @@ class AdminPanel extends Component {
   handleSwitchView = view => {
     this.setState({
       view: view,
+      // in the case of edit, only set the tagsAreLoading flag to false once the checked tags are fetched
+      tagsAreLoading: view === "edit",
+      inc: this.state.inc + 1,
     });
   };
 
@@ -82,7 +90,6 @@ class AdminPanel extends Component {
     if (response) {
       this.setState({
         tags: this.addCheckedProperty(response.data.Response),
-        tagsAreLoading: false,
       });
     }
   };
@@ -90,18 +97,25 @@ class AdminPanel extends Component {
   fetchTagsByCourse = async () => {
     const response = await Api()
       .get(
-        `tags/getTagByCourse?studentID=${this.state.selectedSearch.course_code}`
+        `courses/getTagByCourse?course_code=${this.state.selectedSearch.course_code}`
       )
       .catch(error => {
         // RedirectError(error); //TODO
       });
     if (response) {
-      console.log(response)
-      //TODO go through this.state.tags and mark checked to true for the tags in response.data.Response
-      // this.setState({
-      //   tags: this.addCheckedProperty(response.data.Response),
-      //   tagsAreLoading: false,
-      // });
+      let courseTags = response.data.Response
+      let checkedTags = this.state.tags
+
+      // check the tags that are fetched from the endpoint
+      checkedTags
+        .filter(tag => courseTags.some(t => t.tag_name === tag.name))
+        .map(tag => tag.checked = true)
+      
+      this.setState({
+        tags: checkedTags,
+        tagsAreLoading: false,
+        checkedTagsSet: new Set(this.state.tags.filter(t => t.checked === true).map(t => t.name)),
+      })
     }
   };
 
@@ -111,7 +125,11 @@ class AdminPanel extends Component {
       this.setState({ placeHolder: 'Select a course to edit!' });
     }
     //TODO
-    else this.handleSwitchView('edit');
+    else {
+      console.log("switching to edit view")
+      this.handleSwitchView('edit')
+      this.fetchTagsByCourse()
+    }
   }
 
   handleInputChange(event = {}) {
@@ -140,13 +158,15 @@ class AdminPanel extends Component {
     //   .catch(error => console.log('ERROR', error));
   }
 
-  renderTagsBox = props => {
+  renderTagsBox(props) {
+    let checked = new Set(this.state.tags.filter(t => t.checked === true).map(t => t.name))
+
     return !props.tagsAreLoading ? (
       <TagList
         hasButtons={false}
-        tags={props.tags}
+        tags={this.state.tags}
         applySelection={this.applySelection}
-        checkedTags={new Set()}
+        checkedTags={this.state.checkedTagsSet}
         updateTagsCheckedState={this.updateTagsCheckedState}
       />
     ) : (
@@ -177,7 +197,7 @@ class AdminPanel extends Component {
             />
 
             <div className="tags-container">
-              <this.renderTagsBox tags={tags} tagsAreLoading={tagsAreLoading} />
+              <this.renderTagsBox tags={this.state.tags} tagsAreLoading={tagsAreLoading} />
             </div>
 
             {/* Buttons */}
