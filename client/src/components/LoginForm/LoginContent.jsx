@@ -5,6 +5,7 @@ import Api from '../../services/Api';
 import './LoginForm.css';
 import * as validation from './Validation';
 import * as login from '../../services/Login';
+import Cookies from 'universal-cookie';
 import history from '../../history';
 
 const LOGIN_URL = 'users/login';
@@ -71,7 +72,9 @@ class LoginContent extends Component {
         .then(response => {
           // Save email & redirect
           console.log(response);
-          this.props.setEmail(response.data.Response);
+          const cookies = new Cookies();
+          cookies.set('studentId', this.state.username, { path: '/' });
+          cookies.set('email', response.data.Response, { path: '/' });
           this.redirect();
         })
         .catch(loginError => {

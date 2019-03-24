@@ -22,6 +22,22 @@ router.get(
   })
 );
 
+/**
+ * @api {get} /getCourseByTag
+ * @apiDescription get list of tags for a course
+ * @apiParam (query) {string} course code
+ * @apiExample {curl} Example usage: GET /courses/getCourseByTag?course_code=ECSE+428
+ * @author: Steven Li
+ */
+router.get(
+  "/getTagByCourse",
+  asyncMiddleware(async function(req, res, next) {
+    let courseCode = req.query.course_code;
+    let result = await courses.getTagByCourse(courseCode);
+    res.send(customResponse(result));
+  })
+);
+
 /*
 * @api {post} /createCourse
 * @apiDescription This endpoint will add a course
@@ -65,14 +81,7 @@ router.post(
     const phasedOut = req.body.phasedOut;
     const description = req.body.description;
     const credits = req.body.credits;
-    let result = await courses.addCourse(
-      courseCode,
-      title,
-      departement,
-      phasedOut,
-      description,
-      credits
-    );
+    let result = await courses.addCourse(courseCode, title, departement, phasedOut, description, credits);
     res.send(customResponse(result));
   })
 );
@@ -291,6 +300,8 @@ router.post(
  *	   {
  *       "course": "ECSE 428",
  *       "new_title": "Software Engineering in Practice",
+ *       "new_description": "Some description about the course",
+ *       "new_credits": 3,
  *       "new_tags": ["Software", "Engineering"]
  *     }
  * Curl:
@@ -300,6 +311,8 @@ router.post(
  *	-d '{
  *       "course": "ECSE 428",
  *       "new_title": "Software Engineering in Practice",
+ *       "new_description": "Some description about the course",
+ *       "new_credits": 3,
  *       "new_tags": ["Software", "Engineering"]
  *     }'
  *
@@ -316,10 +329,14 @@ router.post(
   asyncMiddleware(async (req, res, next) => {
     let course = req.body.course;
     let newTitle = req.body.new_title;
+    let newDescription = req.body.new_description;
+    let newCredits = req.body.new_credits;
 
     let result = await courses.updateCourse(
       course,
       newTitle,
+      newDescription,
+      newCredits,
       req.body.new_tags
     );
     res.send(customResponse(result));
@@ -334,17 +351,20 @@ router.post(
         Host: localhost:3001
         Content-Type: application/json
         {
-          "course_code" : "ECSE 428"
+          "course_code" : "ECSE 428",
+          "phasedOut" : "0"
         }
  * @Returns true if successful
  * @throws error if MySQL connection failed
  *         invalid format course code if course code format is incorrect
- * @author: Alex Lam
+ * @author: Alex Lam + Gareth Peters
  */
 router.post(
   "/phaseOutCourse",
   asyncMiddleware(async (req, res, next) => {
-    let result = await courses.phaseOutCourse(req.body.course_code);
+    course_code = req.body.course_code;
+    phaseOut = req.body.phasedOut;
+    let result = await courses.phaseOutCourse(course_code, phasedOut);
     res.send(customResponse(result));
   })
 );
@@ -376,11 +396,7 @@ router.post(
     const courseCode = req.body.courseCode;
     const curriculum = req.body.curriculum;
 
-    let response = await courses.assignCourseToCurriculum(
-      courseType,
-      courseCode,
-      curriculum
-    );
+    let response = await courses.assignCourseToCurriculum(courseType, courseCode, curriculum);
     res.send(customResponse(response));
   })
 );

@@ -104,7 +104,10 @@ var addCompletedCourses = async (studentId, courses) => {
 
     await connection.beginTransaction();
 
-    await connection.query("DELETE FROM student_course_offerings WHERE student_id = ?;", studentId);
+    await connection.query(
+      "DELETE FROM student_course_offerings WHERE student_id = ?;",
+      studentId
+    );
 
     // Insert each course of the student into the database. If a course does not exist then
     // throw an error.
@@ -291,18 +294,27 @@ var addPrereq = async prereq => {
 };
 
 /**
- * Updates a course title and its tags
+ * Updates a course title, description, credits and its tags
  * @author Steven Li
  * @param {string} course
  * @param {string} newTitle
+ * @param {string} newDescription
+ * @param {string} newCredits
  * @param {array} newTags
  * @returns true if insertion was successful
  * @throws error if MySQL connection failed
  *         invalid format course code if the course code is invalid
  *         false if insertion failed
  */
-var updateCourse = async (course, newTitle, newTags) => {
+var updateCourse = async (
+  course,
+  newTitle,
+  newDescription,
+  newCredits,
+  newTags
+) => {
   format.verifyCourseCode(course);
+  format.verifyCredits(newCredits);
   let connection = await mysql.getNewConnection();
 
   try {
@@ -320,8 +332,8 @@ var updateCourse = async (course, newTitle, newTags) => {
     }
 
     await connection.query(
-      "UPDATE courses SET title = ? WHERE course_code = ?;",
-      [newTitle, course]
+      "UPDATE courses SET title = ?, description = ?, credits = ? WHERE course_code = ?;",
+      [newTitle, newDescription, newCredits, course]
     );
     await connection.commit();
     return true;
@@ -335,22 +347,54 @@ var updateCourse = async (course, newTitle, newTags) => {
 
 /**
  * Phases out a course that is no longer offered
- * @author Alex Lam
- * @param {string} courseCode
+ * @author Alex Lam + Gareth Peters
+ * @param {string} courseCode,
+ * @param {string} phasedOut
  * @returns true if successful
  * @throws error if MySQL connection failed
  *         invalid format course code if course code format is incorrect
  */
-let phaseOutCourse = async courseCode => {
-  let connection = await mysql.getNewConnection();
+let phaseOutCourse = async (courseCode, phasedOut) => {
+  // Verifying proper format
+  if (phasedOut === undefined) {
+    phasedOut = "0";
+  }
   format.verifyCourseCode(courseCode);
+  format.verifyPhaseOut(phasedOut);
+
+  let connection = await mysql.getNewConnection();
 
   try {
     await connection.query(
-      "UPDATE courses SET phased_out = TRUE WHERE course_code = ?",
-      courseCode
+      "UPDATE courses SET phased_out = ? WHERE course_code = ?",
+      [phasedOut, courseCode]
     );
     return true;
+  } catch (error) {
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
+
+/**
+ * Returns an array of tags for the given course code.
+ * @author Steven Li
+ * @param {string} courseCode
+ * @returns An array of tags by course code
+ * @throws error if MySQL connection failed
+ *         invalid format course code if course code format is incorrect
+ */
+var getTagByCourse = async courseCode => {
+  format.verifyCourseCode(courseCode);
+  let connection = await mysql.getNewConnection();
+
+  try {
+    let result = await connection.query(
+      "SELECT tag_name FROM course_tags WHERE course_code = ?;",
+      [courseCode]
+    );
+    return result;
   } catch (error) {
     throw error;
   } finally {
@@ -491,6 +535,7 @@ var saveUserPreferences = async (student_id, courses) => {
 
 module.exports = {
   getCourseByTag,
+  getTagByCourse,
   addCourse,
   addCompletedCourses,
   addCourseOfferings,
