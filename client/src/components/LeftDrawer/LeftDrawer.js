@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 
 import MenuButton from '../MenuButton/MenuButton';
 import './LeftDrawer.css';
+import Cookies from 'universal-cookie';
 
 const styles = {
   list: {
@@ -27,6 +28,13 @@ class LeftDrawer extends React.Component {
     this.setState({
       openDrawer: open,
     });
+  };
+
+  logout = () => {
+    console.log('Logging out');
+    const cookies = new Cookies();
+    cookies.remove('studentId', '/');
+    cookies.remove('email', '/');
   };
 
   render() {
@@ -59,6 +67,18 @@ class LeftDrawer extends React.Component {
               </ListItem>
             </Link>
           ))}
+          <Link to={'/login'} key={4} style={{ textDecoration: 'none' }}>
+            <ListItem button onClick={this.logout}>
+              <ListItemIcon>
+                <img
+                  alt="for pages"
+                  src="http://mawarupenguindrum.moonfruit.fr/communities/5/000/001/348/125/images/1860781.png"
+                  style={{ width: 30, height: 30 }}
+                />
+              </ListItemIcon>
+              <ListItemText primary={'Logout'} />
+            </ListItem>
+          </Link>
         </List>
       </div>
     );

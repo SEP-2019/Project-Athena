@@ -11,7 +11,7 @@ class CourseRegistration extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      studentId: 444444444,
+      studentId: null,
       allCourses: [], // list of all courses to select
       semesters: [], // list of all semesters to select
       selectedSearch: {}, // selected course (updates on hover)
@@ -101,34 +101,44 @@ class CourseRegistration extends Component {
   };
 
   componentDidMount() {
-    this.fetchUserData()
-      .then(response => {
-        let userData = response.data.Response;
-        // Sets the already previously selected completed courses
-        this.setState({
-          selectedCourses: userData.completedCourses,
-          loading: false,
-        });
-      })
-      .catch(error => console.log('ERROR', error));
+    this.setState(
+      {
+        studentId: this.props.studentId,
+      },
+      () => {
+        console.log('this is a state', this.state);
+        console.log('this is a prop', this.props.studentId);
 
-    this.fetchAllCourses()
-      .then(response => {
-        let courseData = response.data.Response;
+        this.fetchUserData()
+          .then(response => {
+            let userData = response.data.Response;
+            // Sets the already previously selected completed courses
+            this.setState({
+              selectedCourses: userData.completedCourses,
+              loading: false,
+            });
+          })
+          .catch(error => console.log('ERROR', error));
 
-        // convert course list to array
-        let courseArray = [];
-        for (var key in courseData) {
-          const course = {
-            course_code: key,
-            title: courseData[key].title,
-            semesters: courseData[key].semesters,
-          };
-          courseArray.push(course);
-        }
-        this.setState({ allCourses: courseArray });
-      })
-      .catch(error => console.log('ERROR', error));
+        this.fetchAllCourses()
+          .then(response => {
+            let courseData = response.data.Response;
+
+            // convert course list to array
+            let courseArray = [];
+            for (var key in courseData) {
+              const course = {
+                course_code: key,
+                title: courseData[key].title,
+                semesters: courseData[key].semesters,
+              };
+              courseArray.push(course);
+            }
+            this.setState({ allCourses: courseArray });
+          })
+          .catch(error => console.log('ERROR', error));
+      }
+    );
   }
 
   // Formats the courses for the POST request

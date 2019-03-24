@@ -1,18 +1,32 @@
 import * as React from 'react';
 import HeaderBar from '../../components/HeaderBar';
+import Cookies from 'universal-cookie';
+import history from '../../history';
 
 export default Component => {
   class WithHeaderBar extends React.PureComponent {
-    componentWillReceiveProps(nextProps) {
-      console.log(this.props);
-      console.log(nextProps);
+    constructor(props) {
+      super(props);
+      this.cookies = new Cookies();
+      this.state = {
+        studentId: this.cookies.get('studentId'),
+        email: this.cookies.get('email'),
+      };
+      if (
+        typeof this.state.studentId === 'undefined' ||
+        typeof this.state.email === 'undefined'
+      )
+        history.push('/login');
+
+      console.log(this.state.email);
+      console.log(this.state.studentId);
     }
 
     render() {
       return (
         <>
-          <HeaderBar email={this.props.responseEmail} />
-          <Component {...this.props} />
+          <HeaderBar email={this.state.email} />
+          <Component studentId={this.state.studentId} {...this.props} />
         </>
       );
     }
