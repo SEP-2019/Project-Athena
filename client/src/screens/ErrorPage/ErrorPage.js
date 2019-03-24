@@ -5,9 +5,9 @@ import './ErrorPage.css';
 
 class ErrorPage extends Component {
   render() {
-    let location = this.props;
+    const { location } = this.props;
     let code = '404';
-    let message = 'Not Found';
+    let message = 'Page Not Found';
     if (location.state) {
       code = location.state.error_code;
       message = location.state.error_message;
