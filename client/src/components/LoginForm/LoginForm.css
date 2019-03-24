@@ -3,6 +3,7 @@
   background-color: #b20007;
   color: white;
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
 
   font-weight: 600;
 }
@@ -11,6 +12,7 @@
   margin-block-start: 1.5vh;
   background-color: white;
   color: #b20007;
+  cursor: pointer;
 
   font-weight: 400;
 }
@@ -24,6 +26,7 @@
   margin-inline-start: 1vh;
   color: blue;
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .note {

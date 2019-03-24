@@ -232,10 +232,11 @@ var getStudentData = async studentID => {
     let incompleteCore = await conn.query(
       `SELECT course_code, semester 
       FROM course_offerings 
-      WHERE (id 
-              NOT IN (SELECT offering_id 
-                      FROM student_course_offerings 
-                      WHERE student_id = ?)) 
+      WHERE (course_code 
+        NOT IN (SELECT co.course_code 
+        FROM student_course_offerings sco 
+        join course_offerings co 
+        on sco.offering_id = co.id WHERE student_id = ?))
       AND (semester = ? OR semester = ?) 
       AND (course_code 
           IN (SELECT course_code 

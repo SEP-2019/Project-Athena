@@ -7,6 +7,7 @@ import * as validation from './Validation';
 import Cookies from 'universal-cookie';
 import history from '../../history';
 
+const HOME_URL = '/courseRegistration';
 const LOGIN_URL = 'users/login';
 
 class LoginContent extends Component {
@@ -41,14 +42,15 @@ class LoginContent extends Component {
     if (this.isInputValid()) {
       Api()
         .post(LOGIN_URL, {
-          username: this.state.username,
+          username: this.state.username.replace(/\s/g, ''),
           password: this.state.password,
         })
         .then(response => {
-          // Save email & redirect
-          console.log(response);
+          // Save email, student ID & redirect
           const cookies = new Cookies();
-          cookies.set('studentId', this.state.username, { path: '/' });
+          cookies.set('studentId', this.state.username.replace(/\s/g, ''), {
+            path: '/',
+          });
           cookies.set('email', response.data.Response, { path: '/' });
           this.redirect();
         })
@@ -79,11 +81,11 @@ class LoginContent extends Component {
   }
 
   redirect = () => {
-    history.push('/courseregistration');
+    history.push(HOME_URL);
   };
 
   isInputValid() {
-    var id = this.state.username;
+    var id = this.state.username.replace(/\s/g, '');
     var password = this.state.password;
     var isValid = true;
 
