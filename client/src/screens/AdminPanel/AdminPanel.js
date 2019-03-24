@@ -120,7 +120,9 @@ class AdminPanel extends Component {
       let checkedTags = this.state.tags;
 
       // check the tags that are fetched from the endpoint
-      checkedTags.map(tag => tag.checked = courseTags.some(t => t.tag_name === tag.name))
+      checkedTags.map(
+        tag => (tag.checked = courseTags.some(t => t.tag_name === tag.name))
+      );
 
       this.setState({
         tags: checkedTags,
@@ -134,7 +136,6 @@ class AdminPanel extends Component {
 
   onEditView() {
     if (typeof this.state.selectedSearch.course_code === 'undefined') {
-      console.log('empty bar! Dont switch view');
       this.setState({ placeHolder: 'Select a course to edit!' });
     } else {
       this.setState(prevState => ({
@@ -157,7 +158,6 @@ class AdminPanel extends Component {
   }
 
   updateTagsCheckedState = newTags => {
-    console.log(newTags);
     this.setState({ tags: newTags });
   };
 
@@ -170,7 +170,7 @@ class AdminPanel extends Component {
       new_title: this.state.courseToEdit.title,
       new_description: this.state.courseToEdit.description,
       new_credits: this.state.courseToEdit.credits,
-      //new_tags: ['Software', 'Engineering'], //TODO
+      new_tags: Array.from(this.state.checkedTagsSet),
     };
 
     Api()
@@ -202,7 +202,7 @@ class AdminPanel extends Component {
 
     let newTags = {
       courseCode: this.state.courseToEdit.course_code,
-      //tags: //TODO
+      tags: Array.from(this.state.checkedTagsSet),
     };
 
     Api()
@@ -212,8 +212,7 @@ class AdminPanel extends Component {
   }
 
   renderTagsBox(props) {
-   
-    console.log(this.state.checkedTagsSet)
+    console.log(this.state.checkedTagsSet);
 
     return !props.tagsAreLoading ? (
       <TagList
@@ -248,6 +247,7 @@ class AdminPanel extends Component {
             <AdminForm
               selectedCourse={this.state.courseToEdit}
               handleInputChange={this.handleInputChange}
+              view={this.state.view === 'edit'}
             />
 
             <div className="tags-container">
@@ -278,6 +278,7 @@ class AdminPanel extends Component {
             <AdminForm
               selectedCourse={{}}
               handleInputChange={this.handleInputChange}
+              view={this.state.view === 'edit'}
             />
 
             <div className="tags-container">

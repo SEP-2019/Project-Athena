@@ -15,16 +15,20 @@ class AdminForm extends Component {
     return (
       <Section className="form" flexDirection="column">
         <Section className="subform" flexDirection="row">
-          <EditText
-            required
-            label="Course code"
-            id="course-code-input"
-            type="text"
-            name="course_code"
-            defaultValue={this.props.selectedCourse.course_code}
-            onChange={this.props.handleInputChange}
-            // error={this.state.usernameError}
-          />
+          {this.props.view ? (
+            <div>Course code: {this.props.selectedCourse.course_code}</div>
+          ) : (
+            <EditText
+              required
+              label="Course code"
+              id="course-code-input"
+              type="text"
+              name="course_code"
+              defaultValue={this.props.selectedCourse.course_code}
+              onChange={this.props.handleInputChange}
+              // error={this.state.usernameError}
+            />
+          )}
         </Section>
         <EditText
           required
