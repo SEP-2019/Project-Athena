@@ -47,7 +47,14 @@ var getCourseByTag = async function getCourseByTag(tag, studentID) {
  *         Invalid course format if JSON format is incorrect
  *         false if insertion failed
  */
-var addCourse = async (courseCode, title, departement, phasedOut, description, credits) => {
+var addCourse = async (
+  courseCode,
+  title,
+  departement,
+  phasedOut,
+  description,
+  credits
+) => {
   // Verifying proper format
   if (phasedOut === undefined) {
     phasedOut = "0";
@@ -85,26 +92,35 @@ var addCompletedCourses = async (studentId, courses) => {
 
   try {
     // Obtain all current course offerings and put them into a hashtable for fast lookup
-    let results = await connection.query("SELECT course_code, semester, section, id FROM course_offerings;");
+    let results = await connection.query(
+      "SELECT course_code, semester, section, id FROM course_offerings;"
+    );
     let hashTable = {};
     for (let i = 0; i < results.length; i++) {
-      hashTable[results[i].course_code + results[i].semester + results[i].section] = results[i].id;
+      hashTable[
+        results[i].course_code + results[i].semester + results[i].section
+      ] = results[i].id;
     }
 
     await connection.beginTransaction();
 
-    await connection.query("DELETE FROM student_course_offerings WHERE student_id = ?;", studentId);
+    await connection.query(
+      "DELETE FROM student_course_offerings WHERE student_id = ?;",
+      studentId
+    );
 
     // Insert each course of the student into the database. If a course does not exist then
     // throw an error.
     for (let course in courses) {
       for (let i = 0; i < courses[course].length; i++) {
-        let id = hashTable[course + courses[course][i].semester + courses[course][i].section];
-        await connection.query("INSERT INTO student_course_offerings (student_id, offering_id, semester) VALUES(?, ?, ?);", [
-          studentId,
-          id,
-          courses[course][i].semester
-        ]);
+        let id =
+          hashTable[
+            course + courses[course][i].semester + courses[course][i].section
+          ];
+        await connection.query(
+          "INSERT INTO student_course_offerings (student_id, offering_id, semester) VALUES(?, ?, ?);",
+          [studentId, id, courses[course][i].semester]
+        );
       }
     }
 
@@ -127,7 +143,9 @@ var addCompletedCourses = async (studentId, courses) => {
 var getAllCourses = async () => {
   let connection = await mysql.getNewConnection();
   let result;
-  result = await connection.query("SELECT * FROM courses WHERE phased_out = FALSE;");
+  result = await connection.query(
+    "SELECT * FROM courses WHERE phased_out = FALSE;"
+  );
   connection.release();
   return result;
 };
@@ -141,9 +159,13 @@ var getAllCourses = async () => {
 var getAllCourseOfferings = async () => {
   let connection = await mysql.getNewConnection();
   let result = {};
-  let courses = await connection.query("SELECT course_code, title FROM courses WHERE phased_out = FALSE;");
+  let courses = await connection.query(
+    "SELECT course_code, title FROM courses WHERE phased_out = FALSE;"
+  );
 
-  let course_offerings = await connection.query("SELECT course_code, semester FROM course_offerings;");
+  let course_offerings = await connection.query(
+    "SELECT course_code, semester FROM course_offerings;"
+  );
 
   for (let i = 0; i < courses.length; i++) {
     result[courses[i].course_code] = {};
@@ -153,7 +175,9 @@ var getAllCourseOfferings = async () => {
 
   for (let i = 0; i < course_offerings.length; i++) {
     try {
-      result[course_offerings[i].course_code].semesters.push(course_offerings[i].semester);
+      result[course_offerings[i].course_code].semesters.push(
+        course_offerings[i].semester
+      );
     } catch (e) {}
   }
 
@@ -173,7 +197,8 @@ var getAllCourseOfferings = async () => {
 var addCourseOfferings = async courseOfferings => {
   await format.verifyCourseOffering(courseOfferings);
   let connection = await mysql.getNewConnection();
-  let query = "INSERT INTO course_offerings (id, semester, scheduled_time, course_code, section) VALUES (?, ?, ?, ?, ?);";
+  let query =
+    "INSERT INTO course_offerings (id, semester, scheduled_time, course_code, section) VALUES (?, ?, ?, ?, ?);";
   try {
     await connection.beginTransaction();
     // Insert each course offering into the database
@@ -214,7 +239,8 @@ var addCourseOfferings = async courseOfferings => {
 var addCoreq = async coreq => {
   await format.verifyCoreq(coreq);
   let connection = await mysql.getNewConnection();
-  let query = "INSERT INTO course_coreqs (course_code, coreq_course_code) VALUES (?, ?);";
+  let query =
+    "INSERT INTO course_coreqs (course_code, coreq_course_code) VALUES (?, ?);";
   try {
     await connection.beginTransaction();
     for (let course in coreq) {
@@ -248,7 +274,8 @@ var addCoreq = async coreq => {
 var addPrereq = async prereq => {
   await format.verifyPrereq(prereq);
   let connection = await mysql.getNewConnection();
-  let query = "INSERT INTO course_prereqs (course_code, prereq_course_code) VALUES (?, ?);";
+  let query =
+    "INSERT INTO course_prereqs (course_code, prereq_course_code) VALUES (?, ?);";
   try {
     await connection.beginTransaction();
     for (let course in prereq) {
@@ -283,13 +310,22 @@ var updateCourse = async (course, newTitle, newTags) => {
 
   try {
     await connection.beginTransaction();
-    await connection.query("DELETE FROM course_tags WHERE course_code = ?;", course);
+    await connection.query(
+      "DELETE FROM course_tags WHERE course_code = ?;",
+      course
+    );
 
     for (let i = 0; i < newTags.length; i++) {
-      await connection.query("INSERT INTO course_tags (course_code, tag_name) VALUES (?, ?);", [course, newTags[i]]);
+      await connection.query(
+        "INSERT INTO course_tags (course_code, tag_name) VALUES (?, ?);",
+        [course, newTags[i]]
+      );
     }
 
-    await connection.query("UPDATE courses SET title = ? WHERE course_code = ?;", [newTitle, course]);
+    await connection.query(
+      "UPDATE courses SET title = ? WHERE course_code = ?;",
+      [newTitle, course]
+    );
     await connection.commit();
     return true;
   } catch (error) {
@@ -320,7 +356,10 @@ let phaseOutCourse = async (courseCode, phasedOut) => {
   let connection = await mysql.getNewConnection();
 
   try {
-    await connection.query("UPDATE courses SET phased_out = ? WHERE course_code = ?", [phasedOut, courseCode]);
+    await connection.query(
+      "UPDATE courses SET phased_out = ? WHERE course_code = ?",
+      [phasedOut, courseCode]
+    );
     return true;
   } catch (error) {
     throw error;
@@ -360,15 +399,23 @@ var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
 
   try {
     ifAssigned = await conn.query(checkExistQuery, [courseCode, curriculum]);
-    checkCourse = await conn.query("SELECT COUNT(*) AS count FROM courses WHERE course_code = ?", [courseCode]);
-    checkCurriculum = await conn.query("SELECT COUNT(*) AS count FROM curriculums WHERE curriculum_name = ?", [curriculum]);
+    checkCourse = await conn.query(
+      "SELECT COUNT(*) AS count FROM courses WHERE course_code = ?",
+      [courseCode]
+    );
+    checkCurriculum = await conn.query(
+      "SELECT COUNT(*) AS count FROM curriculums WHERE curriculum_name = ?",
+      [curriculum]
+    );
   } catch (err) {
     conn.release();
     throw err;
   }
 
   if (ifAssigned[0].count !== 0) {
-    throw Error(`Course ${courseCode} has already been added to ${curriculum}!\n`);
+    throw Error(
+      `Course ${courseCode} has already been added to ${curriculum}!\n`
+    );
   }
   if (checkCourse[0].count === 0) {
     throw Error(`Course ${courseCode} does not exist!\n`);
@@ -431,9 +478,15 @@ var saveUserPreferences = async (student_id, courses) => {
   let connection = await mysql.getNewConnection();
   try {
     await connection.beginTransaction();
-    await connection.query("DELETE FROM student_desired_courses WHERE student_id = ?;", [student_id]);
+    await connection.query(
+      "DELETE FROM student_desired_courses WHERE student_id = ?;",
+      [student_id]
+    );
     for (let i = 0; i < courses.length; i++) {
-      await connection.query("INSERT INTO student_desired_courses (course_code, student_id) VALUES (?, ?);", [courses[i], student_id]);
+      await connection.query(
+        "INSERT INTO student_desired_courses (course_code, student_id) VALUES (?, ?);",
+        [courses[i], student_id]
+      );
     }
     await connection.commit();
     return true;

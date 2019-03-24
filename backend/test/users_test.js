@@ -59,7 +59,8 @@ const expectedIdNumeric = "Id must be numeric";
 const expectedIdSmallerThanMax = "Id too large";
 const expectedCurriculumNameEmpty = "Curriculum name cannot be empty";
 const expectedCurriculumAlphanumeric = "Curriculum name must be alphanumeric";
-const expectedCurriculumYearLength4 = "Curriculum year must be an integer of length 4";
+const expectedCurriculumYearLength4 =
+  "Curriculum year must be an integer of length 4";
 const expectedNonExistentUser = "User does not exist";
 const expectedIncorrectPassword = "Incorrect username or password.";
 
@@ -68,7 +69,15 @@ const expectedTrue = true;
 describe("Tests add student user", function() {
   it(`responds with ${expectedUsernameNotEmpty}`, function(done) {
     users
-      .insertStudentUser(null, "password", "email@email.com", "123456789", "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        null,
+        "password",
+        "email@email.com",
+        "123456789",
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedUsernameNotEmpty);
@@ -79,7 +88,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedPasswordNotEmpty}`, function(done) {
     users
-      .insertStudentUser("username", null, "email@email.com", "123456789", "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        null,
+        "email@email.com",
+        "123456789",
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, "Password cannot be empty");
@@ -90,7 +107,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedEmailNotEmpty}`, function(done) {
     users
-      .insertStudentUser("username", "password", null, "123456789", "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        null,
+        "123456789",
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedEmailNotEmpty);
@@ -101,7 +126,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedIdNotEmpty}`, function(done) {
     users
-      .insertStudentUser("username", "password", "email@email.com", null, "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@email.com",
+        null,
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedIdNotEmpty);
@@ -169,7 +202,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedPassword8To64} 1`, function(done) {
     users
-      .insertStudentUser("username", "short", "email@email.com", "123456789", "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "short",
+        "email@email.com",
+        "123456789",
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedPassword8To64);
@@ -199,7 +240,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedInvalidEmail} 1`, function(done) {
     users
-      .insertStudentUser("username", "password", "email", "123456789", "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email",
+        "123456789",
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedInvalidEmail);
@@ -210,7 +259,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedInvalidEmail} 2`, function(done) {
     users
-      .insertStudentUser("username", "password", "email#@gma.com", "123456789", "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email#@gma.com",
+        "123456789",
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedInvalidEmail);
@@ -221,7 +278,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedInvalidEmail} 3`, function(done) {
     users
-      .insertStudentUser("username", "password", "email@g.c", "123456789", "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@g.c",
+        "123456789",
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedInvalidEmail);
@@ -251,7 +316,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedInvalidIdLength}`, function(done) {
     users
-      .insertStudentUser("username", "password", "email@email.com", "1234", "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@email.com",
+        "1234",
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedInvalidIdLength);
@@ -262,7 +335,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedIdNumeric} 1`, function(done) {
     users
-      .insertStudentUser("username", "password", "email@email.com", "1234ABDS2", "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@email.com",
+        "1234ABDS2",
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedIdNumeric);
@@ -273,7 +354,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedIdNumeric} 2`, function(done) {
     users
-      .insertStudentUser("username", "password", "email@email.com", "ab#%@a141", "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@email.com",
+        "ab#%@a141",
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedIdNumeric);
@@ -284,7 +373,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedCurriculumNameEmpty} 1`, function(done) {
     users
-      .insertStudentUser("username", "password", "email@email.com", "222222222", null, "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@email.com",
+        "222222222",
+        null,
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedCurriculumNameEmpty);
@@ -295,7 +392,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedCurriculumNameEmpty} 2`, function(done) {
     users
-      .insertStudentUser("username", "password", "email@email.com", "222222222", "Software Engineering", "2017", null)
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@email.com",
+        "222222222",
+        "Software Engineering",
+        "2017",
+        null
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedCurriculumNameEmpty);
@@ -306,7 +411,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedCurriculumAlphanumeric} 1`, function(done) {
     users
-      .insertStudentUser("username", "password", "email@email.com", "222222222", "####%%% Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@email.com",
+        "222222222",
+        "####%%% Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedCurriculumAlphanumeric);
@@ -317,7 +430,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedCurriculumAlphanumeric} 2`, function(done) {
     users
-      .insertStudentUser("username", "password", "email@email.com", "222222222", "Software Engineering", "2017", "**##$%%^ curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@email.com",
+        "222222222",
+        "Software Engineering",
+        "2017",
+        "**##$%%^ curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedCurriculumAlphanumeric);
@@ -328,7 +449,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedCurriculumYearLength4} 1`, function(done) {
     users
-      .insertStudentUser("username", "password", "email@email.com", "222222222", "Software Engineering", "111", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@email.com",
+        "222222222",
+        "Software Engineering",
+        "111",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedCurriculumYearLength4);
@@ -339,7 +468,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedCurriculumYearLength4} 2`, function(done) {
     users
-      .insertStudentUser("username", "password", "email@email.com", "222222222", "Software Engineering", "111111", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@email.com",
+        "222222222",
+        "Software Engineering",
+        "111111",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedCurriculumYearLength4);
@@ -351,10 +488,21 @@ describe("Tests add student user", function() {
   it(`responds with curriculum does not exist 1`, function(done) {
     let major = "Liberal Arts|2017|2018|7-semester-curriculum";
     users
-      .insertStudentUser("username", "password", "email@email.com", "222222222", "Liberal Arts", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username",
+        "password",
+        "email@email.com",
+        "222222222",
+        "Liberal Arts",
+        "2017",
+        "7-semester-curriculum"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
-          assert.equal(response.message, `Curriculum with name ${major} does not exist!`);
+          assert.equal(
+            response.message,
+            `Curriculum with name ${major} does not exist!`
+          );
           resolve();
         }).then(done);
       });
@@ -362,7 +510,15 @@ describe("Tests add student user", function() {
 
   it(`responds with ${expectedTrue} 1`, function(done) {
     users
-      .insertStudentUser("username1", "password", "email@email.com", "222222222", "Software Engineering", "2017", "7-semester-curriculum")
+      .insertStudentUser(
+        "username1",
+        "password",
+        "email@email.com",
+        "222222222",
+        "Software Engineering",
+        "2017",
+        "7-semester-curriculum"
+      )
       .then(response => {
         return new Promise(function(resolve) {
           assert.equal(response, "email@email.com");
@@ -403,7 +559,10 @@ describe("Tests add student user", function() {
       )
       .then(response => {
         return new Promise(function(resolve) {
-          assert.equal(response, "I.Have.A.Really.Long.Email.Address@emailDomainToo.com");
+          assert.equal(
+            response,
+            "I.Have.A.Really.Long.Email.Address@emailDomainToo.com"
+          );
           resolve();
         }).then(done);
       });
@@ -439,57 +598,79 @@ describe("Tests add student user", function() {
 
 describe("Tests add admin user", function() {
   it(`responds with ${expectedUsernameNotEmpty}`, function(done) {
-    users.insertAdminUser(null, "password", "email@email.com", "1235219").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedUsernameNotEmpty);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser(null, "password", "email@email.com", "1235219")
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedUsernameNotEmpty);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedPasswordNotEmpty}`, function(done) {
-    users.insertAdminUser("username", null, "email@email.com", "123456789").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedPasswordNotEmpty);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser("username", null, "email@email.com", "123456789")
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedPasswordNotEmpty);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedEmailNotEmpty}`, function(done) {
-    users.insertAdminUser("username", "password", null, "123456789").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedEmailNotEmpty);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser("username", "password", null, "123456789")
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedEmailNotEmpty);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedIdNotEmpty}`, function(done) {
-    users.insertAdminUser("username", "password", "email@email.com", null).catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedIdNotEmpty);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser("username", "password", "email@email.com", null)
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedIdNotEmpty);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedInvalidUsername} 1`, function(done) {
-    users.insertAdminUser("usernameWithSymbols123%@^", "password", "email@email.com", "123456789").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedInvalidUsername);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser(
+        "usernameWithSymbols123%@^",
+        "password",
+        "email@email.com",
+        "123456789"
+      )
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedInvalidUsername);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedInvalidUsername} 2`, function(done) {
-    users.insertAdminUser("username123%@^", "password", "email@email.com", "123456789").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedInvalidUsername);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser(
+        "username123%@^",
+        "password",
+        "email@email.com",
+        "123456789"
+      )
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedInvalidUsername);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedUsernameLessThan64}`, function(done) {
@@ -509,17 +690,24 @@ describe("Tests add admin user", function() {
   });
 
   it(`responds with ${expectedPassword8To64} 1`, function(done) {
-    users.insertAdminUser("username", "short", "email@email.com", "123456789").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedPassword8To64);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser("username", "short", "email@email.com", "123456789")
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedPassword8To64);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedPassword8To64} 2`, function(done) {
     users
-      .insertAdminUser("username", "thisIsARidiculouslyLongPasswordAndStuffButKeepGoingBecauseYeahSoDontDoThis", "email", "123456789")
+      .insertAdminUser(
+        "username",
+        "thisIsARidiculouslyLongPasswordAndStuffButKeepGoingBecauseYeahSoDontDoThis",
+        "email",
+        "123456789"
+      )
       .catch(response => {
         return new Promise(function(resolve) {
           assert.equal(response.message, expectedPassword8To64);
@@ -529,93 +717,133 @@ describe("Tests add admin user", function() {
   });
 
   it(`responds with ${expectedInvalidEmail} 1`, function(done) {
-    users.insertAdminUser("username", "password", "email", "123456789").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedInvalidEmail);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser("username", "password", "email", "123456789")
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedInvalidEmail);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedInvalidEmail} 2`, function(done) {
-    users.insertAdminUser("username", "password", "email#@gma.com", "123456789").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedInvalidEmail);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser("username", "password", "email#@gma.com", "123456789")
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedInvalidEmail);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedInvalidEmail} 3`, function(done) {
-    users.insertAdminUser("username", "password", "email@g.c", "123456789").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedInvalidEmail);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser("username", "password", "email@g.c", "123456789")
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedInvalidEmail);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedInvalidEmail} 4`, function(done) {
-    users.insertAdminUser("username", "password", "email.2.2.12@@gmai.test.com", "1234569235").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedInvalidEmail);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser(
+        "username",
+        "password",
+        "email.2.2.12@@gmai.test.com",
+        "1234569235"
+      )
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedInvalidEmail);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedIdNumeric} 1`, function(done) {
-    users.insertAdminUser("username", "password", "email@email.com", "12 3 4").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedIdNumeric);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser("username", "password", "email@email.com", "12 3 4")
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedIdNumeric);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedIdNumeric} 2`, function(done) {
-    users.insertAdminUser("username", "password", "email@email.com", "1234ABDS2").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedIdNumeric);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser("username", "password", "email@email.com", "1234ABDS2")
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedIdNumeric);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedIdNumeric} 3`, function(done) {
-    users.insertAdminUser("username", "password", "email@email.com", "ab#%@a141").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedIdNumeric);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser("username", "password", "email@email.com", "ab#%@a141")
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedIdNumeric);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedIdSmallerThanMax}`, function(done) {
-    users.insertAdminUser("username", "password", "email@email.com", "1523982350342").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedIdSmallerThanMax);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser(
+        "username",
+        "password",
+        "email@email.com",
+        "1523982350342"
+      )
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedIdSmallerThanMax);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedTrue} 1`, function(done) {
-    users.insertAdminUser("adminusername1", "password", "email@email.com", "123456789").then(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response, expectedTrue);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser(
+        "adminusername1",
+        "password",
+        "email@email.com",
+        "123456789"
+      )
+      .then(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response, expectedTrue);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedTrue} 2`, function(done) {
-    users.insertAdminUser("adminusername2", "passWITHsymbo!@#AOZ;]", "email@email.com", "23453").then(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response, expectedTrue);
-        resolve();
-      }).then(done);
-    });
+    users
+      .insertAdminUser(
+        "adminusername2",
+        "passWITHsymbo!@#AOZ;]",
+        "email@email.com",
+        "23453"
+      )
+      .then(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response, expectedTrue);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedTrue} 3`, function(done) {
@@ -704,7 +932,14 @@ describe("Tests add admin user", function() {
 describe("Test get student completed courses", () => {
   // initialize test data
   before(async () => {
-    await courses.addCourse("TEST 001", "Get completed Course Test", "TEST", "0", "TEST", 3);
+    await courses.addCourse(
+      "TEST 001",
+      "Get completed Course Test",
+      "TEST",
+      "0",
+      "TEST",
+      3
+    );
 
     const courseOffering = {
       "TEST 001": [
@@ -741,9 +976,14 @@ describe("Test get student completed courses", () => {
   // clean up test data
   after(async () => {
     const conn = await mysql.getNewConnection();
-    await conn.query(`DELETE FROM student_course_offerings WHERE student_id = ?;`, [260561054]);
+    await conn.query(
+      `DELETE FROM student_course_offerings WHERE student_id = ?;`,
+      [260561054]
+    );
     await conn.query(`DELETE FROM course_offerings WHERE id = ?;`, [940915]);
-    await conn.query(`DELETE FROM courses WHERE course_code = ?;`, ["TEST 001"]);
+    await conn.query(`DELETE FROM courses WHERE course_code = ?;`, [
+      "TEST 001"
+    ]);
     await users.deleteStudentUser("getCompletedCourseTest");
 
     await conn.release();
@@ -778,8 +1018,10 @@ describe("Test get student's data", () => {
   //Student Desired Courses (COMP 499)
   desiredCourses = ["COMP 499"];
   // Curriculum
-  majorCurriculumName = "TEST Electrical Engineering Major-2015-2016-8-semester-curriculum";
-  minorCurriculumName = "TEST Software Engineering Minor-2015-2016-1-semester-curriculum";
+  majorCurriculumName =
+    "TEST Electrical Engineering Major-2015-2016-8-semester-curriculum";
+  minorCurriculumName =
+    "TEST Software Engineering Minor-2015-2016-1-semester-curriculum";
 
   before(async () => {
     // users - students
@@ -835,14 +1077,22 @@ describe("Test get student's data", () => {
     await conn.query(`INSERT INTO curriculum_complementaries (curriculum_name, course_code) VALUES
     ('TEST Electrical Engineering Major-2015-2016-8-semester-curriculum', 'ANTH 299');`);
     // student_majors
-    await conn.query("INSERT INTO student_majors (student_id, curriculum_name) VALUES(?, ?);", [student_id, majorCurriculumName]);
+    await conn.query(
+      "INSERT INTO student_majors (student_id, curriculum_name) VALUES(?, ?);",
+      [student_id, majorCurriculumName]
+    );
     // student_minors
-    await conn.query("INSERT INTO student_minors (student_id, curriculum_name) VALUES(?, ?);", [student_id, minorCurriculumName]);
+    await conn.query(
+      "INSERT INTO student_minors (student_id, curriculum_name) VALUES(?, ?);",
+      [student_id, minorCurriculumName]
+    );
   });
 
   it("responds with true indicating that the student data was obtained", async () => {
-    const expectedMajor = "TEST Electrical Engineering Major-2015-2016-8-semester-curriculum";
-    const expectedMinor = "TEST Software Engineering Minor-2015-2016-1-semester-curriculum";
+    const expectedMajor =
+      "TEST Electrical Engineering Major-2015-2016-8-semester-curriculum";
+    const expectedMinor =
+      "TEST Software Engineering Minor-2015-2016-1-semester-curriculum";
     const expectedCompletedCourse_1 = "ECSE 276";
     const expectedCompletedCourse_2 = "ECSE 279";
     const expectedCompletedCourse_3 = "ECSE 379";
@@ -856,11 +1106,20 @@ describe("Test get student's data", () => {
 
     assert.equal(expectedMajor, res.major[0].curriculum_name);
     assert.equal(expectedMinor, res.minor[0].curriculum_name);
-    assert.equal(expectedCompletedCourse_1, res.completedCourses[0].course_code);
+    assert.equal(
+      expectedCompletedCourse_1,
+      res.completedCourses[0].course_code
+    );
     assert.equal(expectedCompletedSemester, res.completedCourses[0].semester);
-    assert.equal(expectedCompletedCourse_2, res.completedCourses[1].course_code);
+    assert.equal(
+      expectedCompletedCourse_2,
+      res.completedCourses[1].course_code
+    );
     assert.equal(expectedCompletedSemester, res.completedCourses[1].semester);
-    assert.equal(expectedCompletedCourse_3, res.completedCourses[2].course_code);
+    assert.equal(
+      expectedCompletedCourse_3,
+      res.completedCourses[2].course_code
+    );
     assert.equal(expectedCompletedSemester, res.completedCourses[2].semester);
     assert.equal(expectedIncompleted[0], res.incompletedCore[0]);
     assert.equal(expectedDesired[0], res.desiredTC[0]);
@@ -878,25 +1137,43 @@ describe("Test get student's data", () => {
 
   after(async () => {
     // student_minors
-    await conn.query(`DELETE FROM student_minors WHERE student_id = ?;`, [student_id]);
+    await conn.query(`DELETE FROM student_minors WHERE student_id = ?;`, [
+      student_id
+    ]);
     // student_majors
-    await conn.query(`DELETE FROM student_majors WHERE student_id = ?;`, [student_id]);
+    await conn.query(`DELETE FROM student_majors WHERE student_id = ?;`, [
+      student_id
+    ]);
     // curriculums / curriculum_core_classes / curriculum_tech_comps / curriculum_complementaries
-    await conn.query(`DELETE FROM curriculum_complementaries WHERE curriculum_name = ?;`, [majorCurriculumName]);
-    await conn.query(`DELETE FROM curriculum_tech_comps WHERE curriculum_name = ?;`, [majorCurriculumName]);
+    await conn.query(
+      `DELETE FROM curriculum_complementaries WHERE curriculum_name = ?;`,
+      [majorCurriculumName]
+    );
+    await conn.query(
+      `DELETE FROM curriculum_tech_comps WHERE curriculum_name = ?;`,
+      [majorCurriculumName]
+    );
     await conn.query(`DELETE FROM curriculum_core_classes WHERE curriculum_name IN 
     ('TEST Software Engineering Minor-2015-2016-1-semester-curriculum', 'TEST Electrical Engineering Major-2015-2016-8-semester-curriculum');`);
     await conn.query(`DELETE FROM curriculums WHERE curriculum_name IN 
     ('TEST Software Engineering Minor-2015-2016-1-semester-curriculum', 'TEST Electrical Engineering Major-2015-2016-8-semester-curriculum');`);
     // student_desired_courses
-    await conn.query(`DELETE FROM student_desired_courses WHERE student_id = ?;`, [student_id]);
+    await conn.query(
+      `DELETE FROM student_desired_courses WHERE student_id = ?;`,
+      [student_id]
+    );
     // course_coreqs
-    await conn.query(`DELETE FROM course_coreqs WHERE course_code = ?;`, ["ECSE 276"]);
+    await conn.query(`DELETE FROM course_coreqs WHERE course_code = ?;`, [
+      "ECSE 276"
+    ]);
     // course_prereqs
     await conn.query(`DELETE FROM course_prereqs WHERE course_code IN 
     ('ECSE 379', 'ECSE 479');`);
     // student_course_offering
-    await conn.query(`DELETE FROM student_course_offerings WHERE student_id = ?;`, [student_id]);
+    await conn.query(
+      `DELETE FROM student_course_offerings WHERE student_id = ?;`,
+      [student_id]
+    );
     // course_offerings
     await conn.query(`DELETE FROM course_offerings WHERE id IN 
     ('11276', '11279', '22379', '33479', '44499', '5299', '1199');`);
@@ -925,27 +1202,51 @@ describe("Tests assign student a minor", () => {
     );
   });
   it("ensures student is assigned to minor", async () => {
-    await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|7-semester-curriculum");
+    await users.assignStudentMinor(
+      "260678627",
+      "Electrical Engineering|2015|2016|7-semester-curriculum"
+    );
 
     let conn = await mysql.getNewConnection();
-    let assigned = await conn.query(`SELECT * FROM student_minors WHERE student_id = ?;`, ["260678627"]);
+    let assigned = await conn.query(
+      `SELECT * FROM student_minors WHERE student_id = ?;`,
+      ["260678627"]
+    );
     assert.equal(assigned[0].student_id, "260678627");
-    assert.equal(assigned[0].curriculum_name, "Electrical Engineering|2015|2016|7-semester-curriculum");
+    assert.equal(
+      assigned[0].curriculum_name,
+      "Electrical Engineering|2015|2016|7-semester-curriculum"
+    );
     conn.release();
   });
   it("ensures student is updated to be assigned to new minor", async () => {
-    await users.assignStudentMinor("260678627", "Software Engineering|2017|2018|7-semester-curriculum");
-    await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|7-semester-curriculum");
+    await users.assignStudentMinor(
+      "260678627",
+      "Software Engineering|2017|2018|7-semester-curriculum"
+    );
+    await users.assignStudentMinor(
+      "260678627",
+      "Electrical Engineering|2015|2016|7-semester-curriculum"
+    );
 
     let conn = await mysql.getNewConnection();
-    let assigned = await conn.query(`SELECT * FROM student_minors WHERE student_id = ?;`, ["260678627"]);
+    let assigned = await conn.query(
+      `SELECT * FROM student_minors WHERE student_id = ?;`,
+      ["260678627"]
+    );
     assert.equal(assigned[0].student_id, "260678627");
-    assert.equal(assigned[0].curriculum_name, "Electrical Engineering|2015|2016|7-semester-curriculum");
+    assert.equal(
+      assigned[0].curriculum_name,
+      "Electrical Engineering|2015|2016|7-semester-curriculum"
+    );
     conn.release();
   });
   it(`responds with ${expectedIdNumeric}`, async () => {
     try {
-      await users.assignStudentMinor("ABCDEFG", "Electrical Engineering|2015|2016|7-semester-curriculum");
+      await users.assignStudentMinor(
+        "ABCDEFG",
+        "Electrical Engineering|2015|2016|7-semester-curriculum"
+      );
     } catch (error) {
       assert.equal(error.message, expectedIdNumeric);
     }
@@ -959,30 +1260,53 @@ describe("Tests assign student a minor", () => {
   });
   it("responds with student id does not exist", async () => {
     try {
-      await users.assignStudentMinor("100000000", "Electrical Engineering|2015|2016|7-semester-curriculum");
+      await users.assignStudentMinor(
+        "100000000",
+        "Electrical Engineering|2015|2016|7-semester-curriculum"
+      );
     } catch (error) {
-      assert.equal(error.message, `Student user with student ID 100000000 does not exist!`);
+      assert.equal(
+        error.message,
+        `Student user with student ID 100000000 does not exist!`
+      );
     }
   });
   it("responds with curriculum does not exist", async () => {
     try {
-      await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|10-semester-curriculum");
+      await users.assignStudentMinor(
+        "260678627",
+        "Electrical Engineering|2015|2016|10-semester-curriculum"
+      );
     } catch (error) {
-      assert.equal(error.message, `Curriculum with name Electrical Engineering|2015|2016|10-semester-curriculum does not exist!`);
+      assert.equal(
+        error.message,
+        `Curriculum with name Electrical Engineering|2015|2016|10-semester-curriculum does not exist!`
+      );
     }
   });
   it("responds with student is already assigned to minor", async () => {
-    await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|7-semester-curriculum");
+    await users.assignStudentMinor(
+      "260678627",
+      "Electrical Engineering|2015|2016|7-semester-curriculum"
+    );
     try {
-      await users.assignStudentMinor("260678627", "Electrical Engineering|2015|2016|7-semester-curriculum");
+      await users.assignStudentMinor(
+        "260678627",
+        "Electrical Engineering|2015|2016|7-semester-curriculum"
+      );
     } catch (error) {
-      assert.equal(error.message, `Student is already assigned to Electrical Engineering|2015|2016|7-semester-curriculum as a minor`);
+      assert.equal(
+        error.message,
+        `Student is already assigned to Electrical Engineering|2015|2016|7-semester-curriculum as a minor`
+      );
     }
   });
   after(async () => {
     const conn = await mysql.getNewConnection();
 
-    await conn.query(`DELETE FROM student_minors WHERE student_id = ?;`, ["260678627"]);
+    await conn.query(`DELETE FROM student_minors WHERE student_id = ?;`, [
+      "260678627"
+    ]);
     await users.deleteStudentUser("TESTMINOR");
     await conn.release();
   });
@@ -998,7 +1322,15 @@ describe("Testing Login", () => {
   let curr_type = "7-semester-curriculum";
 
   before(async () => {
-    await users.insertStudentUser(username, password, email, studentId, program, year, curr_type);
+    await users.insertStudentUser(
+      username,
+      password,
+      email,
+      studentId,
+      program,
+      year,
+      curr_type
+    );
   });
 
   it(`Null username responds with ${expectedUsernameNotEmpty}`, function(done) {
@@ -1074,12 +1406,17 @@ describe("Testing Login", () => {
   });
 
   it(`Long username greater than 64 length responds with ${expectedUsernameLessThan64}`, function(done) {
-    users.login("teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm", password).catch(error => {
-      return new Promise(function(resolve) {
-        assert.equal(error.message, expectedUsernameLessThan64);
-        resolve();
-      }).then(done);
-    });
+    users
+      .login(
+        "teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+        password
+      )
+      .catch(error => {
+        return new Promise(function(resolve) {
+          assert.equal(error.message, expectedUsernameLessThan64);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`Short password less than 8 responds wth ${expectedPassword8To64}`, function(done) {
@@ -1092,12 +1429,17 @@ describe("Testing Login", () => {
   });
 
   it(`Long password greater than 64 responds wth ${expectedPassword8To64}`, function(done) {
-    users.login(username, "teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm").catch(error => {
-      return new Promise(function(resolve) {
-        assert.equal(error.message, expectedPassword8To64);
-        resolve();
-      }).then(done);
-    });
+    users
+      .login(
+        username,
+        "teammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+      )
+      .catch(error => {
+        return new Promise(function(resolve) {
+          assert.equal(error.message, expectedPassword8To64);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`Successful login responds with user email: ${email}`, function(done) {
@@ -1124,43 +1466,59 @@ describe("Update student Major", () => {
   let curr_type = "7-semester-curriculum";
 
   before(async () => {
-    await users.insertStudentUser(username, password, email, studentId, "Electrical Engineering", 2015, "7-semester-curriculum");
+    await users.insertStudentUser(
+      username,
+      password,
+      email,
+      studentId,
+      "Electrical Engineering",
+      2015,
+      "7-semester-curriculum"
+    );
   });
 
   it(`responds with ${expectedInvalidIdLength}`, function(done) {
-    users.updateStudentMajor("1234", program, year, curr_type).catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedInvalidIdLength);
-        resolve();
-      }).then(done);
-    });
+    users
+      .updateStudentMajor("1234", program, year, curr_type)
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedInvalidIdLength);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedIdNumeric} 1`, function(done) {
-    users.updateStudentMajor("1234ABDS2", program, year, curr_type).catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedIdNumeric);
-        resolve();
-      }).then(done);
-    });
+    users
+      .updateStudentMajor("1234ABDS2", program, year, curr_type)
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedIdNumeric);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedIdNumeric} 2`, function(done) {
-    users.updateStudentMajor("ab#%@a141", program, year, curr_type).catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedIdNumeric);
-        resolve();
-      }).then(done);
-    });
+    users
+      .updateStudentMajor("ab#%@a141", program, year, curr_type)
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedIdNumeric);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedCurriculumNameEmpty} 1`, function(done) {
-    users.updateStudentMajor(studentId, null, year, curr_type).catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedCurriculumNameEmpty);
-        resolve();
-      }).then(done);
-    });
+    users
+      .updateStudentMajor(studentId, null, year, curr_type)
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedCurriculumNameEmpty);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedCurriculumNameEmpty} 2`, function(done) {
@@ -1173,70 +1531,99 @@ describe("Update student Major", () => {
   });
 
   it(`responds with ${expectedCurriculumAlphanumeric} 1`, function(done) {
-    users.updateStudentMajor(studentId, "####%%% Engineering", year, curr_type).catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedCurriculumAlphanumeric);
-        resolve();
-      }).then(done);
-    });
+    users
+      .updateStudentMajor(studentId, "####%%% Engineering", year, curr_type)
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedCurriculumAlphanumeric);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedCurriculumAlphanumeric} 2`, function(done) {
-    users.updateStudentMajor(studentId, program, year, "**##$%%^ curriculum").catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedCurriculumAlphanumeric);
-        resolve();
-      }).then(done);
-    });
+    users
+      .updateStudentMajor(studentId, program, year, "**##$%%^ curriculum")
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedCurriculumAlphanumeric);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedCurriculumYearLength4} 1`, function(done) {
-    users.updateStudentMajor(studentId, program, "111", curr_type).catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedCurriculumYearLength4);
-        resolve();
-      }).then(done);
-    });
+    users
+      .updateStudentMajor(studentId, program, "111", curr_type)
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedCurriculumYearLength4);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedCurriculumYearLength4} 2`, function(done) {
-    users.updateStudentMajor(studentId, program, "111111", curr_type).catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, expectedCurriculumYearLength4);
-        resolve();
-      }).then(done);
-    });
+    users
+      .updateStudentMajor(studentId, program, "111111", curr_type)
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(response.message, expectedCurriculumYearLength4);
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with curriculum does not exist 1`, function(done) {
     let major = "Liberal Arts|2017|2018|7-semester-curriculum";
-    users.updateStudentMajor(studentId, "Liberal Arts", year, curr_type).catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, `Curriculum with name ${major} does not exist!`);
-        resolve();
-      }).then(done);
-    });
+    users
+      .updateStudentMajor(studentId, "Liberal Arts", year, curr_type)
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(
+            response.message,
+            `Curriculum with name ${major} does not exist!`
+          );
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with user does not exist 1`, function(done) {
     let test_id = 299999999;
-    users.updateStudentMajor(test_id, program, year, curr_type).catch(response => {
-      return new Promise(function(resolve) {
-        assert.equal(response.message, `Student user with student ID ${test_id} does not exist!`);
-        resolve();
-      }).then(done);
-    });
+    users
+      .updateStudentMajor(test_id, program, year, curr_type)
+      .catch(response => {
+        return new Promise(function(resolve) {
+          assert.equal(
+            response.message,
+            `Student user with student ID ${test_id} does not exist!`
+          );
+          resolve();
+        }).then(done);
+      });
   });
 
   it(`responds with ${expectedTrue} 1`, async () => {
-    let response = await users.updateStudentMajor(studentId, program, year, curr_type);
+    let response = await users.updateStudentMajor(
+      studentId,
+      program,
+      year,
+      curr_type
+    );
     let connection = await mysql.getNewConnection();
-    let results = await connection.query(`SELECT curriculum_name FROM student_majors WHERE student_id = ?;`, [studentId]);
+    let results = await connection.query(
+      `SELECT curriculum_name FROM student_majors WHERE student_id = ?;`,
+      [studentId]
+    );
     connection.release();
 
     let nextYear = (parseInt(year, 10) + 1).toString(10);
     let major = results[0].curriculum_name;
-    assert.equal(major, program.concat("|", year, "|", nextYear, "|", curr_type));
+    assert.equal(
+      major,
+      program.concat("|", year, "|", nextYear, "|", curr_type)
+    );
     assert.equal(response, expectedTrue);
   });
 
