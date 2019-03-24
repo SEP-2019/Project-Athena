@@ -379,8 +379,8 @@ let phaseOutCourse = async courseCode => {
  *         invalid format course code if course code format is incorrect
  */
 var getTagByCourse = async courseCode => {
-  let connection = await mysql.getNewConnection();
   format.verifyCourseCode(courseCode);
+  let connection = await mysql.getNewConnection();
 
   try {
     let result = await connection.query(
