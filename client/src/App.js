@@ -13,9 +13,9 @@ class App extends Component {
     return (
       <Switch>
         <Route path="/login" render={props => <Login {...props} />} />
-        <Route path="/courseregistration" component={CourseRegistration} />
-        <Route path="/curriculumdisplay" component={CurriculumDisplay} />
-        <Route path="/Home" component={CourseSuggestion} />
+        <Route path="/courseRegistration" component={CourseRegistration} />
+        <Route path="/curriculumDisplay" component={CurriculumDisplay} />
+        <Route path="/courseSuggestions" component={CourseSuggestion} />
         <Route path="/Error" component={ErrorPage} />
         <Route exact path="/" component={Login} />
         <Route path="*" component={ErrorPage} />
