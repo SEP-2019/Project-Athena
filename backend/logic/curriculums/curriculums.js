@@ -119,17 +119,19 @@ var createCurriculum = async (name, type, department, numOfElectives, cores, tec
 
 var getCurriculumData = async () => {
   let connection = await mysql.getNewConnection();
-  let years = [];
+  let years = {};
   let curriculumNames = await connection.query("SELECT curriculum_name FROM curriculums;");
   for (let i = 0; i < curriculumNames.length; i++) {
     let name = curriculumNames[i].curriculum_name;
     arrName = name.split("|");
     if (!(arrName[1] == undefined || arrName[2] == undefined)) {
       let curriculumYear = arrName[1];
-      years.push(curriculumYear);
+      if(!years[curriculumYear]){
+        years[curriculumYear] = curriculumYear
+      }
     }
-  }
-  return years;
+  };
+  return Object.keys(years);
 };
 
 module.exports = {
