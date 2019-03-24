@@ -65,14 +65,7 @@ router.post(
     const phasedOut = req.body.phasedOut;
     const description = req.body.description;
     const credits = req.body.credits;
-    let result = await courses.addCourse(
-      courseCode,
-      title,
-      departement,
-      phasedOut,
-      description,
-      credits
-    );
+    let result = await courses.addCourse(courseCode, title, departement, phasedOut, description, credits);
     res.send(customResponse(result));
   })
 );
@@ -317,11 +310,7 @@ router.post(
     let course = req.body.course;
     let newTitle = req.body.new_title;
 
-    let result = await courses.updateCourse(
-      course,
-      newTitle,
-      req.body.new_tags
-    );
+    let result = await courses.updateCourse(course, newTitle, req.body.new_tags);
     res.send(customResponse(result));
   })
 );
@@ -334,17 +323,20 @@ router.post(
         Host: localhost:3001
         Content-Type: application/json
         {
-          "course_code" : "ECSE 428"
+          "course_code" : "ECSE 428",
+          "phasedOut" : "0"
         }
  * @Returns true if successful
  * @throws error if MySQL connection failed
  *         invalid format course code if course code format is incorrect
- * @author: Alex Lam
+ * @author: Alex Lam + Gareth Peters
  */
 router.post(
   "/phaseOutCourse",
   asyncMiddleware(async (req, res, next) => {
-    let result = await courses.phaseOutCourse(req.body.course_code);
+    course_code = req.body.course_code;
+    phaseOut = req.body.phasedOut;
+    let result = await courses.phaseOutCourse(course_code, phasedOut);
     res.send(customResponse(result));
   })
 );
@@ -376,11 +368,7 @@ router.post(
     const courseCode = req.body.courseCode;
     const curriculum = req.body.curriculum;
 
-    let response = await courses.assignCourseToCurriculum(
-      courseType,
-      courseCode,
-      curriculum
-    );
+    let response = await courses.assignCourseToCurriculum(courseType, courseCode, curriculum);
     res.send(customResponse(response));
   })
 );

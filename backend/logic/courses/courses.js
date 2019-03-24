@@ -104,7 +104,10 @@ var addCompletedCourses = async (studentId, courses) => {
 
     await connection.beginTransaction();
 
-    await connection.query("DELETE FROM student_course_offerings WHERE student_id = ?;", studentId);
+    await connection.query(
+      "DELETE FROM student_course_offerings WHERE student_id = ?;",
+      studentId
+    );
 
     // Insert each course of the student into the database. If a course does not exist then
     // throw an error.
@@ -335,20 +338,27 @@ var updateCourse = async (course, newTitle, newTags) => {
 
 /**
  * Phases out a course that is no longer offered
- * @author Alex Lam
- * @param {string} courseCode
+ * @author Alex Lam + Gareth Peters
+ * @param {string} courseCode,
+ * @param {string} phasedOut
  * @returns true if successful
  * @throws error if MySQL connection failed
  *         invalid format course code if course code format is incorrect
  */
-let phaseOutCourse = async courseCode => {
-  let connection = await mysql.getNewConnection();
+let phaseOutCourse = async (courseCode, phasedOut) => {
+  // Verifying proper format
+  if (phasedOut === undefined) {
+    phasedOut = "0";
+  }
   format.verifyCourseCode(courseCode);
+  format.verifyPhaseOut(phasedOut);
+
+  let connection = await mysql.getNewConnection();
 
   try {
     await connection.query(
-      "UPDATE courses SET phased_out = TRUE WHERE course_code = ?",
-      courseCode
+      "UPDATE courses SET phased_out = ? WHERE course_code = ?",
+      [phasedOut, courseCode]
     );
     return true;
   } catch (error) {
