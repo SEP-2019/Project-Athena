@@ -15,6 +15,7 @@ class CourseRegistration extends Component {
       selectedSearch: {}, // selected course (updates on hover)
       selectedSemester: '', // selected semester
       selectedCourses: [], // courses that have already been selected
+      studentID: null,
     };
     this.updateSelectedSemester = this.updateSelectedSemester.bind(this);
     this.onClickSelect = this.onClickSelect.bind(this);
@@ -107,6 +108,15 @@ class CourseRegistration extends Component {
   };
 
   componentDidMount() {
+    this.setState(
+      {
+        studentId: this.props.studentId,
+      },
+      () => {
+        console.log('this is a state', this.state);
+        console.log('this is a prop', this.props.studentId);
+      }
+    );
     axios
       .all([this.fetchAllCourses(), this.fetchUserData()])
       .then(

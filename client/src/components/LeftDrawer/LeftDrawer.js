@@ -10,6 +10,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { Link } from 'react-router-dom';
 import MenuButton from '../MenuButton/MenuButton';
 import './LeftDrawer.css';
+import Cookies from 'universal-cookie';
 
 const styles = {
   list: {
@@ -29,7 +30,10 @@ class LeftDrawer extends React.Component {
   };
 
   logout = () => {
-    //TODO
+    console.log('Logging out');
+    const cookies = new Cookies();
+    cookies.remove('studentId', '/');
+    cookies.remove('email', '/');
   };
 
   render() {
@@ -63,7 +67,7 @@ class LeftDrawer extends React.Component {
             </Link>
           ))}
           <Link to={'/login'} key={4} className="link">
-            <ListItem button onClick={this.logout()}>
+            <ListItem button onClick={this.logout}>
               <ListItemIcon>
                 <img
                   alt="for pages"

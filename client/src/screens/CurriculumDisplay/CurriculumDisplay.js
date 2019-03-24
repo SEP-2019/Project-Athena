@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './CurriculumDisplay.css';
-import Api from '../../services/Api'
+import Api from '../../services/Api';
 import WithHeaderBar from '../../hocs/WithHeaderBar';
 import CourseTable from '../../components/CourseTable';
 import axios from 'axios';
@@ -8,9 +8,7 @@ import _ from 'lodash';
 import Cookies from 'universal-cookie';
 
 class CurriculumDisplay extends Component {
-
   constructor(props) {
-
     super(props);
     this.getStudentData = this.getStudentData.bind(this);
     this.parseCourseData = this.parseCourseData.bind(this);
@@ -23,17 +21,23 @@ class CurriculumDisplay extends Component {
       desiredTechComps: [],
       studentDataError: null,
     };
-
     this.cookies = new Cookies();
   }
 
-  componentDidMount(){
-    this.setState({
-        studentId : this.cookies.get('studentId'),
-    },
-    () => this.getStudentData(this.state.studentId));
+  componentDidMount() {
+    this.setState(
+      {
+        studentId: this.props.studentId,
+      },
+      () => {
+        console.log('this is a state', this.state);
+        console.log('this is a prop', this.props.studentId);
+
+        this.getStudentData(this.state.studentId); //TODO set this to state
+      }
+    );
   }
-  
+
   /**
    * Fetches the data of a student from the backend, this includes their major, minor,
    * completed courses, and incomplete semesters and courses
@@ -44,9 +48,8 @@ class CurriculumDisplay extends Component {
     Api()
       .get('users/getStudentData?studentID=' + studentid)
       .then(response => {
-
         let res = response.data.Response;
-        
+
         this.setState({
           curriculumName: res.major[0].curriculum_name,
           completedCourses: this.parseCourseData(

@@ -12,6 +12,7 @@ class CourseSuggestion extends Component {
     super(props);
     this.state = {
       currentTab: 'Mandatory Courses',
+      studentId: null,
     };
   }
 
@@ -31,6 +32,15 @@ class CourseSuggestion extends Component {
   }
 
   componentDidMount() {
+    this.setState(
+      {
+        studentId: this.props.studentId,
+      },
+      () => {
+        console.log('this is a state', this.state);
+        console.log('this is a prop', this.props.studentId);
+      }
+    );
     this.hydrateStateWithLocalStorage();
     // add event listener to save state to localStorage
     // when user leaves/refreshes the page
