@@ -79,7 +79,7 @@ class CourseRegistration extends Component {
       }); // this is where the warning appears :(
     } else {
       // remove the semesters when user clears input
-      this.setState({ semesters: [] });
+      this.setState({ selectedSearch: {}, semesters: [] });
     }
   }
 
