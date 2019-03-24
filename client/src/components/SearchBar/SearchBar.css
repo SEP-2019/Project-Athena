@@ -1,6 +1,5 @@
 .search-bar {
   display: flex;
-  align-items: center;
 }
 
 .react-autosuggest__container {
@@ -14,7 +13,8 @@
   font-weight: normal;
   font-size: 16px;
   border: 1px solid #aaa;
-  border-radius: 4px;
+  border-radius: 4px 0 0 4px;
+  border-right: none;
 }
 
 .react-autosuggest__input--focused {
@@ -75,4 +75,18 @@
   color: white;
   border-radius: 5px;
   border: none;
+}
+
+.clear-text {
+  color: #aaa;
+  font-weight: normal;
+  font-size: 20px;
+  border: 1px solid #aaa;
+  border-left: none;
+  background-color: white;
+  border-radius: 0 4px 4px 0;
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+  cursor: pointer;
 }

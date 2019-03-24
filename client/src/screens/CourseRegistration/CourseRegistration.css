@@ -33,6 +33,10 @@
   flex-grow: 1;
 }
 
+.search-section {
+  display: flex;
+}
+
 .selected-side {
   list-style-type: none;
   padding: 0;
@@ -80,7 +84,6 @@
   flex: 1 1 0;
 }
 
-/* LOADING ANIMATION */
 .animation-wrapper {
   margin-left: 20px;
   text-align: center;

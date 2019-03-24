@@ -165,7 +165,8 @@ class CourseRegistration extends Component {
       <div className="course-registration">
         <div className="instruction">
           Find the courses that you have already taken, then select the semester
-          you took it in. These courses will then appear in the Curriculum page.
+          you took it in. Save your changes so your courses can appear in the
+          Curriculum page.
         </div>
         <div className="content">
           <div className="selection-side">
