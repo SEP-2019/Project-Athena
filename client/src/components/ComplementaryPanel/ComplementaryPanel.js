@@ -95,6 +95,17 @@ class ComplementaryPanel extends Component {
     });
   };
 
+  updateSelected = (isSelected, checkbox) => {
+    const { selectedCourses } = this.state;
+    this.newSelectedCourses = new Set(selectedCourses);
+    if (isSelected) {
+      this.newSelectedCourses.add(checkbox);
+    } else {
+      this.newSelectedCourses.delete(checkbox);
+    }
+    this.setState({ selectedCourses: this.newSelectedCourses });
+  };
+
   populateDesiredCourses = course => {
     const code = course.course_code;
     if (course.desired === 1) {
@@ -123,19 +134,8 @@ class ComplementaryPanel extends Component {
     return false;
   };
 
-  loadSuggestions = (tag, courses) => {
-    return (
-      <CourseSuggestionList
-        key={tag}
-        tag={tag}
-        courses={courses}
-        selectedCourses={this.state.selectedCourses}
-      />
-    );
-  };
-
   render() {
-    const { tagsAreLoading, tags, suggestions } = this.state;
+    const { tagsAreLoading, tags, suggestions, selectedCourses } = this.state;
     return (
       <div className="tab_content">
         <div className="spacer" />
@@ -156,9 +156,15 @@ class ComplementaryPanel extends Component {
         <div className="spacer" />
         <div className="courses-container">
           {suggestions.length > 0 ? (
-            suggestions.map(elem =>
-              this.loadSuggestions(elem.name, elem.courses)
-            )
+            suggestions.map(elem => (
+              <CourseSuggestionList
+                key={elem.name}
+                tag={elem.name}
+                courses={elem.courses}
+                updateSelected={this.updateSelected}
+                selectedCourses={selectedCourses}
+              />
+            ))
           ) : (
             <p>
               You did not select any filter. Please select a filter to see the
