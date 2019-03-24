@@ -108,11 +108,11 @@ class CurriculumDisplay extends Component {
           hasPrereqs =
             group[k][i].prereqs === undefined || group[k][i].prereqs.length <= 0
               ? true
-              : group[k][i].prereqs.every(prereq => {
+              : group[k][i].prereqs.every(prereq => 
                   completedCourses.some(
                     c => c.course_code === prereq.prereq_course_code
-                  );
-                });
+                  )
+                )
         } catch (error) {
           console.log(error);
         }
