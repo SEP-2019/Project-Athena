@@ -66,16 +66,21 @@ class CourseRegistration extends Component {
 
   // Called on click of a search suggestion, updates the selected course
   onSelectFromSearch(selection) {
-    // Sorts the semesters
-    let sortedSemesters = selection.semesters;
-    sortedSemesters.sort((a, b) => {
-      return a.charAt(1).localeCompare(b.charAt(1));
-    });
+    if (Object.keys(selection).length > 0) {
+      // Sorts the semesters
+      let sortedSemesters = selection.semesters;
+      sortedSemesters.sort((a, b) => {
+        return a.charAt(1).localeCompare(b.charAt(1));
+      });
 
-    this.setState({
-      selectedSearch: selection,
-      semesters: sortedSemesters,
-    }); // this is where the warning appears :(
+      this.setState({
+        selectedSearch: selection,
+        semesters: sortedSemesters,
+      }); // this is where the warning appears :(
+    } else {
+      // remove the semesters when user clears input
+      this.setState({ selectedSearch: {}, semesters: [] });
+    }
   }
 
   // Removes the course from the selected courses list
