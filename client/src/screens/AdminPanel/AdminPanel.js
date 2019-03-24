@@ -75,7 +75,12 @@ class AdminPanel extends Component {
   handleSwitchView = view => {
     this.setState({
       view: view,
-      // in the case of edit, only set the tagsAreLoading flag to false once the checked tags are fetched
+      /*
+      in the case of edit, only set the tagsAreLoading flag to false once the checked tags are fetched
+      this is because the TagList component sets the checked tags in componentWillMount() which is only
+      called on the first render. In the case of edit, the checked tags for the current course need to be fetched
+      before the tags list can be rendered
+      */
       tagsAreLoading: view === "edit",
       inc: this.state.inc + 1,
     });
