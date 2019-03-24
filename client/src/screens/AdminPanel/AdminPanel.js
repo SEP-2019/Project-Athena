@@ -120,9 +120,7 @@ class AdminPanel extends Component {
       let checkedTags = this.state.tags;
 
       // check the tags that are fetched from the endpoint
-      checkedTags
-        .filter(tag => courseTags.some(t => t.tag_name === tag.name))
-        .map(tag => (tag.checked = true));
+      checkedTags.map(tag => tag.checked = courseTags.some(t => t.tag_name === tag.name))
 
       this.setState({
         tags: checkedTags,
@@ -214,9 +212,8 @@ class AdminPanel extends Component {
   }
 
   renderTagsBox(props) {
-    let checked = new Set(
-      this.state.tags.filter(t => t.checked === true).map(t => t.name)
-    );
+   
+    console.log(this.state.checkedTagsSet)
 
     return !props.tagsAreLoading ? (
       <TagList

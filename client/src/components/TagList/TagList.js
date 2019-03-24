@@ -18,6 +18,15 @@ class TagList extends Component {
     this.selectedTags = this.props.checkedTags;
   };
 
+  /**
+   * Refreshes the checkboxes on re-render / receiving new checked tags
+   */
+  componentWillReceiveProps = () => {
+    if(this.props.refreshChecks){
+      this.selectedTags = this.props.checkedTags;
+    }
+  };
+
   handleChange = (index, checked, checkbox) => {
     const { tags } = this.state;
     tags[index].checked = checked;
