@@ -96,6 +96,7 @@ class AdminPanel extends Component {
         // RedirectError(error); //TODO
       });
     if (response) {
+      console.log(response)
       //TODO go through this.state.tags and mark checked to true for the tags in response.data.Response
       // this.setState({
       //   tags: this.addCheckedProperty(response.data.Response),
