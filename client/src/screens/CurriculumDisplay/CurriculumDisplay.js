@@ -3,11 +3,8 @@ import './CurriculumDisplay.css';
 import Api from '../../services/Api'
 import WithHeaderBar from '../../hocs/WithHeaderBar';
 import CourseTable from '../../components/CourseTable';
-import DropDown from '../../components/DropDown/DropDown';
-import axios from 'axios';
 import { StudentContext } from '../../contexts/StudentContext';
 import _ from 'lodash';
-import { FORMERR } from 'dns';
 
 class CurriculumDisplay extends Component {
   static contextType = StudentContext;
@@ -62,11 +59,15 @@ class CurriculumDisplay extends Component {
           // requires that completed courses is defined first
           this.setState({
             incompleteCourses: this.parseCourseData(
-              res.incompletedCore,
+              res.incompletedCore.concat(res.desiredTC),
               'semester',
               this.state.completedCourses.map(cc => cc.courses).flat(),
             ),
-            desiredTechComps: res.desiredTC,
+            desiredTechComps: this.parseCourseData(
+              res.desiredTC,
+              'semester',
+              this.state.completedCourses.map(cc => cc.courses).flat(),
+            ),
             loadingMessage: "",
           })
         })
@@ -87,29 +88,29 @@ class CurriculumDisplay extends Component {
     console.log(completedCourses)
 
     let courses = Object.keys(group).map(function(k) {
+      for(var i = 0; i < group[k].length; i++){
+        let hasPrereqs = false
 
-      if(completedCourses.length > 0){
-        for(var i = 0; i < group[k].length; i++){
-          let hasPrereqs = false
-
-          // check if the student has the prereqs for the current course
-            try{
-              // if the prereqs are empty, assume the course has no prereqs and thus the
-              // student has all the requirements to take the course
-              // or else, check that the list of completed courses contains every prereq course
-              // for the current course
-              hasPrereqs = (group[k][i].prereqs === undefined || group[k][i].prereqs.length <= 0) ? true :
-              group[k][i].prereqs.every(prereq => {
-                completedCourses.some(c => c.course_code === prereq.prereq_course_code)
-              })
-            }
-            catch(error){
-              console.log(error)
-            }
-          
-          group[k][i].isDisabled = !hasPrereqs
-        }
+        // check if the student has the prereqs for the current course
+          try{
+            // if the prereqs are empty, assume the course has no prereqs and thus the
+            // student has all the requirements to take the course
+            // or else, check that the list of completed courses contains every prereq course
+            // for the current course
+            hasPrereqs = (group[k][i].prereqs === undefined || group[k][i].prereqs.length <= 0) ? true :
+            group[k][i].prereqs.every(prereq => {
+              completedCourses.some(c => c.course_code === prereq.prereq_course_code)
+            })
+          }
+          catch(error){
+            console.log(error)
+          }
+        
+        group[k][i].isDisabled = !hasPrereqs
       }
+
+      console.log(group[k])
+      group[k].map(course => course.displayMember = course.course_code + " - " + course.description[0].title)
 
       console.log(group[k])
 
@@ -173,6 +174,7 @@ class CurriculumDisplay extends Component {
             </div>
 
             <div className="semester-course-display" key="Incomplete Courses">
+            {/* make the selectable courses for then incomplete semesters the union of incomplete courses and desired TCs */}
               {this.state.incompleteCourses.map((incompleteSemester, index) => (
                 <div key={"Incomplete__" + index}>
                   <div className="semester-name" key={"Incomplete_" + index}>

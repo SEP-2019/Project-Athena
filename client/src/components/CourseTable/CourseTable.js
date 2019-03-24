@@ -8,6 +8,10 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 
+const pStyle = {
+  width: '512px',
+};
+
 class CourseTable extends Component {
   handleChange(event) {
     this.props.getValue(event.target.value);
@@ -19,12 +23,14 @@ class CourseTable extends Component {
     this.renderCourseTable = this.renderCourseTable.bind(this);
     this.updateSelectedCourse = this.updateSelectedCourse.bind(this);
     this.getUniqueCoursesByCode = this.getUniqueCoursesByCode.bind(this);
+    this.renderSemester = this.renderSemester.bind(this);
 
     this.state = {
       useDropdown: props.useDropdown,
       courses: this.getUniqueCoursesByCode(props.courses),
       selectedCourses: [],
       selectedThing: "",
+      coursesPerSemseter: 6,
     };
   }
 
@@ -34,6 +40,9 @@ class CourseTable extends Component {
     })
   }
 
+  /**
+   * Gets the unique courses by course code in case duplicates are fetched from the endpoint
+   */
   getUniqueCoursesByCode(courses){
     let codes = {}
     let uniqueCourses = []
@@ -47,11 +56,16 @@ class CourseTable extends Component {
     return uniqueCourses
   }
 
+  /**
+   * Makes the previously selected course selectable again
+   * and makes the currently selected course unselectable by other dropdowns
+   * 
+   * @param {Object} selection 
+   * @param {int} index 
+   * @param {Object} metaData 
+   */
   updateSelectedCourse(selection, index, metaData){ 
-    console.log(metaData)
-
     let prevSelectedValue = this.state.selectedCourses[index]
-    console.log(prevSelectedValue)
 
     let newSelection = this.state.selectedCourses
     newSelection[index] = selection
@@ -60,28 +74,30 @@ class CourseTable extends Component {
 
     // make the previously selected value available for selection again
     // there shouldn't be duplicate courses, so filtering by course code shouldn't be a problem
-    selectableCourses.filter(c => c.course_code === prevSelectedValue).map(course => course.isDisabled = false)
+    selectableCourses.filter(c => c.course_code === prevSelectedValue.course_code).map(course => course.isDisabled = false)
 
     // make the selected course not selectable anymore to avoid duplicate selection.
     // if the same value is selected again, it should overwrite the reset operation
     selectableCourses[parseInt(metaData.key)].isDisabled = true
-   
 
     this.setState({
       courses: selectableCourses,
       selectedCourses: newSelection,
     })
-
-    
   }
 
+  /**
+   * Renders the content for a single course slot
+   * 
+   * @param {Object} props 
+   */
   renderCourseTable(props){
     return props.useDropdown
     ?
     <DropDown
       defaultValue={this.state.selectedCourses[props.index]}
       getValueWithIndex={this.updateSelectedCourse}
-      menuList={this.state.courses.map(c => c.course_code)}
+      menuList={this.state.courses}
       className="select"
       associatedIndex={props.index}
       disabledItems = {this.state.courses.map(c => c.isDisabled)}
@@ -93,25 +109,51 @@ class CourseTable extends Component {
       description={props.description}
     />
   }
+
+  /**
+   * Renders the content for a semester
+   * 
+   * In  the case of completed semesters/courses, they will be displayed in an expandable course component.
+   * If that's the case, render all courses completed in those given semesters.
+   * In the case of future semesters where students still have to choose their courses, assume that a student
+   * can choose a maximum of 6 courses per term. As a result, render 6 dropdown components for each semester
+   * 
+   * @param {Object} props 
+   */
+  renderSemester(props){
+    return this.state.useDropdown
+    ? [...Array(this.state.coursesPerSemseter).keys()].map((element, index) => (
+      <TableRow key={index}>
+        <TableCell key={index}>
+          <this.renderCourseTable
+            key={index}
+            index={index}
+            useDropdown={this.state.useDropdown}
+          />
+        </TableCell>
+      </TableRow>
+    ))
+    : this.state.courses.map((course, index) => (
+      <TableRow key={index}>
+        <TableCell key={index}>
+          <this.renderCourseTable
+            key={index}
+            index={index}
+            course_code={course.course_code}
+            description={course.description}
+            useDropdown={this.state.useDropdown}
+          />
+        </TableCell>
+      </TableRow>
+    ))
+  }
     
   render() {
     return (
       <div>
         <Table>
           <TableBody>
-            {this.state.courses.map((course, index) => (
-              <TableRow key={index}>
-                <TableCell key={index}>
-                  <this.renderCourseTable
-                    key={index}
-                    index={index}
-                    course_code={course.course_code}
-                    description={course.course_code}
-                    useDropdown={this.state.useDropdown}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
+            <this.renderSemester/>
           </TableBody>
         </Table>
       </div>
