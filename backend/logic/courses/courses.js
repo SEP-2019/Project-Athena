@@ -24,8 +24,12 @@ var getCourseByTag = async function getCourseByTag(tag, studentID) {
       JOIN courses ON (courses.course_code = course_tags.course_code)
       WHERE (student_desired_courses.student_id = ? 
             OR student_desired_courses.student_id is null) 
-      AND course_tags.tag_name = ?;`,
-      [studentID, studentID, tag]
+      AND course_tags.tag_name = ?
+      AND course_tags.course_code NOT IN (SELECT co.course_code 
+        FROM student_course_offerings sco 
+        join course_offerings co 
+        on sco.offering_id = co.id WHERE student_id = ?);`,
+      [studentID, studentID, tag, studentID]
     );
     return JSON.parse(JSON.stringify(courses));
   } finally {
