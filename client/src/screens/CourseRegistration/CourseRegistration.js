@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import Api from '../../services/Api';
 import './CourseRegistration.css';
 import WithHeaderBar from '../../hocs/WithHeaderBar';
 import CourseRegistrationItem from './CourseRegistrationItem/CourseRegistrationItem';
@@ -16,6 +16,7 @@ class CourseRegistration extends Component {
       selectedSemester: 'semester', // selected semester
       selectedCourses: [], // courses that have already been selected
       disabledButton: false,
+      loading: true,
     };
     this.updateSelectedSemester = this.updateSelectedSemester.bind(this);
     this.onSelectCourse = this.onSelectCourse.bind(this);
@@ -96,38 +97,38 @@ class CourseRegistration extends Component {
         semesters.push('F' + year.toString());
       }
     }
+    this.setState({ loading: false });
     return semesters;
   }
 
   // TODO: remove harcoded student id
   // TODO: get base URL by importing from a base instance
   fetchUserData = async () => {
-    return await axios.get(
-      'http://localhost:3001/users/getStudentData?studentID=999999999'
-    );
+    return await Api().get('/users/getStudentData?studentID=999999999');
   };
 
   fetchAllCourses = async () => {
-    return await axios.get('http://localhost:3001/courses/getAllCourses');
+    return await Api().get('/courses/getAllCourseOfferings');
   };
 
   componentDidMount() {
-    axios
-      .all([this.fetchAllCourses(), this.fetchUserData()])
-      .then(
-        axios.spread((courses, user) => {
-          let coursesData = courses.data.Response;
-          let userData = user.data.Response;
-          const major = userData.major[0].curriculum_name;
-          // find start year of the student
-          const year = parseInt(major.split('|')[1]);
-          this.setState({
-            semesters: this.findSemesters(year),
-            allCourses: coursesData,
-          });
-        })
-      )
+    this.fetchUserData()
+      .then(response => {
+        let userData = response.data.Response;
+        const major = userData.major[0].curriculum_name;
+        // find start year of the student
+        const year = parseInt(major.split('|')[1]);
+        this.setState({ semesters: this.findSemesters(year) });
+        //TODO: Save the completedCourses and display them
+      })
       .catch(error => console.log('ERROR', error));
+
+    // this.fetchAllCourses()
+    //   .then(response => {
+    //     let courseData = response.data.Response;
+    //     this.setState({ allCourses: courseData });
+    //   })
+    //   .catch(error => console.log('ERROR', error));
   }
 
   // Formats the courses for the POST request
@@ -148,8 +149,8 @@ class CourseRegistration extends Component {
 
     console.log(completedCourses);
 
-    axios
-      .post('http://localhost:3001/courses/addCompletedCourses', {
+    Api()
+      .post('/courses/addCompletedCourses', {
         completedCourses,
       })
       .then(res => {
@@ -164,8 +165,8 @@ class CourseRegistration extends Component {
     return (
       <div className="course-registration">
         <div className="instruction">
-          Select the courses that you have already taken. These courses will
-          then appear in the Curriculum page.
+          Find the courses that you have already taken, then select the semester
+          you took it in. These courses will then appear in the Curriculum page.
         </div>
         <div className="content">
           <div className="selection-side">
@@ -175,12 +176,23 @@ class CourseRegistration extends Component {
                 data={allCourses}
                 getValue={this.onSelectFromSearch}
               />
-              <DropDown
-                defaultValue={this.state.selectedSemester}
-                getValue={this.updateSelectedSemester}
-                menuList={semesters}
-                className="select"
-              />
+              {this.state.loading ? (
+                <div className="animation-wrapper">
+                  <div className="lds-ellipsis">
+                    <div />
+                    <div />
+                    <div />
+                    <div />
+                  </div>
+                </div>
+              ) : (
+                <DropDown
+                  defaultValue={this.state.selectedSemester}
+                  getValue={this.updateSelectedSemester}
+                  menuList={semesters}
+                  className="select"
+                />
+              )}
             </div>
           </div>
           <div className="selected-size-frame">
