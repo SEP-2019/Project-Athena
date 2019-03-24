@@ -331,13 +331,16 @@ router.post(
     let newTitle = req.body.new_title;
     let newDescription = req.body.new_description;
     let newCredits = req.body.new_credits;
+    let newTags = req.body.new_tags;
+    let phasedOut = req.body.phased_out;
 
     let result = await courses.updateCourse(
       course,
       newTitle,
       newDescription,
       newCredits,
-      req.body.new_tags
+      newTags,
+      phasedOut
     );
     res.send(customResponse(result));
   })

@@ -60,6 +60,7 @@ class SearchBar extends Component {
 
   onClearInput() {
     this.setState({ value: '' });
+    this.props.getValue({});
   }
 
   // Renders the suggestions under the search bar
