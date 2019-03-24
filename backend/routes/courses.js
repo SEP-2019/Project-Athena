@@ -22,6 +22,22 @@ router.get(
   })
 );
 
+/**
+ * @api {get} /getCourseByTag
+ * @apiDescription get list of tags for a course
+ * @apiParam (query) {string} course code
+ * @apiExample {curl} Example usage: GET /courses/getCourseByTag?course_code=ECSE+428
+ * @author: Steven Li
+ */
+router.get(
+  "/getTagByCourse",
+  asyncMiddleware(async function(req, res, next) {
+    let courseCode = req.query.course_code;
+    let result = await courses.getTagByCourse(courseCode);
+    res.send(customResponse(result));
+  })
+);
+
 /*
 * @api {post} /createCourse
 * @apiDescription This endpoint will add a course
@@ -284,6 +300,8 @@ router.post(
  *	   {
  *       "course": "ECSE 428",
  *       "new_title": "Software Engineering in Practice",
+ *       "new_description": "Some description about the course",
+ *       "new_credits": 3,
  *       "new_tags": ["Software", "Engineering"]
  *     }
  * Curl:
@@ -293,6 +311,8 @@ router.post(
  *	-d '{
  *       "course": "ECSE 428",
  *       "new_title": "Software Engineering in Practice",
+ *       "new_description": "Some description about the course",
+ *       "new_credits": 3,
  *       "new_tags": ["Software", "Engineering"]
  *     }'
  *
@@ -309,8 +329,16 @@ router.post(
   asyncMiddleware(async (req, res, next) => {
     let course = req.body.course;
     let newTitle = req.body.new_title;
+    let newDescription = req.body.new_description;
+    let newCredits = req.body.new_credits;
 
-    let result = await courses.updateCourse(course, newTitle, req.body.new_tags);
+    let result = await courses.updateCourse(
+      course,
+      newTitle,
+      newDescription,
+      newCredits,
+      req.body.new_tags
+    );
     res.send(customResponse(result));
   })
 );
