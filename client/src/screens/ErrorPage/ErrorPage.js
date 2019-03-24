@@ -5,11 +5,12 @@ import './ErrorPage.css';
 
 class ErrorPage extends Component {
   render() {
-    var code = '404';
-    var message = 'Not Found';
-    if (this.props.location.state) {
-      code = this.props.location.state.error_code;
-      message = this.props.location.state.error_message;
+    let location = this.props;
+    let code = '404';
+    let message = 'Not Found';
+    if (location.state) {
+      code = location.state.error_code;
+      message = location.state.error_message;
     }
     return (
       <div className="error_div">

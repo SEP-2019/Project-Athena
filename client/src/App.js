@@ -17,7 +17,8 @@ class App extends Component {
         <Route path="/curriculumdisplay" component={CurriculumDisplay} />
         <Route path="/Home" component={CourseSuggestion} />
         <Route path="/Error" component={ErrorPage} />
-        <Redirect to="/login" />
+        <Route exact path="/" component={Login} />
+        <Route path="*" component={ErrorPage} />
       </Switch>
     );
   }

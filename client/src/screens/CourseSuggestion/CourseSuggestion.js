@@ -12,7 +12,6 @@ class CourseSuggestion extends Component {
     super(props);
     this.state = {
       currentTab: 'Mandatory Courses',
-      studentId: null,
     };
   }
 
@@ -32,9 +31,6 @@ class CourseSuggestion extends Component {
   }
 
   componentDidMount() {
-    this.setState({
-      studentId: this.props.studentId,
-    });
     this.hydrateStateWithLocalStorage();
 
     window.addEventListener(
