@@ -103,6 +103,9 @@ var addCompletedCourses = async (studentId, courses) => {
     }
 
     await connection.beginTransaction();
+
+    await connection.query("DELETE FROM student_course_offerings WHERE student_id = ?;", studentId);
+
     // Insert each course of the student into the database. If a course does not exist then
     // throw an error.
     for (let course in courses) {
