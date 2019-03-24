@@ -106,7 +106,10 @@ class LoginContent extends Component {
 
   redirectAdmin = () => {
     this.setError('ADMIN LOGIN');
-    //TODO
+    history.push({
+      pathname: '/admin',
+      isAdmin: true,
+    });
   };
 
   isInputValid() {
