@@ -67,7 +67,7 @@ class LeftDrawer extends React.Component {
               </ListItem>
             </Link>
           ))}
-          <Link to={'/login'} key={4} className="link">
+          <Link to={'/login'} key={4} style={{ textDecoration: 'none' }}>
             <ListItem button onClick={this.logout}>
               <ListItemIcon>
                 <img
