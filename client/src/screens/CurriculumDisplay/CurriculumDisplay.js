@@ -17,7 +17,7 @@ class CurriculumDisplay extends Component {
     this.state = {
       loadingMessage: 'Loading curriculum information...',
       instructions: '',
-      studentId: null, // placeholder student id until sessions/persistance are implemented
+      studentId: "", // placeholder student id until sessions/persistance are implemented
       curriculumName: 'View ECSE Curriculums',
       completedCourses: [],
       incompleteCourses: [],

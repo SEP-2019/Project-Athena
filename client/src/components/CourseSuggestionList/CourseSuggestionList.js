@@ -53,6 +53,7 @@ class CourseSuggestionList extends Component {
               handleChange={e =>
                 this.handleChange(index, e.target.checked, e.target.name)
               }
+              description={course.description}
             />
           ))}
         </div>

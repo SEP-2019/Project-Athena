@@ -11,7 +11,7 @@ class CourseRegistration extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      studentId: null,
+      studentId: '',
       allCourses: [], // list of all courses to select
       semesters: [], // list of all semesters to select
       selectedSearch: {}, // selected course (updates on hover)
