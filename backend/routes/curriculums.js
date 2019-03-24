@@ -100,9 +100,9 @@ router.post(
 );
 
 router.get(
-  "/getCurriculumYears",
+  "/getCurriculumData",
   asyncMiddleware(async function(req, res, next) {
-    let result = await curriculums.getCurriculumYears();
+    let result = await curriculums.getCurriculumData();
     res.send(customResponse(result));
   })
 );

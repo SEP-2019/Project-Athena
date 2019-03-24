@@ -117,20 +117,18 @@ var createCurriculum = async (name, type, department, numOfElectives, cores, tec
   }
 };
 
-var getCurriculumYears = async () => {
+var getCurriculumData = async () => {
   let connection = await mysql.getNewConnection();
   let years = [];
   let curriculumNames = await connection.query("SELECT curriculum_name FROM curriculums;");
   for (let i = 0; i < curriculumNames.length; i++) {
     let name = curriculumNames[i].curriculum_name;
     arrName = name.split("|");
-    console.log(arrName);
     if (!(arrName[1] == undefined || arrName[2] == undefined)) {
-      let curriculumYear = arrName[1] + "|" + arrName[2];
+      let curriculumYear = arrName[1];
       years.push(curriculumYear);
     }
   }
-
   return years;
 };
 
@@ -138,5 +136,5 @@ module.exports = {
   getAllCurriculumNames,
   createCurriculum,
   getCurriculum,
-  getCurriculumYears
+  getCurriculumData
 };
