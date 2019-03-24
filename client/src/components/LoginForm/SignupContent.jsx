@@ -4,7 +4,7 @@ import EditText from '../EditText';
 import DropDown from '../DropDownOutlined/DropDown';
 import Api from '../../services/Api';
 import * as validation from './Validation';
-import { customHistory as history } from '../../';
+import history from '../../history';
 
 const tempYears = ['2014', '2015', '2016', '2017', '2018', '2019'];
 const tempCurriculum = ['7 semesters', '8 semesters'];

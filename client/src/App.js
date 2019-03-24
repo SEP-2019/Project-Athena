@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
+
 import CourseRegistration from './screens/CourseRegistration';
 import CourseSuggestion from './screens/CourseSuggestion';
 import Login from './screens/Login';
+import ErrorPage from './screens/ErrorPage';
 import CurriculumDisplay from './screens/CurriculumDisplay';
-import Cookies from 'universal-cookie';
 import './App.css';
 
 class App extends Component {
@@ -31,33 +33,10 @@ class App extends Component {
           path="/login"
           render={props => <Login setEmail={this.setEmail} {...props} />}
         />
-        <Route
-          path="/courseregistration"
-          render={props => (
-            <CourseRegistration
-              responseEmail={this.state.responseEmail}
-              {...props}
-            />
-          )}
-        />
-        <Route
-          path="/curriculumdisplay"
-          render={props => (
-            <CurriculumDisplay
-              responseEmail={this.state.responseEmail}
-              {...props}
-            />
-          )}
-        />
-        <Route
-          path="/Home"
-          render={props => (
-            <CourseSuggestion
-              responseEmail={this.state.responseEmail}
-              {...props}
-            />
-          )}
-        />
+        <Route path="/courseregistration" component={CourseRegistration} />
+        <Route path="/curriculumdisplay" component={CurriculumDisplay} />
+        <Route path="/Home" component={CourseSuggestion} />
+        <Route path="/Error" component={ErrorPage} />
         <Redirect to="/login" />
       </Switch>
     );

@@ -21,7 +21,7 @@ router.get(
 /**
  * @api {post} /createTag
  * @apiDescription creates a tag
- * @apiExample {curl} Example usage: 
+ * @apiExample {curl} Example usage:
  * Http:
  *	POST /tags/createTag HTTP/1.1
  *	Host: localhost:3001
@@ -38,7 +38,7 @@ router.get(
  *      }'
  * @author: Steven Li
  */
-router.post("/createTag", async function (req, res, next) {
+router.post("/createTag", async function(req, res, next) {
   let tag = req.body.tag;
 
   try {
@@ -53,7 +53,7 @@ router.post("/createTag", async function (req, res, next) {
 /**
  * @api {post} /deleteTag
  * @apiDescription deletes a tag
- * @apiExample {curl} Example usage: 
+ * @apiExample {curl} Example usage:
  * Http:
  *	DELETE /tags/deleteTag HTTP/1.1
  *	Host: localhost:3001
@@ -70,7 +70,7 @@ router.post("/createTag", async function (req, res, next) {
  *      }'
  * @author: Steven Li
  */
-router.delete("/deleteTag", async function (req, res, next) {
+router.delete("/deleteTag", async function(req, res, next) {
   let tag = req.body.tag;
 
   try {
@@ -85,7 +85,7 @@ router.delete("/deleteTag", async function (req, res, next) {
 /**
  * @api {post} /assignTagsToCourse
  * @apiDescription assign tags to a specified course
- * @apiExample {curl} Example usage: 
+ * @apiExample {curl} Example usage:
  * Http:
  *	POST /tags/assignTagsToCourse HTTP/1.1
  *	Host: localhost:3001
@@ -104,7 +104,7 @@ router.delete("/deleteTag", async function (req, res, next) {
  *      }'
  * @author: Steven Li
  */
-router.post("/assignTagsToCourse", async function (req, res, next) {
+router.post("/assignTagsToCourse", async function(req, res, next) {
   let course = req.body.course;
   let tag;
 

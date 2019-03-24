@@ -4,7 +4,7 @@ import EditText from '../EditText';
 import Api from '../../services/Api';
 import './LoginForm.css';
 import * as validation from './Validation';
-import { customHistory as history } from '../../';
+import history from '../../history';
 
 const LOGIN_URL = 'users/login';
 

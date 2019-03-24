@@ -1,0 +1,20 @@
+.error_div {
+  display: flex; /* establish flex container */
+  flex-direction: column; /* stack flex items vertically */
+  justify-content: center; /* center items vertically, in this case */
+  align-items: center; /* center items horizontally, in this case */
+  height: 100%;
+}
+
+.error_cat {
+  width: 50%;
+  margin: 5px;
+  text-align: center;
+}
+
+.error_message {
+  margin: 5px;
+  font-size: 1.5rem;
+  color: crimson;
+  text-align: center;
+}
