@@ -10,9 +10,6 @@ import Section from '../../components/Section';
 import history from '../../history';
 import EditText from '../../components/EditText';
 import TagList from '../../components/TagList/TagList';
-import { SnackbarProvider, withSnackbar } from 'notistack';
-
-const TagListWithSnackBar = withSnackbar(TagList);
 
 class AdminPanel extends Component {
   constructor(props) {
@@ -100,8 +97,23 @@ class AdminPanel extends Component {
   }
 
   updateTagsCheckedState = newTags => {
+    console.log(newTags)
     this.setState({ tags: newTags });
   };
+
+  renderTagsBox = (props) => {
+    return !props.tagsAreLoading ? (
+      <TagList
+        hasButtons={false}
+        tags={props.tags}
+        applySelection={this.applySelection}
+        checkedTags={new Set()}
+        updateTagsCheckedState={this.updateTagsCheckedState}
+      />
+    ) : (
+      <h3>Loading tags...</h3>
+    )
+  }
 
   render() {
     const { allCourses } = this.state;
@@ -165,18 +177,10 @@ class AdminPanel extends Component {
             </Section>
 
             <div className="tags-container">
-              {!tagsAreLoading ? (
-                <SnackbarProvider maxSnack={3}>
-                  <TagListWithSnackBar
-                    tags={tags}
-                    applySelection={this.applySelection}
-                    checkedTags={new Set()}
-                    updateTagsCheckedState={this.updateTagsCheckedState}
-                  />
-                </SnackbarProvider>
-              ) : (
-                <h3>Loading tags...</h3>
-              )}
+            <this.renderTagsBox
+                tags={tags}
+                tagsAreLoading={tagsAreLoading}
+              />
             </div>
 
             {/* Buttons */}
@@ -238,18 +242,10 @@ class AdminPanel extends Component {
             </Section>
 
             <div className="tags-container">
-              {!tagsAreLoading ? (
-                <SnackbarProvider maxSnack={3}>
-                  <TagListWithSnackBar
-                    tags={tags}
-                    applySelection={this.applySelection}
-                    checkedTags={new Set()}
-                    updateTagsCheckedState={this.updateTagsCheckedState}
-                  />
-                </SnackbarProvider>
-              ) : (
-                <h3>Loading tags...</h3>
-              )}
+              <this.renderTagsBox
+                tags={tags}
+                tagsAreLoading={tagsAreLoading}
+              />
             </div>
 
             {/* Buttons */}
