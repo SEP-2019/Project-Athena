@@ -59,17 +59,19 @@ class AdminForm extends Component {
             onChange={this.props.handleInputChange}
             // error={this.state.passwordError}
           />
-          <TagCheckBox
-            className="column"
-            key={this.props.selectedCourse.course_code}
-            index={this.props.selectedCourse.course_code}
-            // the name property is a duplicate property referring to the label of the checkbox
-            // as well as the property that is passed to the event handler. keep it as 
-            // "phased_out" or else it won't set the new value properly
-            name={"phased_out"}
-            checked={this.props.selectedCourse.phased_out}
-            handleChange={this.props.handleInputChange}
-          />
+          <div className="check">
+            <TagCheckBox
+              className="column"
+              key={this.props.selectedCourse.course_code}
+              index={this.props.selectedCourse.course_code}
+              // the name property is a duplicate property referring to the label of the checkbox
+              // as well as the property that is passed to the event handler. keep it as 
+              // "phased_out" or else it won't set the new value properly
+              name={"phased_out"}
+              checked={this.props.selectedCourse.phased_out}
+              handleChange={this.props.handleInputChange}
+            />
+          </div>
         </Section>
       </Section>
     );
