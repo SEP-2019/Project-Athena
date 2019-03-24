@@ -25,7 +25,7 @@ const curriculum_URL = String(process.argv[2]);
 const tech_comps_URL = String(process.argv[3]);
 
 /*
-Example input 
+Example input
 curriculum: 2018-2019-electrical-engineering-7-semester-curriculum
 tech comps: 2018-2019-electrical-eng-technical-complementaries
 */
@@ -98,11 +98,13 @@ async function store_curriculum(curriculum) {
     courses.forEach(async course => {
       //Stores the courses
       await connection.query(
-        "INSERT INTO courses (course_code,title,department,description,credits) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
+        "INSERT INTO courses (course_code,title,department,description,credits) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE description=?,credits=?;",
         [
           course.course_code,
           course.course_title,
           course.department,
+          course.course_description,
+          course.credits,
           course.course_description,
           course.credits
         ]
@@ -170,8 +172,16 @@ async function store_curriculum(curriculum) {
     tech_comps.forEach(async tech_comp => {
       //Insert tech comps into courses
       await connection.query(
-        "INSERT INTO courses (course_code,title,department) VALUES(?,?,?) ON DUPLICATE KEY UPDATE course_code=course_code;",
-        [tech_comp.course_code, tech_comp.course_title, tech_comp.department]
+        "INSERT INTO courses (course_code, title, department, description, credits) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE description=?,credits=?;",
+        [
+          tech_comp.course_code,
+          tech_comp.course_title,
+          tech_comp.department,
+          tech_comp.description,
+          tech_comp.credits,
+          tech_comp.description,
+          tech_comp.credits
+        ]
       );
 
       let curriculum_tech_comps = await connection.query(
@@ -278,14 +288,15 @@ async function parse_courses(url, property) {
               .find(".course_number")
               .text()
               .replace(/\s\d*/g, ""),
-            credits: $(course_element).find(".course_credits")
-              ? parseInt(
-                  $(course_element)
-                    .find(".course_credits")
-                    .text()
-                    .match(/[0-9]{1}/g)
-                )
-              : 0,
+            credits:
+              $(course_element).find(".course_credits").length != 0
+                ? parseInt(
+                    $(course_element)
+                      .find(".course_credits")
+                      .text()
+                      .match(/[0-9]{1}/g)
+                  )
+                : 0,
             semesters: parse_semester(
               $(course_element).find("li.course_terms > ul > li")
             )
