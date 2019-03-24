@@ -12,38 +12,7 @@ class App extends Component {
   render() {
     return (
       <Switch>
-        <Route
-          path="/login"
-          // render={props => <Login setEmail={this.setEmail} {...props} />}
-          render={props => <Login {...props} />}
-        />
-        {/* <Route
-          path="/courseregistration"
-          render={props => (
-            <CourseRegistration
-              // responseEmail={this.state.responseEmail}
-              {...props}
-            />
-          )}
-        />
-        <Route
-          path="/curriculumdisplay"
-          render={props => (
-            <CurriculumDisplay
-              // responseEmail={this.state.responseEmail}
-              {...props}
-            />
-          )}
-        />
-        <Route
-          path="/Home"
-          render={props => (
-            <CourseSuggestion
-              // responseEmail={this.state.responseEmail}
-              {...props}
-            />
-          )}
-        /> */}
+        <Route path="/login" render={props => <Login {...props} />} />
         <Route path="/courseregistration" component={CourseRegistration} />
         <Route path="/curriculumdisplay" component={CurriculumDisplay} />
         <Route path="/Home" component={CourseSuggestion} />

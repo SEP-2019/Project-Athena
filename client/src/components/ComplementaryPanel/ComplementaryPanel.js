@@ -9,8 +9,6 @@ import CourseSuggestionList from '../CourseSuggestionList/CourseSuggestionList';
 import './ComplementaryPanel.css';
 
 const TagListWithSnackBar = withSnackbar(TagList);
-// Hardcoded student id for now
-const sid = '123456789';
 
 class ComplementaryPanel extends Component {
   state = {
@@ -31,7 +29,7 @@ class ComplementaryPanel extends Component {
   addDesiredCourses = async courses => {
     await Api()
       .post(`/courses/updateDesiredCourse`, {
-        student_id: sid,
+        student_id: this.props.sid,
         courses: courses,
       })
       .catch(error => {
@@ -55,7 +53,7 @@ class ComplementaryPanel extends Component {
 
   fetchCourseSuggestions = async newTag => {
     const response = await Api()
-      .get(`courses/getCourseByTag?tag=${newTag}&studentID=${sid}`)
+      .get(`courses/getCourseByTag?tag=${newTag}&studentID=${this.props.sid}`)
       .catch(error => {
         RedirectError(error);
       });

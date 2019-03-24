@@ -4,10 +4,13 @@ import WithHeaderBar from '../../hocs/WithHeaderBar';
 import './ErrorPage.css';
 
 class ErrorPage extends Component {
-  state = {};
   render() {
-    const code = this.props.location.state.error_code;
-    const message = this.props.location.state.error_message;
+    var code = '404';
+    var message = 'Not Found';
+    if (this.props.location.state) {
+      code = this.props.location.state.error_code;
+      message = this.props.location.state.error_message;
+    }
     return (
       <div className="error_div">
         <p className="error_message">{message}</p>

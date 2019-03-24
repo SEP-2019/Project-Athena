@@ -32,18 +32,11 @@ class CourseSuggestion extends Component {
   }
 
   componentDidMount() {
-    this.setState(
-      {
-        studentId: this.props.studentId,
-      },
-      () => {
-        console.log('this is a state', this.state);
-        console.log('this is a prop', this.props.studentId);
-      }
-    );
+    this.setState({
+      studentId: this.props.studentId,
+    });
     this.hydrateStateWithLocalStorage();
-    // add event listener to save state to localStorage
-    // when user leaves/refreshes the page
+
     window.addEventListener(
       'beforeunload',
       this.saveStateToLocalStorage.bind(this)
@@ -87,10 +80,10 @@ class CourseSuggestion extends Component {
           </TabList>
           <Divider />
           <TabPanel tabId="Mandatory Courses">
-            <MandatoryPanel />
+            <MandatoryPanel sid={this.props.studentId} />
           </TabPanel>
           <TabPanel tabId="Complementary Courses">
-            <ComplementaryPanel />
+            <ComplementaryPanel sid={this.props.studentId} />
           </TabPanel>
         </Tabs>
       </div>
