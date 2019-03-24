@@ -165,9 +165,9 @@ class CurriculumDisplay extends Component {
           <this.renderLoadingMessage message = {this.state.loadingMessage}/>
           <this.renderInstructions message = {this.state.instructions}/>
           <div className="curriculum-content">
-            <div className="semester-course-display" key="Completed Courses">
+            <div className="semester-course-display row" key="Completed Courses">
               {this.state.completedCourses.map((completedSemester, index) => (
-                <div key={"Complete__" + index}>
+                <div key={"Complete__" + index} className="column">
                   <div className="semester-name" key={"Completed_" + index}>
                     {completedSemester.semester}
                   </div>
@@ -183,10 +183,10 @@ class CurriculumDisplay extends Component {
               ))}
             </div>
 
-            <div className="semester-course-display" key="Incomplete Courses">
+            <div className="semester-course-display row" key="Incomplete Courses">
             {/* make the selectable courses for then incomplete semesters the union of incomplete courses and desired TCs */}
               {this.state.incompleteCourses.map((incompleteSemester, index) => (
-                <div key={"Incomplete__" + index}>
+                <div key={"Incomplete__" + index} className="column">
                   <div className="semester-name" key={"Incomplete_" + index}>
                     {incompleteSemester.semester}
                   </div>
