@@ -20,7 +20,7 @@ class MandatoryPanel extends Component {
 
   fetchCourses = async () => {
     const response = await Api()
-      .get(`courses/getAllCourses`)
+      .get(`users/getRemainingCourses?studentId=${this.props.sid}`)
       .catch(error => {
         RedirectError(error);
       });

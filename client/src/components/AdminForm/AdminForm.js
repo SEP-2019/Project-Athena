@@ -7,7 +7,7 @@ class AdminForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedSearch: this.props.selectedSearch,
+      selectedCourse: this.props.selectedcourse,
     };
   }
 
@@ -21,7 +21,7 @@ class AdminForm extends Component {
             id="course-code-input"
             type="text"
             name="course code"
-            defaultValue={this.state.selectedSearch.course_code}
+            defaultValue={this.state.selectedCourse.course_code}
             onChange={this.props.handleInputChange}
             // error={this.state.usernameError}
           />
@@ -32,7 +32,7 @@ class AdminForm extends Component {
           id="title-input"
           type="text"
           name="title"
-          defaultValue={this.state.selectedSearch.title}
+          defaultValue={this.state.selectedCourse.title}
           onChange={this.props.handleInputChange}
           // error={this.state.usernameError}
         />
@@ -42,7 +42,7 @@ class AdminForm extends Component {
           id="desc-input"
           type="text" //TODO make it multiline?
           name="desc"
-          defaultValue={this.state.selectedSearch.description}
+          defaultValue={this.state.selectedCourse.description}
           onChange={this.props.handleInputChange}
           // error={this.state.emailError}
         />
@@ -53,7 +53,7 @@ class AdminForm extends Component {
             id="credits-input"
             type="number"
             name="credits"
-            defaultValue={this.state.selectedSearch.credits}
+            defaultValue={this.state.selectedCourse.credits}
             onChange={this.props.handleInputChange}
             // error={this.state.passwordError}
           />

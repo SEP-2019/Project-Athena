@@ -44,7 +44,7 @@ class TagList extends Component {
       this.props.updateTagsCheckedState(tags);
     }
     if (isCleared) {
-      this.props.enqueueSnackbar('Your selections have been cleared', {
+      this.props.enqueueSnackbar('Your filters have been cleared', {
         variant: 'info',
         action: <Button size="small">{'Dismiss'}</Button>,
         autoHideDuration: 1500,
@@ -61,7 +61,7 @@ class TagList extends Component {
   onApply = e => {
     e.preventDefault();
     if (this.props.applySelection()) {
-      this.props.enqueueSnackbar('Your selections have been applied', {
+      this.props.enqueueSnackbar('Your changes have been applied', {
         variant: 'success',
         action: <Button size="small">{'Dismiss'}</Button>,
         autoHideDuration: 1500,

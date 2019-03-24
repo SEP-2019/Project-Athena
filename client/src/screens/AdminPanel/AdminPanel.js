@@ -21,6 +21,7 @@ class AdminPanel extends Component {
     this.state = {
       allCourses: [], // list of all courses to select
       selectedSearch: {}, // selected course (updates on hover)
+      courseToEdit: {},
       loading: true,
       tags: [],
       placeHolder: 'Type a course number',
@@ -108,9 +109,10 @@ class AdminPanel extends Component {
     if (typeof this.state.selectedSearch.course_code === 'undefined') {
       console.log('empty bar! Dont switch view');
       this.setState({ placeHolder: 'Select a course to edit!' });
+    } else {
+      this.setState({ courseToEdit: this.state.selectedSearch });
+      this.handleSwitchView('edit');
     }
-    //TODO
-    else this.handleSwitchView('edit');
   }
 
   handleInputChange(event = {}) {
@@ -171,7 +173,7 @@ class AdminPanel extends Component {
             </span>
 
             <AdminForm
-              selectedSearch={this.state.selectedSearch}
+              selectedCourse={this.state.courseToEdit}
               handleInputChange={this.handleInputChange}
             />
 
@@ -193,7 +195,7 @@ class AdminPanel extends Component {
               {this.state.errorMessage}
             </span>
 
-            <AdminForm selectedSearch={{}} />
+            <AdminForm selectedCourse={{}} />
 
             <div className="tags-container">
               <this.renderTagsBox tags={tags} tagsAreLoading={tagsAreLoading} />
@@ -215,7 +217,7 @@ class AdminPanel extends Component {
             className="selection-search"
             data={allCourses}
             getValue={this.onSelectFromSearch}
-            placeHolder={this.state.placeHolder}
+            placeholder={this.state.placeHolder}
           />
           <button
             className="primary-button"
