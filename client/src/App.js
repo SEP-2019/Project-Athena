@@ -29,7 +29,10 @@ class App extends Component {
 
     return (
       <Switch>
-        <Route path="/login" component={Login} />
+        <Route
+          path="/login"
+          render={props => <Login setEmail={this.setEmail} {...props} />}
+        />
         <Route path="/courseregistration" component={CourseRegistration} />
         <Route path="/curriculumdisplay" component={CurriculumDisplay} />
         <Route path="/Home" component={CourseSuggestion} />
