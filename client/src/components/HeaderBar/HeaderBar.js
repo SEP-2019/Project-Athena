@@ -3,9 +3,9 @@ import './HeaderBar.css';
 import LeftDrawer from '../LeftDrawer/LeftDrawer';
 
 const pages = [
-  { label: 'Course Registration', path: '/courseregistration' },
-  { label: 'Course Suggestions', path: '/home' },
-  { label: 'Curriculum', path: '/curriculumdisplay' },
+  { label: 'Course Registration', path: '/courseRegistration' },
+  { label: 'Course Suggestions', path: '/courseSuggestions' },
+  { label: 'Curriculum', path: '/curriculumDisplay' },
 ];
 const HeaderBar = props => (
   <header className="HeaderBar">
