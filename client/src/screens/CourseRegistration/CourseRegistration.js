@@ -175,6 +175,7 @@ class CourseRegistration extends Component {
                 className="selection-search"
                 data={allCourses}
                 getValue={this.onSelectFromSearch}
+                placeholder="Type a course number"
               />
               <DropDown
                 defaultValue={this.state.selectedSemester}
