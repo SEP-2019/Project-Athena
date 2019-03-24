@@ -3,14 +3,12 @@ import React, { Component } from 'react';
 import ExpandableCourse from '../ExpandableCourse/ExpandableCourse';
 import DropDown from '../DropDown/DropDown';
 
+import './CourseTable.css';
+
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-
-const pStyle = {
-  width: '512px',
-};
 
 class CourseTable extends Component {
   handleChange(event) {
@@ -94,14 +92,16 @@ class CourseTable extends Component {
   renderCourseTable(props){
     return props.useDropdown
     ?
-    <DropDown
-      defaultValue={this.state.selectedCourses[props.index]}
-      getValueWithIndex={this.updateSelectedCourse}
-      menuList={this.state.courses}
-      className="select"
-      associatedIndex={props.index}
-      disabledItems = {this.state.courses.map(c => c.isDisabled)}
-    />
+    <div className="with-border">
+      <DropDown
+        defaultValue={this.state.selectedCourses[props.index]}
+        getValueWithIndex={this.updateSelectedCourse}
+        menuList={this.state.courses}
+        associatedIndex={props.index}
+        useAlternateStyle={true}
+        disabledItems = {this.state.courses.map(c => c.isDisabled)}
+      />
+    </div>
     :
     <ExpandableCourse
       index={props.index}
@@ -123,39 +123,27 @@ class CourseTable extends Component {
   renderSemester(props){
     return this.state.useDropdown
     ? [...Array(this.state.coursesPerSemseter).keys()].map((element, index) => (
-      <TableRow key={index}>
-        <TableCell key={index}>
-          <this.renderCourseTable
-            key={index}
-            index={index}
-            useDropdown={this.state.useDropdown}
-          />
-        </TableCell>
-      </TableRow>
+      <this.renderCourseTable
+        key={index}
+        index={index}
+        useDropdown={this.state.useDropdown}
+      />
     ))
     : this.state.courses.map((course, index) => (
-      <TableRow key={index}>
-        <TableCell key={index}>
-          <this.renderCourseTable
-            key={index}
-            index={index}
-            course_code={course.course_code}
-            description={course.description}
-            useDropdown={this.state.useDropdown}
-          />
-        </TableCell>
-      </TableRow>
+      <this.renderCourseTable
+        key={index}
+        index={index}
+        course_code={course.course_code}
+        description={course.description}
+        useDropdown={this.state.useDropdown}
+      />
     ))
   }
     
   render() {
     return (
       <div>
-        <Table>
-          <TableBody>
-            <this.renderSemester/>
-          </TableBody>
-        </Table>
+        <this.renderSemester/>
       </div>
     );
   }

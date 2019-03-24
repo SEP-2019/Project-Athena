@@ -2,6 +2,11 @@ div.curriculum-display{
   padding: 24px 32px 24px 32px ;
 }
 
+div.instructions{
+  font-size: 20px;
+  padding: 16px 0px 0px 0px;
+}
+
 div.page-header{
   font-weight: bold;
   font-size: 30px;
@@ -27,6 +32,6 @@ div.semester-course-display{
 div.semester-name{
   padding: 0px 0px 12px 0px ;
   font-weight: bold;
-  font-size: 24px;
+  font-size: 22px;
   color: black;
 }

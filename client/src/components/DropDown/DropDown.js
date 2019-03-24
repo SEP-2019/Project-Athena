@@ -10,6 +10,15 @@ const overrideStyle = {
   padding: '3px 0 3px 15px',
 };
 
+/**
+ * The alternate style is used for the dropdowns for selecting courses in the curriculum display page
+ */
+const alternateStyle = {
+  color: '#000000',
+  fontSize: '0.8rem',
+  padding: '3px 0 3px 15px',
+};
+
 class DropDown extends Component {
   handleChange(event) {
     this.props.getValue(event.target.value);
@@ -31,10 +40,10 @@ class DropDown extends Component {
     return (
       <Select
         disableUnderline
-        style={overrideStyle}
+        style={this.props.useAlternateStyle ? alternateStyle : overrideStyle}
         value={this.props.defaultValue}
         onChange={(e, metaData) => this.handleChangeWithIndex(e, metaData)}
-        className="select"
+        className={this.props.useAlternateStyle ? "course-selection-dropdown" : "select"}
       >
         {this.props.menuList.map((item, index) => (
           <MenuItem key={index} value={item} className="menu-item" disabled={this.props.disabledItems === undefined ? false : this.props.disabledItems[index]}>

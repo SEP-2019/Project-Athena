@@ -15,8 +15,10 @@ class CurriculumDisplay extends Component {
     this.parseCourseData = this.parseCourseData.bind(this);
     this.renderCourseTable = this.renderCourseTable.bind(this);
     this.renderLoadingMessage = this.renderLoadingMessage.bind(this);
+    this.renderInstructions = this.renderInstructions.bind(this);
     this.state = {
       loadingMessage: "Loading curriculum information...",
+      instructions: "",
       studentId: null, // placeholder student id until sessions/persistance are implemented
       curriculumName: 'View ECSE Curriculums',
       completedCourses: [],
@@ -46,7 +48,7 @@ class CurriculumDisplay extends Component {
       .get('users/getStudentData?studentID=' + studentid)
       .then(response => {
 
-        let res = response.data.Response;
+        let res   = response.data.Response;
         
         this.setState({
           curriculumName: res.major[0].curriculum_name,
@@ -69,6 +71,7 @@ class CurriculumDisplay extends Component {
               this.state.completedCourses.map(cc => cc.courses).flat(),
             ),
             loadingMessage: "",
+            instructions: "Select the courses you wish to take in each semester from the tables below"
           })
         })
       })
@@ -107,7 +110,9 @@ class CurriculumDisplay extends Component {
         group[k][i].isDisabled = !hasPrereqs
       }
 
-      group[k].map(course => course.displayMember = course.course_code + " - " + course.description[0].title)
+      if(group[k]){
+        group[k].map(course => course.displayMember = course.course_code + " - " + course.title)
+      }
 
       return { semester: k, courses: group[k] };
     });
@@ -141,6 +146,15 @@ class CurriculumDisplay extends Component {
     return props.message ? <div>{props.message}</div> : (null)
   }
 
+  /**
+   * Renders the instructions to use the page
+   * 
+   * @param {Object} props 
+   */
+  renderInstructions(props){
+    return props.message ? <div className="instructions">{props.message}</div> : (null)
+  }
+
   render() {
     return (
       <div className="page">
@@ -149,6 +163,7 @@ class CurriculumDisplay extends Component {
             {'Current Curriculum: ' + this.state.curriculumName}
           </div>
           <this.renderLoadingMessage message = {this.state.loadingMessage}/>
+          <this.renderInstructions message = {this.state.instructions}/>
           <div className="curriculum-content">
             <div className="semester-course-display" key="Completed Courses">
               {this.state.completedCourses.map((completedSemester, index) => (

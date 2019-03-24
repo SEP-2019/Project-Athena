@@ -5,6 +5,18 @@
   font-weight: normal;
 }
 
+.course-selection-dropdown {
+  background-color: white;
+  text-align: left;
+  border-radius: 0px;
+  font-weight: normal;
+  width: 495px;
+  height: 48px;
+  outline: #000000;
+  outline-width: 20px;
+  outline-color: #000000;
+}
+
 .select svg {
   color: #ffffff;
 }
