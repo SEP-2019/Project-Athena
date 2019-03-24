@@ -8,6 +8,7 @@ import Login from './screens/Login';
 import ErrorPage from './screens/ErrorPage';
 import CurriculumDisplay from './screens/CurriculumDisplay';
 import './App.css';
+import AdminPanel from './screens/AdminPanel/AdminPanel';
 
 class App extends Component {
   constructor(props) {
@@ -37,6 +38,7 @@ class App extends Component {
         <Route path="/curriculumdisplay" component={CurriculumDisplay} />
         <Route path="/Home" component={CourseSuggestion} />
         <Route path="/Error" component={ErrorPage} />
+        <Route path="/Admin" component={AdminPanel} />
         <Redirect to="/login" />
       </Switch>
     );
