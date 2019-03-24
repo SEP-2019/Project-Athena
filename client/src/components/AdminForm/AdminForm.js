@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Section from '../Section';
 import EditText from '../EditText';
 import './AdminForm.css';
+import TagCheckBox from '../TagCheckBox/TagCheckBox';
 
 class AdminForm extends Component {
   constructor(props) {
@@ -53,6 +54,7 @@ class AdminForm extends Component {
         <Section className="subform" flexDirection="row">
           <EditText
             required
+            className="column"
             label="Number of credits"
             id="credits-input"
             type="number"
@@ -60,6 +62,17 @@ class AdminForm extends Component {
             defaultValue={this.props.selectedCourse.credits}
             onChange={this.props.handleInputChange}
             // error={this.state.passwordError}
+          />
+          <TagCheckBox
+            className="column"
+            key={this.props.selectedCourse.course_code}
+            index={this.props.selectedCourse.course_code}
+            // the name property is a duplicate property referring to the label of the checkbox
+            // as well as the property that is passed to the event handler. keep it as 
+            // "phased_out" or else it won't set the new value properly
+            name={"phased_out"}
+            checked={this.props.selectedCourse.phased_out}
+            handleChange={this.props.handleInputChange}
           />
         </Section>
       </Section>

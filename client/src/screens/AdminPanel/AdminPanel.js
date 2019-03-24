@@ -149,10 +149,15 @@ class AdminPanel extends Component {
   handleInputChange(event = {}) {
     const name = event.target && event.target.name;
     const value = event.target && event.target.value;
+
+    // in the case of the TagCheckBox component, the value cannot be parsed directly, but rather
+    // comes from the "checked" property of the event
+    const newValue = name === "phased_out" ? event.target && event.target.checked : value
+
     this.setState(prevState => ({
       courseToEdit: {
         ...prevState.courseToEdit,
-        [name]: value,
+        [name]: newValue,
       },
     }));
   }
@@ -217,6 +222,7 @@ class AdminPanel extends Component {
     return !props.tagsAreLoading ? (
       <TagList
         hasButtons={false}
+        refreshChecks={true}
         tags={this.state.tags}
         applySelection={this.applySelection}
         checkedTags={this.state.checkedTagsSet}
