@@ -59,12 +59,17 @@ class DropDown extends React.Component {
     return (
       <MuiThemeProvider theme={theme}>
         <div className={classes.root}>
-          <FormControl variant="outlined" className={classes.formControl}>
+          <FormControl
+            required
+            variant="outlined"
+            className={classes.formControl}
+            error={this.props.error}
+          >
             <InputLabel
               ref={ref => {
                 this.InputLabelRef = ref;
               }}
-              htmlFor="outlined-age-native-simple"
+              htmlFor="dropdown-input"
             >
               {this.props.label}
             </InputLabel>
@@ -75,7 +80,7 @@ class DropDown extends React.Component {
               input={
                 <OutlinedInput
                   labelWidth={this.state.labelWidth}
-                  id="outlined-age-native-simple"
+                  id="dropdown-input"
                 />
               }
             >

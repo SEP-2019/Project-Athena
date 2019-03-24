@@ -7,6 +7,7 @@ import * as validation from './Validation';
 import Cookies from 'universal-cookie';
 import history from '../../history';
 
+const HOME_URL = '/courseRegistration';
 const LOGIN_URL = 'users/login';
 
 class LoginContent extends Component {
@@ -46,7 +47,6 @@ class LoginContent extends Component {
         })
         .then(response => {
           // Save email, student ID & redirect
-          console.log(response);
           const cookies = new Cookies();
           cookies.set('studentId', this.state.username.replace(/\s/g, ''), {
             path: '/',
@@ -81,7 +81,7 @@ class LoginContent extends Component {
   }
 
   redirect = () => {
-    history.push('/courseregistration');
+    history.push(HOME_URL);
   };
 
   isInputValid() {

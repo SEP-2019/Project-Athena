@@ -3,6 +3,7 @@ import Section from '../Section';
 import EditText from '../EditText';
 import DropDown from '../DropDownOutlined/DropDown';
 import Api from '../../services/Api';
+import Cookies from 'universal-cookie';
 import * as validation from './Validation';
 import history from '../../history';
 
@@ -10,6 +11,8 @@ const tempCurriculum = ['7 semesters', '8 semesters'];
 const tempMajors = ['Computer', 'Electrical', 'Software'];
 
 const SIGNUP_URL = 'users/addStudentUser';
+const YEARS_URL = 'curriculums/getCurriculumData';
+const HOME_URL = '/courseRegistration';
 
 class SignupContent extends Component {
   //call get years request
@@ -24,13 +27,15 @@ class SignupContent extends Component {
       selectedMajor: '',
       selectedYear: '',
       selectedCurriculum: '',
-      startYear: '',
       errorMessage: '',
       years: [],
       usernameError: false,
       emailError: false,
       passwordError: false,
       confirmError: false,
+      majorError: false,
+      curriculumError: false,
+      yearError: false,
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -45,68 +50,98 @@ class SignupContent extends Component {
         emailError: false,
         passwordError: false,
         confirmError: false,
+        majorError: false,
+        curriculumError: false,
+        yearError: false,
         errorMessagere: '',
       },
       () => {
-        // this.sendSignUpRequest();
-        this.setError('MAJOR' + this.state.selectedMajor);
+        this.fillRequest();
       }
     );
   }
 
   async getYears() {
     try {
-      let url = 'curriculums/getCurriculumData';
-      let r = await Api().get(url);
+      let r = await Api().get(YEARS_URL);
       let response = r.data.Response;
       this.setState({
         years: response,
       });
     } catch (e) {
       alert(
-        'There has been an error while loading your page \nPlease try again later.'
+        'An error occured while loading your page. \nPlease try again later.'
       );
     }
   }
 
-  sendSignUpRequest() {
+  fillRequest() {
     var id = this.state.username.replace(/\s/g, '');
     var email = this.state.email;
     var password = this.state.password;
     var confirmPassword = this.state.confirmPassword;
+    var isDropDownValid = true;
 
-    if (this.isInputValid(id, email, password, confirmPassword)) {
-      console.log(id);
-      // Send Request
-      Api()
-        .post(SIGNUP_URL, {
-          username: id,
-          password: password,
-          email: email,
-          student_id: id,
-        })
-        .then(response => {
-          // Got response
-          console.log(response);
-          // TODO: change page, save email when backend is done
-          // this.props.setEmail(response.data.Response);
-          // this.redirect();
-        })
-        .catch(loginError => {
-          console.log(loginError);
-          // Network Error
-          if (validation.isEmpty(loginError.response)) {
-            this.setError(loginError);
-          } else {
-            // Error from server
-            this.displaySignupError(loginError.response.data.ErrorMessage);
-          }
-        });
+    if (!this.state.selectedYear) {
+      isDropDownValid = false;
+      this.setError('Select your year of enrollment.');
+      this.updateErrorState('yearError', true);
+    }
+    if (this.state.selectedCurriculum) {
+      var str = this.state.selectedCurriculum.replace(/\s/g, '-');
+      var curriculum = str.substring(0, str.length - 1) + '-curriculum';
+    } else {
+      isDropDownValid = false;
+      this.setError('Select the length of your curriculum.');
+      this.updateErrorState('curriculumError', true);
+    }
+    if (this.state.selectedMajor) {
+      var program = this.state.selectedMajor + ' Engineering';
+    } else {
+      isDropDownValid = false;
+      this.setError('Select your major.');
+      this.updateErrorState('majorError', true);
+    }
+
+    if (
+      this.isInputValid(id, email, password, confirmPassword) &&
+      isDropDownValid
+    ) {
+      this.sendRequest(id, password, email, program, curriculum);
     }
   }
 
+  sendRequest(id, password, email, program, curriculum) {
+    Api()
+      .post(SIGNUP_URL, {
+        username: id,
+        password: password,
+        email: email,
+        student_id: id,
+        program: program,
+        year: this.state.selectedYear,
+        curr_type: curriculum,
+      })
+      .then(response => {
+        const cookies = new Cookies();
+        cookies.set('studentId', id, { path: '/' });
+        cookies.set('email', response.data.Response, { path: '/' });
+        this.redirect();
+      })
+      .catch(loginError => {
+        console.log(loginError);
+        // Network Error
+        if (validation.isEmpty(loginError.response)) {
+          this.setError(loginError);
+        } else {
+          // Error from server
+          this.displaySignupError(loginError.response.data.ErrorMessage);
+        }
+      });
+  }
+
   redirect = () => {
-    history.push('/courseregistration');
+    history.push(HOME_URL);
   };
 
   isInputValid(id, email, password, confirmPassword) {
@@ -137,14 +172,14 @@ class SignupContent extends Component {
       isValid = false;
     }
 
-    //TODO, add curiculum validation
-
     return isValid;
   }
 
   displaySignupError(error) {
     if (error === 'ER_DUP_ENTRY') {
       this.setError('User with this student ID already exists.');
+    } else if (error.includes('Curriculum with name')) {
+      this.setError('Sorry, this curriculum is currently unsupported.');
     } else {
       this.setError(error);
     }
@@ -223,27 +258,30 @@ class SignupContent extends Component {
         </Section>
         <Section className="subform" flexDirection="row">
           <DropDown
-            label="ECSE major *"
+            label="ECSE major"
             menuList={tempMajors}
             name="selectedMajor"
             defaultValue={this.state.selectedMajor}
             onChange={this.handleInputChange}
+            error={this.state.majorError}
           />
           &nbsp;
           <DropDown
-            label="Curriculum *"
+            label="Curriculum"
             menuList={tempCurriculum}
             name="selectedCurriculum"
             defaultValue={this.state.selectedCurriculum}
             onChange={this.handleInputChange}
+            error={this.state.curriculumError}
           />
           &nbsp;
           <DropDown
-            label="Start year *"
+            label="Start year"
             menuList={this.state.years}
             name="selectedYear"
             defaultValue={this.state.selectedYear}
             onChange={this.handleInputChange}
+            error={this.state.yearError}
           />
         </Section>
         <span className="note">
