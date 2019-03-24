@@ -12,7 +12,7 @@ class SearchBar extends Component {
     };
     this.getSuggestions = this.getSuggestions.bind(this);
     this.getSuggestionValue = this.getSuggestionValue.bind(this);
-    this.onClickSuggestion = this.onClickSuggestion.bind(this);
+    this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
     this.renderSuggestion = this.renderSuggestion.bind(this);
     this.onClearInput = this.onClearInput.bind(this);
   }
@@ -58,11 +58,6 @@ class SearchBar extends Component {
     });
   };
 
-  // Passes the suggestion value to the parent component
-  onClickSuggestion(suggestion) {
-    this.props.getValue(suggestion);
-  }
-
   onClearInput() {
     this.setState({ value: '' });
   }
@@ -70,14 +65,17 @@ class SearchBar extends Component {
   // Renders the suggestions under the search bar
   renderSuggestion(suggestion) {
     return (
-      <div
-        className="suggestion-item"
-        onClick={this.onClickSuggestion(suggestion)}
-      >
+      <div className="suggestion-item">
         <div className="suggestion-code">{suggestion.course_code}</div>
         <div className="suggestion-title">{suggestion.title}</div>
       </div>
     );
+  }
+
+  // Passes the suggestion value to the parent component
+  onSuggestionSelected(event, { suggestion }) {
+    // console.log('onSuggestionSelected: ', suggestion);
+    this.props.getValue(suggestion);
   }
 
   render() {
@@ -95,6 +93,7 @@ class SearchBar extends Component {
           suggestions={suggestions}
           onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
           onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+          onSuggestionSelected={this.onSuggestionSelected}
           getSuggestionValue={this.getSuggestionValue}
           renderSuggestion={this.renderSuggestion}
           inputProps={inputProps}
