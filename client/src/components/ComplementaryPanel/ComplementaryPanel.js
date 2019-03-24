@@ -4,6 +4,7 @@ import { SnackbarProvider, withSnackbar } from 'notistack';
 
 import Api from '../../services/Api';
 import TagList from '../TagList/TagList';
+import RedirectError from '../RedirectError/RedirectError';
 import CourseSuggestionList from '../CourseSuggestionList/CourseSuggestionList';
 import './ComplementaryPanel.css';
 
@@ -34,7 +35,7 @@ class ComplementaryPanel extends Component {
         courses: courses,
       })
       .catch(error => {
-        console.error(error);
+        RedirectError(error);
       });
   };
 
@@ -42,8 +43,7 @@ class ComplementaryPanel extends Component {
     const response = await Api()
       .get(`tags/getAllTags`)
       .catch(error => {
-        console.error(error);
-        this.setState({ tagsAreLoading: false });
+        RedirectError(error);
       });
     if (response) {
       this.setState({
@@ -57,7 +57,7 @@ class ComplementaryPanel extends Component {
     const response = await Api()
       .get(`courses/getCourseByTag?tag=${newTag}&studentID=${sid}`)
       .catch(error => {
-        console.error(error);
+        RedirectError(error);
       });
     if (response) {
       const courses = response.data.Response;
