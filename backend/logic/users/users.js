@@ -408,12 +408,12 @@ let getRemainingCourses = async studentId => {
     AND (c.course_code 
         IN (SELECT course_code 
             FROM curriculum_core_classes 
-            WHERE curriculum_name = (SELECT curriculum_name FROM student_majors where student_id = ? limit 1)));`, 
-            [studentId]
-  )
+            WHERE curriculum_name = (SELECT curriculum_name FROM student_majors where student_id = ? limit 1)));`,
+    [studentId]
+  );
   conn.release();
   return incompleteCoreCourses;
-}
+};
 
 module.exports = {
   insertStudentUser,
