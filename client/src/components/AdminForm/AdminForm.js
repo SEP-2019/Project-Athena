@@ -7,7 +7,7 @@ class AdminForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedCourse: this.props.selectedcourse,
+      //   selectedCourse: this.props.selectedCourse,
     };
   }
 
@@ -20,8 +20,8 @@ class AdminForm extends Component {
             label="Course code"
             id="course-code-input"
             type="text"
-            name="course code"
-            defaultValue={this.state.selectedCourse.course_code}
+            name="course_code"
+            defaultValue={this.props.selectedCourse.course_code}
             onChange={this.props.handleInputChange}
             // error={this.state.usernameError}
           />
@@ -32,7 +32,7 @@ class AdminForm extends Component {
           id="title-input"
           type="text"
           name="title"
-          defaultValue={this.state.selectedCourse.title}
+          defaultValue={this.props.selectedCourse.title}
           onChange={this.props.handleInputChange}
           // error={this.state.usernameError}
         />
@@ -41,8 +41,8 @@ class AdminForm extends Component {
           label="Description"
           id="desc-input"
           type="text" //TODO make it multiline?
-          name="desc"
-          defaultValue={this.state.selectedCourse.description}
+          name="description"
+          defaultValue={this.props.selectedCourse.description}
           onChange={this.props.handleInputChange}
           // error={this.state.emailError}
         />
@@ -53,7 +53,7 @@ class AdminForm extends Component {
             id="credits-input"
             type="number"
             name="credits"
-            defaultValue={this.state.selectedCourse.credits}
+            defaultValue={this.props.selectedCourse.credits}
             onChange={this.props.handleInputChange}
             // error={this.state.passwordError}
           />

@@ -76,7 +76,12 @@ class CourseSuggestion extends Component {
           </TabList>
           <Divider />
           <TabPanel tabId="Mandatory Courses">
-            <MandatoryPanel sid={this.props.studentId} />
+            <MandatoryPanel
+              sid={this.props.studentId}
+              url={`users/getRemainingCourses?studentId=${
+                this.props.studentId
+              }`}
+            />
           </TabPanel>
           <TabPanel tabId="Complementary Courses">
             <ComplementaryPanel sid={this.props.studentId} />

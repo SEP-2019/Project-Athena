@@ -25,6 +25,7 @@ class AdminPanel extends Component {
       loading: true,
       tags: [],
       placeHolder: 'Type a course number',
+      disableEdit: true,
     };
 
     this.onSelectFromSearch = this.onSelectFromSearch.bind(this);
@@ -33,6 +34,8 @@ class AdminPanel extends Component {
     this.handleSwitchView = this.handleSwitchView.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.fetchTags = this.fetchTags.bind(this);
+    this.onEdit = this.onEdit.bind(this);
+    this.onAdd = this.onAdd.bind(this);
   }
 
   // Called on click of a search suggestion, updates the selected course
@@ -110,7 +113,9 @@ class AdminPanel extends Component {
       console.log('empty bar! Dont switch view');
       this.setState({ placeHolder: 'Select a course to edit!' });
     } else {
-      this.setState({ courseToEdit: this.state.selectedSearch });
+      this.setState(prevState => ({
+        courseToEdit: prevState.selectedSearch,
+      }));
       this.handleSwitchView('edit');
     }
   }
@@ -118,8 +123,12 @@ class AdminPanel extends Component {
   handleInputChange(event = {}) {
     const name = event.target && event.target.name;
     const value = event.target && event.target.value;
-    this.setState({ [name]: value });
-    console.log(name, ' and ', value);
+    this.setState(prevState => ({
+      courseToEdit: {
+        ...prevState.courseToEdit,
+        [name]: value,
+      },
+    }));
   }
 
   updateTagsCheckedState = newTags => {
@@ -128,10 +137,7 @@ class AdminPanel extends Component {
   };
 
   onEdit() {
-    //TODO
-  }
-
-  onAdd() {
+    console.log(this.state.courseToEdit);
     //TODO
     // Api()
     //   .post('/courses/addCompletedCourses', completedCourses)
@@ -139,6 +145,31 @@ class AdminPanel extends Component {
     //     console.log(res);
     //   })
     //   .catch(error => console.log('ERROR', error));
+  }
+
+  onAdd() {
+    console.log(this.state.courseToEdit);
+    if (!/^[a-z]{4} \d{3}$/i.test(this.state.courseToEdit.course_code)) {
+      //TODO
+      console.log('invalid course code');
+    }
+
+    //TODO
+    let newCourse = {
+      courseCode: 'ECSE 428',
+      title: 'Software Engineering Practice',
+      departement: 'ECSE',
+      phasedOut: '0',
+      description: 'Practice in software',
+      credits: 3,
+    };
+
+    Api()
+      .post('/courses/createCourse', newCourse)
+      .then(res => {
+        console.log(res);
+      })
+      .catch(error => console.log('ERROR', error));
   }
 
   renderTagsBox = props => {
@@ -163,7 +194,7 @@ class AdminPanel extends Component {
     let view;
     switch (this.state.view) {
       case 'list':
-        view = <MandatoryPanel />;
+        view = <MandatoryPanel url={'courses/getAllCourses'} />;
         break;
       case 'edit':
         view = (
@@ -182,7 +213,11 @@ class AdminPanel extends Component {
             </div>
 
             {/* Buttons */}
-            <button className="primary-button" onClick={this.onEdit}>
+            <button
+              className="primary-button"
+              onClick={this.onEdit}
+              disabled={this.state.disableEdit}
+            >
               Edit course
             </button>
           </Section>
@@ -195,7 +230,10 @@ class AdminPanel extends Component {
               {this.state.errorMessage}
             </span>
 
-            <AdminForm selectedCourse={{}} />
+            <AdminForm
+              selectedCourse={{}}
+              handleInputChange={this.handleInputChange}
+            />
 
             <div className="tags-container">
               <this.renderTagsBox tags={tags} tagsAreLoading={tagsAreLoading} />
