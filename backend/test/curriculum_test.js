@@ -6,31 +6,6 @@ const mysql = require("../sql/connection");
 describe("Test retrieve curriculum by name", function() {
     before(async () => {
         const conn = await mysql.getNewConnection();
-      //clean up the database beforehand, just in case.
-        await conn.query(
-          `DELETE FROM curriculum_core_classes WHERE course_code = ?;`,
-          ["TEST 001"]
-        );
-        await conn.query(
-          `DELETE FROM curriculum_tech_comps WHERE course_code = ?;`,
-          ["TEST 002"]
-        );
-        await conn.query(
-          `DELETE FROM curriculum_complementaries WHERE course_code = ?;`,
-          ["TEST 003"]
-        );
-        await conn.query(`DELETE FROM courses WHERE course_code = ?;`, [
-          "TEST 001"
-        ]);
-        await conn.query(`DELETE FROM courses WHERE course_code = ?;`, [
-          "TEST 002"
-        ]);
-        await conn.query(`DELETE FROM courses WHERE course_code = ?;`, [
-          "TEST 003"
-        ]);
-        await conn.query(`DELETE FROM curriculums WHERE curriculum_name = ?;`, [
-          "Curriculumn Test 1"
-        ]);
     
         await conn.query(
           "INSERT INTO curriculums (curriculum_name, type, department, numOfElectives) VALUES(?, ?, ?, ?);",
