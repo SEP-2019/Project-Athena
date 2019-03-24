@@ -11,6 +11,7 @@ import history from '../../history';
 import EditText from '../../components/EditText';
 import TagList from '../../components/TagList/TagList';
 import { SnackbarProvider, withSnackbar } from 'notistack';
+import AdminForm from '../../components/AdminForm/AdminForm';
 
 const TagListWithSnackBar = withSnackbar(TagList);
 
@@ -22,6 +23,7 @@ class AdminPanel extends Component {
       selectedSearch: {}, // selected course (updates on hover)
       loading: true,
       tags: [],
+      placeHolder: 'Type a course number',
     };
 
     this.onSelectFromSearch = this.onSelectFromSearch.bind(this);
@@ -85,9 +87,27 @@ class AdminPanel extends Component {
     }
   };
 
+  fetchTagsByCourse = async () => {
+    const response = await Api()
+      .get(
+        `tags/getTagByCourse?studentID=${this.state.selectedSearch.course_code}`
+      )
+      .catch(error => {
+        // RedirectError(error); //TODO
+      });
+    if (response) {
+      //TODO go through this.state.tags and mark checked to true for the tags in response.data.Response
+      // this.setState({
+      //   tags: this.addCheckedProperty(response.data.Response),
+      //   tagsAreLoading: false,
+      // });
+    }
+  };
+
   onEditView() {
-    if (this.state.selectedSearch.course_code === '') {
+    if (typeof this.state.selectedSearch.course_code === 'undefined') {
       console.log('empty bar! Dont switch view');
+      this.setState({ placeHolder: 'Select a course to edit!' });
     }
     //TODO
     else this.handleSwitchView('edit');
@@ -97,11 +117,26 @@ class AdminPanel extends Component {
     const name = event.target && event.target.name;
     const value = event.target && event.target.value;
     this.setState({ [name]: value });
+    console.log(name, ' and ', value);
   }
 
   updateTagsCheckedState = newTags => {
     this.setState({ tags: newTags });
   };
+
+  onEdit() {
+    //TODO
+  }
+
+  onAdd() {
+    //TODO
+    // Api()
+    //   .post('/courses/addCompletedCourses', completedCourses)
+    //   .then(res => {
+    //     console.log(res);
+    //   })
+    //   .catch(error => console.log('ERROR', error));
+  }
 
   render() {
     const { allCourses } = this.state;
@@ -119,50 +154,11 @@ class AdminPanel extends Component {
             <span className="error" id="error-msg">
               {this.state.errorMessage}
             </span>
-            <Section className="subform" flexDirection="row">
-              <EditText
-                required
-                label="Course code"
-                id="course-code-input"
-                type="text"
-                name="course code"
-                defaultValue={this.state.selectedSearch.course_code}
-                onChange={this.handleInputChange}
-                // error={this.state.usernameError}
-              />
-            </Section>
-            <EditText
-              required
-              label="Title"
-              id="title-input"
-              type="text"
-              name="title"
-              defaultValue={this.state.selectedSearch.title}
-              onChange={this.handleInputChange}
-              // error={this.state.usernameError}
+
+            <AdminForm
+              selectedSearch={this.state.selectedSearch}
+              handleInputChange={this.handleInputChange}
             />
-            <EditText
-              required
-              label="Description"
-              id="desc-input"
-              type="text" //TODO make it multiline?
-              name="desc"
-              defaultValue={this.state.selectedSearch.description}
-              onChange={this.handleInputChange}
-              // error={this.state.emailError}
-            />
-            <Section className="subform" flexDirection="row">
-              <EditText
-                required
-                label="Number of credits"
-                id="credits-input"
-                type="number"
-                name="credits"
-                defaultValue={this.state.selectedSearch.credits}
-                onChange={this.handleInputChange}
-                // error={this.state.passwordError}
-              />
-            </Section>
 
             <div className="tags-container">
               {!tagsAreLoading ? (
@@ -192,50 +188,8 @@ class AdminPanel extends Component {
             <span className="error" id="error-msg">
               {this.state.errorMessage}
             </span>
-            <Section className="subform" flexDirection="row">
-              <EditText
-                required
-                label="Course code"
-                id="course-code-input"
-                type="text"
-                name="course code"
-                defaultValue={this.state.course_code}
-                onChange={this.handleInputChange}
-                // error={this.state.usernameError}
-              />
-            </Section>
-            <EditText
-              required
-              label="Title"
-              id="title-input"
-              type="text"
-              name="title"
-              defaultValue={this.state.course_code}
-              onChange={this.handleInputChange}
-              // error={this.state.usernameError}
-            />
-            <EditText
-              required
-              label="Description"
-              id="desc-input"
-              type="text" //TODO make it multiline?
-              name="desc"
-              defaultValue={this.state.desc}
-              onChange={this.handleInputChange}
-              // error={this.state.emailError}
-            />
-            <Section className="subform" flexDirection="row">
-              <EditText
-                required
-                label="Number of credits"
-                id="credits-input"
-                type="number"
-                name="credits"
-                defaultValue={this.state.credits}
-                onChange={this.handleInputChange}
-                // error={this.state.passwordError}
-              />
-            </Section>
+
+            <AdminForm selectedSearch={{}} />
 
             <div className="tags-container">
               {!tagsAreLoading ? (
@@ -268,6 +222,7 @@ class AdminPanel extends Component {
             className="selection-search"
             data={allCourses}
             getValue={this.onSelectFromSearch}
+            placeHolder={this.state.placeHolder}
           />
           <button
             className="primary-button"
