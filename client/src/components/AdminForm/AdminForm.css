@@ -1,0 +1,23 @@
+.title {
+  left: 30px;
+  top: 30px;
+
+  font-weight: 500;
+  font-size: 36px;
+  color: #b20007;
+}
+
+.description {
+  width: 45%;
+  margin-left: 10vh;
+  margin-inline-end: 10vh;
+}
+
+.form {
+  width: 24rem;
+  margin-inline-end: 10vh;
+}
+
+.check {
+  padding: 12px 0px 0px 12px
+}
