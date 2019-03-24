@@ -394,6 +394,27 @@ var updateStudentMajor = async (student_id, program, year, curr_type) => {
   }
 };
 
+let getRemainingCourses = async studentId => {
+  format.verifyStudentId(studentId);
+  let conn = await mysql.getNewConnection();
+  let incompleteCoreCourses = await conn.query(
+    `SELECT distinct c.course_code, c.title, c.description
+    FROM course_offerings co join courses c on co.course_code = c.course_code
+    WHERE (c.course_code 
+            NOT IN (SELECT co.course_code 
+            FROM student_course_offerings sco 
+            join course_offerings co 
+            on sco.offering_id = co.id)) 
+    AND (c.course_code 
+        IN (SELECT course_code 
+            FROM curriculum_core_classes 
+            WHERE curriculum_name = (SELECT curriculum_name FROM student_majors where student_id = ? limit 1)));`, 
+            [studentId]
+  )
+  conn.release();
+  return incompleteCoreCourses;
+}
+
 module.exports = {
   insertStudentUser,
   deleteStudentUser,
@@ -403,5 +424,6 @@ module.exports = {
   login,
   getStudentData,
   assignStudentMinor,
-  updateStudentMajor
+  updateStudentMajor,
+  getRemainingCourses
 };
