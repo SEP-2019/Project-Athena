@@ -7,13 +7,8 @@ import SearchBar from '../../components/SearchBar';
 
 import MandatoryPanel from '../../components/MandatoryPanel/MandatoryPanel';
 import Section from '../../components/Section';
-import history from '../../history';
-import EditText from '../../components/EditText';
 import TagList from '../../components/TagList/TagList';
-import { SnackbarProvider, withSnackbar } from 'notistack';
 import AdminForm from '../../components/AdminForm/AdminForm';
-
-const TagListWithSnackBar = withSnackbar(TagList);
 
 class AdminPanel extends Component {
   constructor(props) {
@@ -40,9 +35,16 @@ class AdminPanel extends Component {
 
   // Called on click of a search suggestion, updates the selected course
   onSelectFromSearch(selection) {
-    this.setState({
-      selectedSearch: selection,
-    }); // this is where the warning appears :(
+    if (Object.keys(selection).length > 0) {
+      this.setState({
+        selectedSearch: selection,
+      }); // this is where the warning appears :(
+    } else {
+      this.setState({
+        selectedSearch: {},
+      });
+      if (this.state.view === 'edit') this.handleSwitchView('');
+    }
   }
 
   fetchAllCourses = async () => {
@@ -246,6 +248,8 @@ class AdminPanel extends Component {
           </Section>
         );
         break;
+      default:
+        view = <div />;
     }
 
     return (
