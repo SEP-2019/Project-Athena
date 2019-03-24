@@ -8,7 +8,7 @@ let customResponse = require("../validation/customResponse");
 /**
  * @api {post} /addStudentUser
  * @apiDescription This endpoint will add a student and an associated user
- * @apiParam (body) {string} username, {string} password, {string} email, {int} student_id
+ * @apiParam (body) {string} username, {string} password, {string} email, {int} student_id, {string} program, {int} year, {string} curr_type
  * @apiExample {curl} Example usage:
  * Http:
  *	POST /users/addStudentUser HTTP/1.1
@@ -18,7 +18,10 @@ let customResponse = require("../validation/customResponse");
  *		"username": "alex1234",
  *		"password": "test1234:",
  *		"email" : "alex@email.com",
- *		"student_id" : 123456789
+ *		"student_id" : 123456789,
+ *		"program": "Electrical Engineering",
+ *		"year" : 2019,
+ *		"curr_type" : 7-semester-curriculum
  *	}
  * Curl:
  *	curl -X POST \
@@ -28,12 +31,15 @@ let customResponse = require("../validation/customResponse");
  *		"username": "alex1234",
  *		"password": "test1234:",
  *		"email" : "alex@email.com",
- *		"student_id" : 123456789
+ *		"student_id" : 123456789,
+ *		"program": "Electrical Engineering",
+ *		"year" : 2019,
+ *		"curr_type" : 7-semester-curriculum
  *	}'
  *
- * @returns true if student was added successfully or false if not
+ * @returns The student's email if the insertion was successful
  *
- * @author: Steven Li + Alex Lam
+ * @author: Steven Li + Alex Lam + Gareth Peters
  */
 router.post(
   "/addStudentUser",
@@ -42,8 +48,11 @@ router.post(
     const password = req.body.password;
     const email = req.body.email;
     const id = req.body.student_id;
-    let result = await users.insertStudentUser(username, password, email, id);
-    res.send(customResponse(result));
+    const program = req.body.program;
+    const year = req.body.year;
+    const curr_type = req.body.curr_type;
+    let studentEmail = await users.insertStudentUser(username, password, email, id, program, year, curr_type);
+    res.send(customResponse(studentEmail));
   })
 );
 
@@ -160,6 +169,72 @@ router.get(
   asyncMiddleware(async (req, res, next) => {
     const student_id = req.query.studentID;
     const result = await users.getStudentData(student_id);
+    res.send(customResponse(result));
+  })
+);
+
+/**
+ *
+ * @api {post} /assignStudentMinor
+ * @apiDescription assign or update a Minor curriculum to a student
+ * @apiParam (body) {Integer} studentID, {string} minor
+ * @apiExample {curl} Example usage:
+ *	curl -X POST \
+ *  -H 'Content-Type: application/json' \
+ *  -d '{"studentID": 260678788, "minor": "Software Engineering"}' \
+ *  http://localhost:3001/courses/assignStudentMinor
+ *
+ * @returns True on success
+ *          invalid student ID
+ *          invalid curriculum name
+ *          student does not exist
+ *          curriculum does not exist
+ *          student already assigned minor
+ *
+ * @author: Gareth Peters
+ *
+ */
+
+router.post(
+  "/assignStudentMinor",
+  asyncMiddleware(async (req, res) => {
+    const studentID = req.body.studentID;
+    const minor = req.body.minor;
+    let result = users.assignStudentMinor(studentID, minor);
+    res.send(customResponse(result));
+  })
+);
+
+/**
+ *
+ * @api {post} /updateStudentMajor
+ * @apiDescription update a student's major curriculum
+ * @apiParam (body) {Integer} studentID, {string} program, {Integer} year, {string} curr_type
+ * @apiExample {curl} Example usage:
+ *	curl -X POST \
+ *  -H 'Content-Type: application/json' \
+ *  -d '{"studentID": 260678788, "program": "Software Engineering", "year": 2017, "curr_type": "7-semester-curriculum"}' \
+ *  http://localhost:3001/courses/updateStudentMajor
+ *
+ * @returns True on success
+ *          invalid student ID
+ *          invalid curriculum name
+ *          invalid year
+ *          student does not exist
+ *          curriculum does not exist
+ *
+ * @author: Gareth Peters
+ *
+ */
+
+router.post(
+  "/updateStudentMajor",
+  asyncMiddleware(async (req, res, next) => {
+    const student_id = req.body.studentID;
+    const program = req.body.program;
+    const year = req.body.year;
+    const curr_type = req.body.curr_type;
+    let result = await users.updateStudentMajor(student_id, program, year, curr_type);
     res.send(customResponse(result));
   })
 );

@@ -9,18 +9,18 @@ let asyncMiddleware = require("./errorHandlingMiddleware");
  * @apiDescription gets a list of all curriculum names
  * @apiExample {curl} Example usage: GET /curriculums/getAllCurriculumNames
  * @author Patrick Lai
- * @returns : 
+ * @returns :
  * {
  * }
  */
 router.get("/getAllCurriculumNames", async (req, res, next) => {
-  try{
+  try {
     let result = await curriculums.getAllCurriculumNames();
     res.status(200).send(result);
-  } catch (err){
+  } catch (err) {
     res.status(500).send(err.message);
   }
-})
+});
 
 /**
  * @api {get} /getCurriculum
@@ -94,15 +94,7 @@ router.post(
     const cores = req.body.cores;
     const techComps = req.body.techComps;
     const comps = req.body.comps;
-    let result = await curriculums.createCurriculum(
-      name,
-      type,
-      department,
-      numOfElectives,
-      cores,
-      techComps,
-      comps
-    );
+    let result = await curriculums.createCurriculum(name, type, department, numOfElectives, cores, techComps, comps);
     res.send(customResponse(result));
   })
 );
@@ -111,7 +103,7 @@ router.get(
   "/getCurriculumYears",
   asyncMiddleware(async function(req, res, next) {
     let result = await curriculums.getCurriculumYears();
-    res.send(customResponse(result))
+    res.send(customResponse(result));
   })
 );
 

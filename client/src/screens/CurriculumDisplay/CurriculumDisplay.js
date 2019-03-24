@@ -3,13 +3,13 @@ import './CurriculumDisplay.css';
 import Api from '../../services/Api'
 import WithHeaderBar from '../../hocs/WithHeaderBar';
 import CourseTable from '../../components/CourseTable';
-import { StudentContext } from '../../contexts/StudentContext';
 import _ from 'lodash';
+import Cookies from 'universal-cookie';
 
 class CurriculumDisplay extends Component {
-  static contextType = StudentContext;
 
   constructor(props) {
+
     super(props);
     this.getStudentData = this.getStudentData.bind(this);
     this.parseCourseData = this.parseCourseData.bind(this);
@@ -24,12 +24,14 @@ class CurriculumDisplay extends Component {
       desiredTechComps: [],
       studentDataError: null,
     };
+
+    this.cookies = new Cookies();
   }
 
   componentDidMount(){
     this.setState({
-        studentId : this.context.studentId,
-    }, 
+        studentId : this.cookies.get('studentId'),
+    },
     () => this.getStudentData(this.state.studentId));
   }
   
