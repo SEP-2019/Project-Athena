@@ -63,6 +63,7 @@ class AdminForm extends Component {
             label="Number of credits"
             id="credits-input"
             type="number"
+            InputProps={{ inputProps: { min: 1, max: 9 } }}
             name="credits"
             defaultValue={this.props.selectedCourse.credits}
             onChange={this.props.handleInputChange}
