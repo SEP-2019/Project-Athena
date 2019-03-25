@@ -36,6 +36,7 @@ class AdminPanel extends Component {
     this.onAdd = this.onAdd.bind(this);
     this.fetchTagsByCourse = this.fetchTagsByCourse.bind(this);
     this.renderTagsBox = this.renderTagsBox.bind(this);
+    this.checkInput = this.checkInput.bind(this);
   }
 
   // Called on click of a search suggestion, updates the selected course
@@ -83,33 +84,36 @@ class AdminPanel extends Component {
   }
 
   handleSwitchView = view => {
-    this.setState({
-      /*
+    this.setState(
+      {
+        /*
       in the case of edit, only set the tagsAreLoading flag to false once the checked tags are fetched
       this is because the TagList component sets the checked tags in componentWillMount() which is only
       called on the first render. In the case of edit, the checked tags for the current course need to be fetched
       before the tags list can be rendered
       */
-      tagsAreLoading: view === 'edit',
-      inc: this.state.inc + 1,
-      checkedTagsSet: new Set(),
-      view: view,
-    }, () => {
-      if (view === "add"){
-        // when adding a new course, clear the currently selected tags
-        let newTags = this.state.tags
-        newTags.map(t => t.checked = false)
-        this.setState({
-          tags: newTags,
-          courseToEdit: {
-            course_code: '',
-            title: '',
-            description: '',
-            credits: '',
-          },
-        })
+        tagsAreLoading: view === 'edit',
+        inc: this.state.inc + 1,
+        checkedTagsSet: new Set(),
+        view: view,
+      },
+      () => {
+        if (view === 'add') {
+          // when adding a new course, clear the currently selected tags
+          let newTags = this.state.tags;
+          newTags.map(t => (t.checked = false));
+          this.setState({
+            tags: newTags,
+            courseToEdit: {
+              course_code: '',
+              title: '',
+              description: '',
+              credits: '',
+            },
+          });
+        }
       }
-    });
+    );
   };
 
   fetchTags = async () => {
@@ -187,8 +191,52 @@ class AdminPanel extends Component {
     this.setState({ tags: newTags });
   };
 
+  checkInput() {
+    if (!/^[a-z]{4} \d{3}$/i.test(this.state.courseToEdit.course_code)) {
+      console.error('invalid course code');
+      this.setState({ errorMessage: 'Invalid course code format' });
+      return true;
+    }
+    if (
+      this.state.courseToEdit.credits > 9 ||
+      this.state.courseToEdit.credits < 0
+    ) {
+      console.error('invalid credits');
+      this.setState({ errorMessage: 'Credits must be between 0 and 9' });
+      return true;
+    }
+    if (this.state.courseToEdit.title.length > 512) {
+      console.error('invalid title');
+      this.setState({
+        errorMessage: 'Title cannot be longer than 512 characters',
+      });
+      return true;
+    }
+    if (this.state.courseToEdit.description.length > 1000) {
+      console.error('invalid description');
+      this.setState({
+        errorMessage: 'Description cannot be longer than 1000 characters',
+      });
+      return true;
+    }
+    if (
+      !this.state.courseToEdit.title ||
+      !this.state.courseToEdit.course_code ||
+      !this.courseToEdit.description ||
+      !this.courseToEdit.credit
+    ) {
+      console.error('missing field');
+      this.setState({
+        errorMessage: 'You must fill in all fields',
+      });
+      return true;
+    }
+    return false;
+  }
+
   onEdit() {
     console.log(this.state.courseToEdit);
+    if (this.checkInput()) return;
 
     let updatedCourse = {
       course: this.state.courseToEdit.course_code,
@@ -212,10 +260,7 @@ class AdminPanel extends Component {
 
   onAdd() {
     console.log(this.state.courseToEdit);
-    if (!/^[a-z]{4} \d{3}$/i.test(this.state.courseToEdit.course_code)) {
-      //TODO
-      console.log('invalid course code');
-    }
+    if (this.checkInput()) return;
 
     let newCourse = {
       courseCode: this.state.courseToEdit.course_code,
