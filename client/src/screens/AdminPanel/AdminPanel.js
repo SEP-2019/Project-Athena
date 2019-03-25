@@ -66,7 +66,7 @@ class AdminPanel extends Component {
         let courseData = response.data.Response;
         this.setState({ allCourses: courseData });
       })
-      .catch(error => console.log('ERROR', error));
+      .catch(error => console.error('ERROR', error));
   }
 
   componentDidMount() {
@@ -240,7 +240,6 @@ class AdminPanel extends Component {
   }
 
   onEdit() {
-    console.log(this.state.courseToEdit);
     if (this.checkInput()) return;
 
     let updatedCourse = {
@@ -252,19 +251,15 @@ class AdminPanel extends Component {
       phased_out: this.state.courseToEdit.phased_out,
     };
 
-    console.log(updatedCourse);
-
     Api()
       .post('/courses/updateCourse', updatedCourse)
       .then(res => {
-        console.log(res);
         this.updateCourseList();
       })
-      .catch(error => console.log('ERROR', error));
+      .catch(error => console.error('ERROR', error));
   }
 
   onAdd() {
-    console.log(this.state.courseToEdit);
     if (this.checkInput()) return;
 
     let newCourse = {
@@ -279,24 +274,21 @@ class AdminPanel extends Component {
     Api()
       .post('/courses/createCourse', newCourse)
       .then(res => {
-        console.log(res);
         let newTags = {
           course: this.state.courseToEdit.course_code,
           tag: Array.from(this.state.checkedTagsSet),
         };
 
-        console.log(newTags);
-
         Api()
           .post('/tags/assignTagsToCourse', newTags)
           .then(res => console.log(res))
-          .catch(error => console.log('ERROR', error));
+          .catch(error => console.error('ERROR', error));
       })
       .then(res => {
         // get the list of courses to update it with the course that was just added
         this.updateCourseList();
       })
-      .catch(error => console.log('ERROR', error));
+      .catch(error => console.error('ERROR', error));
   }
 
   renderTagsBox(props) {
