@@ -27,6 +27,7 @@ class AdminPanel extends Component {
 
     this.onSelectFromSearch = this.onSelectFromSearch.bind(this);
     this.fetchAllCourses = this.fetchAllCourses.bind(this);
+    this.updateCourseList = this.updateCourseList.bind(this);
     this.onEditView = this.onEditView.bind(this);
     this.handleSwitchView = this.handleSwitchView.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -42,6 +43,7 @@ class AdminPanel extends Component {
     if (Object.keys(selection).length > 0) {
       this.setState({
         selectedSearch: selection,
+        disableEdit: false,
       }); // this is where the warning appears :(
     } else {
       this.setState({
@@ -55,18 +57,19 @@ class AdminPanel extends Component {
     return await Api().get('/courses/getAllCourses');
   };
 
+  updateCourseList(){
+    this.fetchAllCourses().then(response => {
+      let courseData = response.data.Response
+      this.setState({ allCourses: courseData });
+    })
+    .catch(error => console.log('ERROR', error));
+  }
+
   componentDidMount() {
     //TODO put this in to prevent going in admin page without logging in
     // if (this.props.location.isAdmin !== true) history.push('/login');
 
-    this.fetchAllCourses()
-      .then(response => {
-        let courseData = response.data.Response;
-
-        this.setState({ allCourses: courseData });
-      })
-      .catch(error => console.log('ERROR', error));
-
+    this.updateCourseList()
     this.fetchTags();
   }
 
@@ -135,7 +138,6 @@ class AdminPanel extends Component {
 
   onEditView() {
     if (typeof this.state.selectedSearch.course_code === 'undefined') {
-      console.log('empty bar! Dont switch view');
       this.setState({ placeHolder: 'Select a course to edit!' });
     } else {
       this.setState(prevState => ({
@@ -164,19 +166,30 @@ class AdminPanel extends Component {
   }
 
   updateTagsCheckedState = newTags => {
-    console.log(newTags);
     this.setState({ tags: newTags });
   };
 
   onEdit() {
     console.log(this.state.courseToEdit);
-    //TODO
-    // Api()
-    //   .post('/courses/addCompletedCourses', completedCourses)
-    //   .then(res => {
-    //     console.log(res);
-    //   })
-    //   .catch(error => console.log('ERROR', error));
+
+    let updatedCourse = {
+      course: this.state.courseToEdit.course_code,
+      new_title: this.state.courseToEdit.title,
+      new_description: this.state.courseToEdit.description,
+      new_credits: this.state.courseToEdit.credits,
+      new_tags: Array.from(this.state.checkedTagsSet),
+      phased_out: this.state.courseToEdit.phased_out,
+    };
+
+    console.log(updatedCourse);
+
+    Api()
+      .post('/courses/updateCourse', updatedCourse)
+      .then(res => {
+        console.log(res)
+        this.updateCourseList()
+      })
+      .catch(error => console.log('ERROR', error));
   }
 
   onAdd() {
@@ -186,20 +199,34 @@ class AdminPanel extends Component {
       console.log('invalid course code');
     }
 
-    //TODO
     let newCourse = {
-      courseCode: 'ECSE 428',
-      title: 'Software Engineering Practice',
-      departement: 'ECSE',
-      phasedOut: '0',
-      description: 'Practice in software',
-      credits: 3,
+      courseCode: this.state.courseToEdit.course_code,
+      title: this.state.courseToEdit.title,
+      departement: this.state.courseToEdit.course_code.substring(0, 4),
+      phasedOut: this.state.courseToEdit.phased_out,
+      description: this.state.courseToEdit.description,
+      credits: this.state.courseToEdit.credits,
     };
 
     Api()
       .post('/courses/createCourse', newCourse)
       .then(res => {
         console.log(res);
+        let newTags = {
+          course: this.state.courseToEdit.course_code,
+          tag: Array.from(this.state.checkedTagsSet),
+        };
+
+        console.log(newTags);
+
+        Api()
+          .post('/tags/assignTagsToCourse', newTags)
+          .then(res => console.log(res))
+          .catch(error => console.log('ERROR', error));
+      })
+      .then(res => {
+        // get the list of courses to update it with the course that was just added
+        this.updateCourseList()
       })
       .catch(error => console.log('ERROR', error));
   }
@@ -241,6 +268,7 @@ class AdminPanel extends Component {
             <AdminForm
               selectedCourse={this.state.courseToEdit}
               handleInputChange={this.handleInputChange}
+              view={this.state.view === 'edit'}
             />
 
             <div className="tags-container">
@@ -251,11 +279,7 @@ class AdminPanel extends Component {
             </div>
 
             {/* Buttons */}
-            <button
-              className="primary-button"
-              onClick={this.onEdit}
-              disabled={this.state.disableEdit}
-            >
+            <button className="primary-button" onClick={this.onEdit}>
               Edit course
             </button>
           </Section>
@@ -277,6 +301,7 @@ class AdminPanel extends Component {
                 phased_out: false,
               }}
               handleInputChange={this.handleInputChange}
+              view={this.state.view === 'edit'}
             />
 
             <div className="tags-container">
@@ -319,7 +344,11 @@ class AdminPanel extends Component {
           >
             Add
           </button>
-          <button className="primary-button" onClick={this.onEditView}>
+          <button
+            className="primary-button"
+            onClick={this.onEditView}
+            disabled={this.state.disableEdit}
+          >
             Edit
           </button>
         </Section>
