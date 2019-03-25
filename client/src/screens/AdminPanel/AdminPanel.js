@@ -94,6 +94,15 @@ class AdminPanel extends Component {
       tagsAreLoading: view === 'edit',
       inc: this.state.inc + 1,
     });
+    if (view === 'add')
+      this.setState({
+        courseToEdit: {
+          course_code: '',
+          title: '',
+          description: '',
+          credits: '',
+        },
+      });
   };
 
   fetchTags = async () => {
@@ -299,7 +308,7 @@ class AdminPanel extends Component {
             </span>
 
             <AdminForm
-              selectedCourse={{}}
+              selectedCourse={this.state.courseToEdit}
               handleInputChange={this.handleInputChange}
               view={this.state.view === 'edit'}
             />
