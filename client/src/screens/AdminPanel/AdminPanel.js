@@ -3,6 +3,7 @@ import Api from '../../services/Api';
 import PropTypes from 'prop-types';
 
 import './AdminPanel.css';
+import history from '../../history';
 import SearchBar from '../../components/SearchBar';
 import MandatoryPanel from '../../components/MandatoryPanel/MandatoryPanel';
 import Section from '../../components/Section';
