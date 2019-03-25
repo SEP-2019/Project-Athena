@@ -16,20 +16,18 @@ var getCourseByTag = async function getCourseByTag(tag, studentID) {
   let connection = await mysql.getNewConnection();
   try {
     let courses = await connection.query(
-      `SELECT course_tags.course_code, 
-              (IF(student_desired_courses.student_id = ?, TRUE, FALSE)) as desired, 
+      `SELECT course_tags.course_code,
+              (IF(student_desired_courses.student_id = ?, TRUE, FALSE)) as desired,
               courses.description, courses.title
-      FROM student_desired_courses 
+      FROM student_desired_courses
       RIGHT JOIN course_tags ON (course_tags.course_code = student_desired_courses.course_code)
       JOIN courses ON (courses.course_code = course_tags.course_code)
-      WHERE (student_desired_courses.student_id = ? 
-            OR student_desired_courses.student_id is null) 
-      AND course_tags.tag_name = ?
-      AND course_tags.course_code NOT IN (SELECT co.course_code 
-        FROM student_course_offerings sco 
-        join course_offerings co 
-        on sco.offering_id = co.id WHERE student_id = ?);`,
-      [studentID, studentID, tag, studentID]
+      WHERE course_tags.tag_name = ?
+      AND course_tags.course_code NOT IN (SELECT co.course_code
+        FROM student_course_offerings sco
+        join course_offerings co
+        on sco.offering_id = co.id WHERE student_id = ?)`,
+      [studentID, tag, studentID]
     );
     return JSON.parse(JSON.stringify(courses));
   } finally {

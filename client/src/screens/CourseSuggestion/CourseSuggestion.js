@@ -64,7 +64,6 @@ class CourseSuggestion extends Component {
         <Tabs
           defaultTab={this.state.currentTab}
           onChange={tabId => {
-            console.log(tabId);
             this.setState({ currentTab: tabId });
           }}
         >

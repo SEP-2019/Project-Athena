@@ -15,7 +15,7 @@ const HeaderBar = props => (
       </div>
       <div />
       <div className="HeaderBar_project_name">
-        <a>{props.email}</a>
+        {props.email}
       </div>
       <div className="spaceFiller" />
       <div className="HeaderBar_logo" />

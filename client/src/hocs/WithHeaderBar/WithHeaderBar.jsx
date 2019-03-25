@@ -17,9 +17,6 @@ export default Component => {
         typeof this.state.email === 'undefined'
       )
         history.push('/login');
-
-      console.log(this.state.email);
-      console.log(this.state.studentId);
     }
 
     render() {
