@@ -82,7 +82,6 @@ class AdminPanel extends Component {
 
   handleSwitchView = view => {
     this.setState({
-      view: view,
       /*
       in the case of edit, only set the tagsAreLoading flag to false once the checked tags are fetched
       this is because the TagList component sets the checked tags in componentWillMount() which is only
@@ -91,7 +90,20 @@ class AdminPanel extends Component {
       */
       tagsAreLoading: view === 'edit',
       inc: this.state.inc + 1,
+      checkedTagsSet: new Set(),
+      view: view,
+    }, () => {
+      if (view === "add"){
+        // when adding a new course, clear the currently selected tags
+        let newTags = this.state.tags
+        newTags.map(t => t.checked = false)
+        this.setState({
+          tags: newTags
+        })
+      }
     });
+
+   
   };
 
   fetchTags = async () => {
@@ -232,8 +244,6 @@ class AdminPanel extends Component {
   }
 
   renderTagsBox(props) {
-    console.log(this.state.checkedTagsSet);
-
     return !props.tagsAreLoading ? (
       <TagList
         hasButtons={false}
