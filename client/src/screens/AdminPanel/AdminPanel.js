@@ -208,9 +208,11 @@ class AdminPanel extends Component {
       .then(res => {
         console.log(res);
         let newTags = {
-          courseCode: this.state.courseToEdit.course_code,
-          tags: Array.from(this.state.checkedTagsSet),
+          course: this.state.courseToEdit.course_code,
+          tag: Array.from(this.state.checkedTagsSet),
         };
+
+        console.log(newTags);
 
         Api()
           .post('/tags/assignTagsToCourse', newTags)
