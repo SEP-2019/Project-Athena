@@ -27,6 +27,7 @@ class AdminPanel extends Component {
 
     this.onSelectFromSearch = this.onSelectFromSearch.bind(this);
     this.fetchAllCourses = this.fetchAllCourses.bind(this);
+    this.updateCourseList = this.updateCourseList.bind(this);
     this.onEditView = this.onEditView.bind(this);
     this.handleSwitchView = this.handleSwitchView.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -56,18 +57,19 @@ class AdminPanel extends Component {
     return await Api().get('/courses/getAllCourses');
   };
 
+  updateCourseList(){
+    this.fetchAllCourses().then(response => {
+      let courseData = response.data.Response
+      this.setState({ allCourses: courseData });
+    })
+    .catch(error => console.log('ERROR', error));
+  }
+
   componentDidMount() {
     //TODO put this in to prevent going in admin page without logging in
     // if (this.props.location.isAdmin !== true) history.push('/login');
 
-    this.fetchAllCourses()
-      .then(response => {
-        let courseData = response.data.Response;
-
-        this.setState({ allCourses: courseData });
-      })
-      .catch(error => console.log('ERROR', error));
-
+    this.updateCourseList()
     this.fetchTags();
   }
 
@@ -218,6 +220,10 @@ class AdminPanel extends Component {
           .post('/tags/assignTagsToCourse', newTags)
           .then(res => console.log(res))
           .catch(error => console.log('ERROR', error));
+      })
+      .then(res => {
+        // get the list of courses to update it with the course that was just added
+        this.updateCourseList()
       })
       .catch(error => console.log('ERROR', error));
   }
