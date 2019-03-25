@@ -185,7 +185,10 @@ class AdminPanel extends Component {
 
     Api()
       .post('/courses/updateCourse', updatedCourse)
-      .then(res => console.log(res))
+      .then(res => {
+        console.log(res)
+        this.updateCourseList()
+      })
       .catch(error => console.log('ERROR', error));
   }
 
