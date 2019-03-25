@@ -27,7 +27,7 @@ var getCourseByTag = async function getCourseByTag(tag, studentID) {
         FROM student_course_offerings sco
         join course_offerings co
         on sco.offering_id = co.id WHERE student_id = ?)`,
-      [studentID, studentID, tag, studentID]
+      [studentID, tag, studentID]
     );
     return JSON.parse(JSON.stringify(courses));
   } finally {
