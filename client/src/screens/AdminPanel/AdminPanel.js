@@ -293,7 +293,6 @@ class AdminPanel extends Component {
               />
             </div>
 
-            {/* Buttons */}
             <button className="primary-button" onClick={this.onEdit}>
               Edit course
             </button>
