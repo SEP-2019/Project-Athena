@@ -48,17 +48,17 @@ body {
 
 .action_bar {
   display: flex;
-  margin-top: 1rem;
+  width: 50%;
+  margin: 2rem auto 0.5rem;
 }
 
 .selection_search {
   padding: 0.6rem 1rem;
 }
 
-.form {
-  width: 24rem;
-  margin: 1rem 1rem;
-  margin-inline-end: 10vh;
+.panel_form {
+  width: 50%;
+  margin: 1rem auto;
   padding: 1.5rem 3rem;
   border: 1px solid rgb(0, 0, 0, 0.2);
 }
@@ -66,4 +66,19 @@ body {
 .footer {
   height: 100px;
   background: #b20007;
+}
+
+.edit:disabled {
+  background-color: rgba(184, 184, 184, 0.973);
+  cursor: default;
+}
+
+.primary-button:focus {
+  outline: none;
+}
+
+.view_list {
+  width: 90%;
+  margin: 0 auto;
+  text-align: center;
 }

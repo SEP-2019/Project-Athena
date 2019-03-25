@@ -34,20 +34,39 @@ class CustomizedInputs extends Component {
   render() {
     return (
       <MuiThemeProvider theme={theme}>
-        <TextField
-          value={this.props.defaultValue}
-          onChange={e => this.handleChange(e)}
-          required={this.props.required}
-          className={this.props.classes.root}
-          id={this.props.id}
-          label={this.props.label}
-          type={this.props.type}
-          name={this.props.name}
-          autoComplete={this.props.type}
-          error={this.props.error}
-          margin="normal"
-          variant="outlined"
-        />
+        {this.props.type === 'description' ? (
+          <TextField
+            value={this.props.defaultValue}
+            onChange={e => this.handleChange(e)}
+            required={this.props.required}
+            className={this.props.classes.root}
+            id={this.props.id}
+            label={this.props.label}
+            type={this.props.type}
+            name={this.props.name}
+            autoComplete={this.props.type}
+            error={this.props.error}
+            margin="normal"
+            variant="outlined"
+            multiline
+            rowsMax="4"
+          />
+        ) : (
+          <TextField
+            value={this.props.defaultValue}
+            onChange={e => this.handleChange(e)}
+            required={this.props.required}
+            className={this.props.classes.root}
+            id={this.props.id}
+            label={this.props.label}
+            type={this.props.type}
+            name={this.props.name}
+            autoComplete={this.props.type}
+            error={this.props.error}
+            margin="normal"
+            variant="outlined"
+          />
+        )}
       </MuiThemeProvider>
     );
   }

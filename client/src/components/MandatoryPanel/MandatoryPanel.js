@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import CompleteCourseList from '../CompleteCourseList/CompleteCourseList';
 import RedirectError from '../RedirectError/RedirectError';
+import Loading from '../Loading';
 import Api from '../../services/Api';
 import './MandatoryPanel.css';
 
@@ -50,7 +51,7 @@ class MandatoryPanel extends Component {
   render() {
     const { coursesAreLoading, courses } = this.state;
     return (
-      <div className="tab_content">
+      <div className="mandatory_content">
         <div className="spacer" />
         <div className="course-list-container">
           {!coursesAreLoading ? (
@@ -60,7 +61,7 @@ class MandatoryPanel extends Component {
               updateCoursesCheckedState={this.updateCoursesCheckedState}
             />
           ) : (
-            <h3>Loading the courses...</h3>
+            <Loading />
           )}
         </div>
         <div className="spacer" />

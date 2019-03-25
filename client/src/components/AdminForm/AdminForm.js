@@ -52,6 +52,7 @@ class AdminForm extends Component {
             name="description"
             defaultValue={this.props.selectedCourse.description}
             onChange={this.props.handleInputChange}
+            type="description"
             // error={this.state.emailError}
           />
         </Section>
@@ -76,7 +77,7 @@ class AdminForm extends Component {
             // the name property is a duplicate property referring to the label of the checkbox
             // as well as the property that is passed to the event handler. keep it as
             // "phased_out" or else it won't set the new value properly
-            name={'phased_out'}
+            name={'Phased_out'}
             checked={this.props.selectedCourse.phased_out}
             handleChange={this.props.handleInputChange}
           />
