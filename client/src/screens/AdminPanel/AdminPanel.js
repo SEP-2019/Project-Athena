@@ -57,19 +57,20 @@ class AdminPanel extends Component {
     return await Api().get('/courses/getAllCourses');
   };
 
-  updateCourseList(){
-    this.fetchAllCourses().then(response => {
-      let courseData = response.data.Response
-      this.setState({ allCourses: courseData });
-    })
-    .catch(error => console.log('ERROR', error));
+  updateCourseList() {
+    this.fetchAllCourses()
+      .then(response => {
+        let courseData = response.data.Response;
+        this.setState({ allCourses: courseData });
+      })
+      .catch(error => console.log('ERROR', error));
   }
 
   componentDidMount() {
     //TODO put this in to prevent going in admin page without logging in
     // if (this.props.location.isAdmin !== true) history.push('/login');
 
-    this.updateCourseList()
+    this.updateCourseList();
     this.fetchTags();
   }
 
@@ -92,6 +93,15 @@ class AdminPanel extends Component {
       tagsAreLoading: view === 'edit',
       inc: this.state.inc + 1,
     });
+    if (view === 'add')
+      this.setState({
+        courseToEdit: {
+          course_code: '',
+          title: '',
+          description: '',
+          credits: '',
+        },
+      });
   };
 
   fetchTags = async () => {
@@ -186,8 +196,8 @@ class AdminPanel extends Component {
     Api()
       .post('/courses/updateCourse', updatedCourse)
       .then(res => {
-        console.log(res)
-        this.updateCourseList()
+        console.log(res);
+        this.updateCourseList();
       })
       .catch(error => console.log('ERROR', error));
   }
@@ -226,7 +236,7 @@ class AdminPanel extends Component {
       })
       .then(res => {
         // get the list of courses to update it with the course that was just added
-        this.updateCourseList()
+        this.updateCourseList();
       })
       .catch(error => console.log('ERROR', error));
   }
@@ -293,13 +303,7 @@ class AdminPanel extends Component {
             </span>
 
             <AdminForm
-              selectedCourse={{
-                course_code: '',
-                title: '',
-                description: '',
-                credits: '',
-                phased_out: false,
-              }}
+              selectedCourse={this.state.courseToEdit}
               handleInputChange={this.handleInputChange}
               view={this.state.view === 'edit'}
             />
