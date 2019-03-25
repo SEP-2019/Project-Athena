@@ -1,0 +1,36 @@
+.title {
+  left: 30px;
+  top: 30px;
+
+  font-weight: 500;
+  font-size: 36px;
+  color: #b20007;
+}
+
+.description {
+  width: 45%;
+  margin-left: 10vh;
+  margin-inline-end: 10vh;
+}
+
+.admin_form {
+  width: 100%;
+  margin-inline-end: 10vh;
+}
+
+.check .checkbox_area {
+  margin-left: 5px;
+}
+.check .checkbox_label {
+  padding: 1rem 0.5rem;
+}
+
+.subform {
+  padding-left: 0 1rem;
+  width: 100%;
+}
+
+.subform [class^='MuiFormControl-root-'] {
+  width: 100%;
+  height: auto;
+}

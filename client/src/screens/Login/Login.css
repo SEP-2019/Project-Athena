@@ -1,3 +1,14 @@
+button {
+  padding: 10px 25px;
+  border-radius: 5px;
+  height: 48px;
+  font-size: 16px;
+}
+
+body {
+  background: #f9f9f9;
+}
+
 .header {
   height: 100px;
   background: #ffffff;
@@ -13,11 +24,14 @@
 }
 
 .description {
-  max-width: 70%;
+  width: 45%;
+  margin-left: 10vh;
+  margin-inline-end: 10vh;
 }
 
-body {
-  background: #f9f9f9;
+.form {
+  width: 24rem;
+  margin-inline-end: 10vh;
 }
 
 .footer {

@@ -3,29 +3,35 @@ const format = require("../../validation/format");
 
 /**
  * Returns a list of courses matching the tag
- * @author Alex Lam
- * @param {string} tag
+ * @author Alex Lam, Feras Al Taha
+ * @param {string} tag, studentID
  * @returns A list of courses in JSON format
  * @throws Undefined tag if tag is null
  *         error if MySQL connection failed
  */
-var queryCourseByTag = async function queryCourseByTag(tag) {
-  if (!tag) {
-    throw Error("Undefined tag");
-  }
+var getCourseByTag = async function getCourseByTag(tag, studentID) {
+  format.verifyTag(tag);
+  format.verifyStudentId(studentID);
 
   let connection = await mysql.getNewConnection();
   try {
     let courses = await connection.query(
-      "SELECT course_code FROM course_tags WHERE tag_name LIKE ?",
-      tag
+      `SELECT course_tags.course_code,
+              (IF(student_desired_courses.student_id = ?, TRUE, FALSE)) as desired,
+              courses.description, courses.title
+      FROM student_desired_courses
+      RIGHT JOIN course_tags ON (course_tags.course_code = student_desired_courses.course_code)
+      JOIN courses ON (courses.course_code = course_tags.course_code)
+      WHERE course_tags.tag_name = ?
+      AND course_tags.course_code NOT IN (SELECT co.course_code
+        FROM student_course_offerings sco
+        join course_offerings co
+        on sco.offering_id = co.id WHERE student_id = ?)`,
+      [studentID, tag, studentID]
     );
-    connection.release();
     return JSON.parse(JSON.stringify(courses));
-  } catch (error) {
+  } finally {
     connection.release();
-    console.error(error);
-    throw Error(error.message);
   }
 };
 
@@ -36,39 +42,40 @@ var queryCourseByTag = async function queryCourseByTag(tag) {
  * @param {String} title
  * @param {String} departement
  * @param {String} phasedOut
+ * @param {String} description
+ * @param {int} credits
  * @returns true if successful
  * @throws error if MySQL connection failed
- *         invalid format courses if JSON format is incorrect
+ *         Invalid course format if JSON format is incorrect
  *         false if insertion failed
  */
-var addCourse = async (courseCode, title, departement, phasedOut) => {
+var addCourse = async (
+  courseCode,
+  title,
+  departement,
+  phasedOut,
+  description,
+  credits
+) => {
   // Verifying proper format
   if (phasedOut === undefined) {
     phasedOut = "0";
   }
-  await format.verifyCourseCode(courseCode);
-  await format.verifyTitle(title);
-  await format.verifyDepartmentSubName(departement);
-  await format.verifyPhaseOut(phasedOut);
-
+  format.verifyCourseCode(courseCode);
+  format.verifyTitle(title);
+  format.verifyDepartmentSubName(departement);
+  //format.verifyPhaseOut(phasedOut);
+  await format.verifyDescription(description);
+  await format.verifyCredits(credits);
   // Connect to database
   let connection = await mysql.getNewConnection();
 
-  try {
-    await connection.query("INSERT INTO courses VALUES(?, ?, ?, ?);", [
-      courseCode,
-      title,
-      departement,
-      phasedOut
-    ]);
-    return true;
-  } catch (error) {
-    connection.rollback();
-    console.error(error);
-    throw new Error(false);
-  } finally {
-    connection.release();
-  }
+  await connection.query(
+    "INSERT INTO courses (course_code, title, department, phased_out, description, credits) VALUES(?, ?, ?, ?, ?, ?);",
+    [courseCode, title, departement, phasedOut, description, credits]
+  );
+  connection.release();
+  return true;
 };
 
 /**
@@ -78,11 +85,11 @@ var addCourse = async (courseCode, title, departement, phasedOut) => {
  * @param {JSON} courses
  * @returns true if successful
  * @throws error if MySQL connection failed
- *         invalid format courses if JSON format is incorrect
+ *         Invalid course format if JSON format is incorrect
  *         false if insertion failed
  */
 var addCompletedCourses = async (studentId, courses) => {
-  await format.verifyCourse(courses);
+  await format.verifyCourses(courses);
   let connection = await mysql.getNewConnection();
 
   try {
@@ -98,6 +105,12 @@ var addCompletedCourses = async (studentId, courses) => {
     }
 
     await connection.beginTransaction();
+
+    await connection.query(
+      "DELETE FROM student_course_offerings WHERE student_id = ?;",
+      studentId
+    );
+
     // Insert each course of the student into the database. If a course does not exist then
     // throw an error.
     for (let course in courses) {
@@ -107,20 +120,19 @@ var addCompletedCourses = async (studentId, courses) => {
             course + courses[course][i].semester + courses[course][i].section
           ];
         await connection.query(
-          "INSERT INTO student_course_offerings VALUES(?, ?, ?);",
+          "INSERT INTO student_course_offerings (student_id, offering_id, semester) VALUES(?, ?, ?);",
           [studentId, id, courses[course][i].semester]
         );
       }
     }
 
     await connection.commit();
-    connection.release();
     return true;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
+    throw error;
+  } finally {
     connection.release();
-    throw new Error(false);
   }
 };
 
@@ -132,21 +144,47 @@ var addCompletedCourses = async (studentId, courses) => {
  */
 var getAllCourses = async () => {
   let connection = await mysql.getNewConnection();
-  let courses;
   let result;
-  try {
-    result = await connection.query(
-      "SELECT * FROM courses WHERE phased_out = FALSE;"
-    );
-  } catch (err) {
-    console.error(err);
-  }
+  result = await connection.query(
+    "SELECT * FROM courses WHERE phased_out = FALSE;"
+  );
   connection.release();
+  return result;
+};
 
-  if (result) {
-    courses = result;
+/**
+ * Returns all course offerings
+ * @author Steven Li
+ * @returns a list of course offerings
+ * @throws error if MySQL connection failed
+ */
+var getAllCourseOfferings = async () => {
+  let connection = await mysql.getNewConnection();
+  let result = {};
+  let courses = await connection.query(
+    "SELECT course_code, title FROM courses WHERE phased_out = FALSE;"
+  );
+
+  let course_offerings = await connection.query(
+    "SELECT course_code, semester FROM course_offerings;"
+  );
+
+  for (let i = 0; i < courses.length; i++) {
+    result[courses[i].course_code] = {};
+    result[courses[i].course_code].title = courses[i].title;
+    result[courses[i].course_code].semesters = [];
   }
-  return courses;
+
+  for (let i = 0; i < course_offerings.length; i++) {
+    try {
+      result[course_offerings[i].course_code].semesters.push(
+        course_offerings[i].semester
+      );
+    } catch (e) {}
+  }
+
+  connection.release();
+  return result;
 };
 
 /**
@@ -177,15 +215,13 @@ var addCourseOfferings = async courseOfferings => {
         ]);
       }
     }
-
     await connection.commit();
-    connection.release();
     return true;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
+    throw error;
+  } finally {
     connection.release();
-    throw new Error(false);
   }
 };
 
@@ -217,9 +253,8 @@ var addCoreq = async coreq => {
     await connection.commit();
     return true;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
-    throw new Error(false);
+    throw error;
   } finally {
     connection.release();
   }
@@ -253,27 +288,37 @@ var addPrereq = async prereq => {
     await connection.commit();
     return true;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
-    throw new Error(false);
+    throw error;
   } finally {
     connection.release();
   }
 };
 
 /**
- * Updates a course title and its tags
+ * Updates a course title, description, credits and its tags
  * @author Steven Li
  * @param {string} course
  * @param {string} newTitle
+ * @param {string} newDescription
+ * @param {string} newCredits
  * @param {array} newTags
  * @returns true if insertion was successful
  * @throws error if MySQL connection failed
  *         invalid format course code if the course code is invalid
  *         false if insertion failed
  */
-var updateCourse = async (course, newTitle, newTags) => {
-  await format.verifyCourseCode(course);
+var updateCourse = async (
+  course,
+  newTitle,
+  newDescription,
+  newCredits,
+  newTags,
+  phasedOut
+) => {
+  console.log(phasedOut);
+  format.verifyCourseCode(course);
+  format.verifyCredits(newCredits);
   let connection = await mysql.getNewConnection();
 
   try {
@@ -291,15 +336,14 @@ var updateCourse = async (course, newTitle, newTags) => {
     }
 
     await connection.query(
-      "UPDATE courses SET title = ? WHERE course_code = ?;",
-      [newTitle, course]
+      "UPDATE courses SET title = ?, description = ?, credits = ?,phased_out=? WHERE course_code = ?;",
+      [newTitle, newDescription, newCredits, phasedOut, course]
     );
     await connection.commit();
     return true;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
-    throw new Error(false);
+    throw error;
   } finally {
     connection.release();
   }
@@ -307,25 +351,56 @@ var updateCourse = async (course, newTitle, newTags) => {
 
 /**
  * Phases out a course that is no longer offered
- * @author Alex Lam
- * @param {string} courseCode
+ * @author Alex Lam + Gareth Peters
+ * @param {string} courseCode,
+ * @param {string} phasedOut
  * @returns true if successful
  * @throws error if MySQL connection failed
  *         invalid format course code if course code format is incorrect
  */
-let phaseOutCourse = async courseCode => {
+let phaseOutCourse = async (courseCode, phasedOut) => {
+  // Verifying proper format
+  if (phasedOut === undefined) {
+    phasedOut = "0";
+  }
+  format.verifyCourseCode(courseCode);
+  //format.verifyPhaseOut(phasedOut);
+
   let connection = await mysql.getNewConnection();
-  await format.verifyCourseCode(courseCode);
 
   try {
     await connection.query(
-      "UPDATE courses SET phased_out = TRUE WHERE course_code = ?",
-      courseCode
+      "UPDATE courses SET phased_out = ? WHERE course_code = ?",
+      [phasedOut, courseCode]
     );
     return true;
   } catch (error) {
-    console.error(error);
-    throw new Error("Internal server error");
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
+
+/**
+ * Returns an array of tags for the given course code.
+ * @author Steven Li
+ * @param {string} courseCode
+ * @returns An array of tags by course code
+ * @throws error if MySQL connection failed
+ *         invalid format course code if course code format is incorrect
+ */
+var getTagByCourse = async courseCode => {
+  format.verifyCourseCode(courseCode);
+  let connection = await mysql.getNewConnection();
+
+  try {
+    let result = await connection.query(
+      "SELECT tag_name FROM course_tags WHERE course_code = ?;",
+      [courseCode]
+    );
+    return result;
+  } catch (error) {
+    throw error;
   } finally {
     connection.release();
   }
@@ -341,9 +416,7 @@ let phaseOutCourse = async courseCode => {
  *
  */
 var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
-  if (!format.isMcGillCourse(courseCode)) {
-    throw Error("Invalid course format!\n");
-  }
+  format.verifyCourseCode(courseCode);
 
   let conn = await mysql.getNewConnection();
 
@@ -373,9 +446,8 @@ var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
       [curriculum]
     );
   } catch (err) {
-    console.log(err);
     conn.release();
-    throw Error("Internal Server Error!\n");
+    throw err;
   }
 
   if (ifAssigned[0].count !== 0) {
@@ -411,26 +483,72 @@ var assignCourseToCurriculum = async (courseType, courseCode, curriculum) => {
   try {
     await conn.beginTransaction();
     await conn.query(query, [curriculum, courseCode]);
-
     await conn.commit();
   } catch (err) {
     await conn.rollback();
-    console.log(err);
-    throw Error("Internal Server Error!\n");
+    throw err;
   } finally {
     conn.release();
+  }
+  return true;
+};
+
+/**
+ * Saves user preferences to the database.
+ * @author Steven Li
+ * @param {int} student_id A student id
+ * @param {JSON} courses An array of course codes
+ * @throws invalid format course code
+ *         invalid format student id
+ *         mysql connection errors
+ */
+var saveUserPreferences = async (student_id, courses) => {
+  if (!format.verifyStudentId(student_id)) {
+    throw new Error("invalid format student id");
+  }
+  if (!courses) {
+    throw new Error("empty courses list");
+  }
+  for (let i = 0; i < courses.length; i++) {
+    format.verifyCourseCode(courses[i]);
+  }
+
+  let connection = await mysql.getNewConnection();
+  try {
+    await connection.beginTransaction();
+    await connection.query(
+      "DELETE FROM student_desired_courses WHERE student_id = ?;",
+      [student_id]
+    );
+    for (let i = 0; i < courses.length; i++) {
+      await connection.query(
+        "INSERT INTO student_desired_courses (course_code, student_id) VALUES (?, ?);",
+        [courses[i], student_id]
+      );
+    }
+    await connection.commit();
+    return true;
+  } catch (err) {
+    console.error(err);
+    await connection.rollback();
+    throw new Error("false");
+  } finally {
+    connection.release();
   }
 };
 
 module.exports = {
-  queryCourseByTag,
+  getCourseByTag,
+  getTagByCourse,
   addCourse,
   addCompletedCourses,
   addCourseOfferings,
   getAllCourses,
+  getAllCourseOfferings,
   addCoreq,
   addPrereq,
   updateCourse,
   phaseOutCourse,
-  assignCourseToCurriculum
+  assignCourseToCurriculum,
+  saveUserPreferences
 };

@@ -12,44 +12,30 @@ class CourseSuggestionList extends Component {
     };
   }
 
-  componentWillMount = () => {
-    this.selectedCheckboxes = this.props.loadedCourses;
+  componentDidUpdate = () => {
+    this.selectedCheckboxes = this.props.selectedCourses;
   };
 
-  //TODO: to be changed
-  handleChange(index, checked, checkbox) {
-    const { tag, courses } = this.state;
-    courses[index].checked = checked;
+  componentWillMount = () => {
+    this.selectedCheckboxes = this.props.selectedCourses;
+  };
+
+  handleChange = (index, checked, checkbox) => {
+    if (typeof checkbox === 'undefined') {
+      return;
+    }
+    const { courses } = this.state;
+    courses[index].desired = checked | 0;
     this.setState({ courses });
 
     if (this.selectedCheckboxes.has(checkbox)) {
       this.selectedCheckboxes.delete(checkbox);
-      console.log(checkbox, 'is unselected');
+      this.props.updateSelected(false, checkbox);
     } else {
       this.selectedCheckboxes.add(checkbox);
-      console.log(checkbox, 'is selected');
+      this.props.updateSelected(true, checkbox);
     }
-    //TODO: Store in cookie
-    this.props.updateCoursesCheckedState(tag, checkbox, courses);
-  }
-
-  createSuggestionList = (tag, index) => (
-    <div className="tag" key={index}>
-      <h4>{tag.name}</h4>
-      {tag.courses.map(this.createCourseList)}
-      {/* {tag.courses.map((course, index) => (
-        <CourseCheckBox
-          key={index}
-          index={index}
-          name={course.course_code}
-          checked={course.checked}
-          handleChange={e =>
-            this.handleChange(index, e.target.checked, e.target.course_code)
-          }
-        />
-      ))} */}
-    </div>
-  );
+  };
 
   createCourseList = (course_label, index) => (
     <div className="suggestion-course" key={index}>
@@ -62,21 +48,21 @@ class CourseSuggestionList extends Component {
       <div className="course-list">
         <div>
           <h4 className="tag-label">{this.props.tag}</h4>
-          {this.props.errorMessage(
-            this.props.courses.map((course, index) => (
-              <CourseCheckBox
-                key={index}
-                index={index}
-                course_code={course.course_code}
-                checked={
-                  this.selectedCheckboxes.has(course.course_code) ? true : false
-                }
-                handleChange={e =>
-                  this.handleChange(index, e.target.checked, e.target.name)
-                }
-              />
-            ))
-          )}
+          {console.log(this.props.tag, this.selectedCheckboxes)}
+          {this.props.courses.map((course, index) => (
+            <CourseCheckBox
+              key={index}
+              index={this.props.tag + course.course_code}
+              course_code={course.course_code}
+              checked={
+                this.selectedCheckboxes.has(course.course_code) ? true : false
+              }
+              handleChange={e =>
+                this.handleChange(index, e.target.checked, e.target.name)
+              }
+              description={course.description}
+            />
+          ))}
         </div>
       </div>
     );

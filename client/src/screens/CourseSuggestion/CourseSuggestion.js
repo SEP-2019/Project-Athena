@@ -32,8 +32,7 @@ class CourseSuggestion extends Component {
 
   componentDidMount() {
     this.hydrateStateWithLocalStorage();
-    // add event listener to save state to localStorage
-    // when user leaves/refreshes the page
+
     window.addEventListener(
       'beforeunload',
       this.saveStateToLocalStorage.bind(this)
@@ -45,7 +44,6 @@ class CourseSuggestion extends Component {
       'beforeunload',
       this.saveStateToLocalStorage.bind(this)
     );
-    // saves if component has a chance to unmount
     this.saveStateToLocalStorage();
   }
 
@@ -59,13 +57,13 @@ class CourseSuggestion extends Component {
     return (
       <div>
         <div className="main_page_message">
-          Here are your remaining mandatory courses and suggestions for your
-          complementary courses. You can add them to your curriculum.
+          Here are your remaining mandatory courses and suggested complementary
+          courses that can be filtered by tags. You can select the desired
+          courses and apply them.
         </div>
         <Tabs
           defaultTab={this.state.currentTab}
           onChange={tabId => {
-            console.log(tabId);
             this.setState({ currentTab: tabId });
           }}
         >
@@ -77,10 +75,15 @@ class CourseSuggestion extends Component {
           </TabList>
           <Divider />
           <TabPanel tabId="Mandatory Courses">
-            <MandatoryPanel />
+            <MandatoryPanel
+              sid={this.props.studentId}
+              url={`users/getRemainingCourses?studentId=${
+                this.props.studentId
+              }`}
+            />
           </TabPanel>
           <TabPanel tabId="Complementary Courses">
-            <ComplementaryPanel />
+            <ComplementaryPanel sid={this.props.studentId} />
           </TabPanel>
         </Tabs>
       </div>

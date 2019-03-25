@@ -3,19 +3,19 @@ import './HeaderBar.css';
 import LeftDrawer from '../LeftDrawer/LeftDrawer';
 
 const pages = [
-  { label: 'Course Registration', path: '/courseregistration' },
-  { label: 'Course Suggestions', path: '/home' },
-  { label: 'Curriculum', path: '/curriculumdisplay' },
+  { label: 'Course Registration', path: '/courseRegistration' },
+  { label: 'Course Suggestions', path: '/courseSuggestions' },
+  { label: 'Curriculum', path: '/curriculumDisplay' },
 ];
-const HeaderBar = () => (
+const HeaderBar = props => (
   <header className="HeaderBar">
     <nav className="HeaderBar_navigation">
       <div>
-        <LeftDrawer pages={pages} />
+        <LeftDrawer pages={pages} email={props.email} />
       </div>
       <div />
       <div className="HeaderBar_project_name">
-        <a href="/">James McGill</a>
+        {props.email}
       </div>
       <div className="spaceFiller" />
       <div className="HeaderBar_logo" />

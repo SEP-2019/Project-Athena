@@ -8,8 +8,10 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { Link } from 'react-router-dom';
+
 import MenuButton from '../MenuButton/MenuButton';
 import './LeftDrawer.css';
+import Cookies from 'universal-cookie';
 
 const styles = {
   list: {
@@ -28,6 +30,12 @@ class LeftDrawer extends React.Component {
     });
   };
 
+  logout = () => {
+    const cookies = new Cookies();
+    cookies.remove('studentId', '/');
+    cookies.remove('email', '/');
+  };
+
   render() {
     const { classes } = this.props;
 
@@ -40,12 +48,12 @@ class LeftDrawer extends React.Component {
             src="https://static.myfigurecollection.net/pics/figure/big/105649.jpg"
             style={{ width: 60, height: 60 }}
           />
-          <p className="Temporary_Drawer_User_Name">James McGill</p>
+          <p className="Temporary_Drawer_User_Name">{this.props.email}</p>
         </div>
         <Divider />
         <List>
           {this.props.pages.map((page, i) => (
-            <Link to={page.path} key={i} className="link">
+            <Link to={page.path} key={i} style={{ textDecoration: 'none' }}>
               <ListItem button>
                 <ListItemIcon>
                   <img
@@ -58,6 +66,18 @@ class LeftDrawer extends React.Component {
               </ListItem>
             </Link>
           ))}
+          <Link to={'/login'} key={4} style={{ textDecoration: 'none' }}>
+            <ListItem button onClick={this.logout}>
+              <ListItemIcon>
+                <img
+                  alt="for pages"
+                  src="http://mawarupenguindrum.moonfruit.fr/communities/5/000/001/348/125/images/1860781.png"
+                  style={{ width: 30, height: 30 }}
+                />
+              </ListItemIcon>
+              <ListItemText primary={'Logout'} />
+            </ListItem>
+          </Link>
         </List>
       </div>
     );

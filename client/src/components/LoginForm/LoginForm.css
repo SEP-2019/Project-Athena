@@ -1,0 +1,36 @@
+.primary-button {
+  margin-block-start: 0.75vh;
+  background-color: #b20007;
+  color: white;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+
+  font-weight: 600;
+}
+
+.secondary-button {
+  margin-block-start: 1.5vh;
+  background-color: white;
+  color: #b20007;
+  cursor: pointer;
+
+  font-weight: 400;
+}
+
+.error {
+  margin-bottom: 0.75vh;
+  color: red;
+}
+
+.link {
+  margin-inline-start: 1vh;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.note {
+  font-weight: 480;
+  margin-top: 0.5vh;
+  margin-bottom: 1.5vh;
+}

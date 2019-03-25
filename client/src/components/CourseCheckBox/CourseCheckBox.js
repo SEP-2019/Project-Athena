@@ -1,35 +1,35 @@
-import React, { Component } from 'react';
+import React from 'react';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 import './CourseCheckBox.css';
+import {
+  ExpansionPanel,
+  ExpansionPanelSummary,
+  ExpansionPanelDetails,
+} from '../MuiStyle/commonStyle';
 
-class CourseCheckBox extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  render() {
-    return (
-      <div>
-        <div htmlFor={this.props.course_code} className="course_checkbox">
-          <label htmlFor={this.props.course_code} className="checkbox_label">
-            {this.props.course_code}
-          </label>
+function CourseCheckBox(props) {
+  return (
+    <ExpansionPanel>
+      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+        <div htmlFor={props.index} className="course_checkbox">
+          <label className="checkbox_label">{props.course_code}</label>
           <input
-            id={this.props.course_code}
+            id={props.index}
             type="checkbox"
-            name={this.props.course_code}
-            checked={this.props.checked}
-            onChange={this.props.handleChange}
+            name={props.course_code}
+            checked={props.checked}
+            onChange={props.handleChange}
           />
-          <label htmlFor={this.props.course_code} className="spacer_label" />
-          <label
-            htmlFor={this.props.course_code}
-            className="custom_large_checkbox"
-          />
+          <label htmlFor={props.index} className="custom_large_checkbox" />
         </div>
-      </div>
-    );
-  }
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <Typography>{props.description || 'N/A'}</Typography>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  );
 }
 
 export default CourseCheckBox;

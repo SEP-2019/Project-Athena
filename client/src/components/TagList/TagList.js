@@ -9,44 +9,57 @@ class TagList extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      hasButtons: props.hasButtons !== undefined ? props.hasButtons : true,
       tags: props.tags.slice(),
     };
   }
 
   componentWillMount = () => {
-    this.selectedCheckboxes = this.props.checkedTags;
+    this.selectedTags = this.props.checkedTags;
   };
 
-  handleChange(index, checked, checkbox) {
+  /**
+   * Refreshes the checkboxes on re-render / receiving new checked tags
+   */
+  componentWillReceiveProps = () => {
+    // if(this.props.refreshChecks){
+    //   this.selectedTags = this.props.checkedTags;
+    // }
+  };
+
+  componentDidUpdate = () => {
+    if(this.props.refreshChecks){
+      this.selectedTags = this.props.checkedTags;
+    }
+  }
+
+  handleChange = (index, checked, checkbox) => {
     const { tags } = this.state;
     tags[index].checked = checked;
     this.setState({ tags });
 
-    if (this.selectedCheckboxes.has(checkbox)) {
-      this.selectedCheckboxes.delete(checkbox);
+    if (this.selectedTags.has(checkbox)) {
+      this.selectedTags.delete(checkbox);
       console.log(checkbox, 'is unselected');
     } else {
-      this.selectedCheckboxes.add(checkbox);
+      this.selectedTags.add(checkbox);
       console.log(checkbox, 'is selected');
     }
-    //TODO: Store in cookie
     this.props.updateTagsCheckedState(tags);
-  }
+  };
 
-  uncheckAll = uncheckAllEvent => {
-    uncheckAllEvent.preventDefault();
+  uncheckAll = () => {
     const { tags } = this.state;
     tags.forEach(interest => (interest.checked = false));
     this.setState({ tags });
     let isCleared = false;
-    for (const checkbox of this.selectedCheckboxes) {
-      this.selectedCheckboxes.delete(checkbox);
-      console.log(checkbox, 'is Cleared');
+    for (const checkbox of this.selectedTags) {
+      this.selectedTags.delete(checkbox);
       isCleared = true;
       this.props.updateTagsCheckedState(tags);
     }
     if (isCleared) {
-      this.props.enqueueSnackbar('Your selections have been cleared', {
+      this.props.enqueueSnackbar('Your filters have been cleared', {
         variant: 'info',
         action: <Button size="small">{'Dismiss'}</Button>,
         autoHideDuration: 1500,
@@ -56,38 +69,55 @@ class TagList extends Component {
   };
 
   onClearAll = e => {
-    this.props.clearSelection(e);
-    this.uncheckAll(e);
+    e.preventDefault();
+    this.uncheckAll();
   };
+
+  onApply = e => {
+    e.preventDefault();
+    if (this.props.applySelection()) {
+      this.props.enqueueSnackbar('Your changes have been applied', {
+        variant: 'success',
+        action: <Button size="small">{'Dismiss'}</Button>,
+        autoHideDuration: 1500,
+      });
+    }
+  };
+
+  renderButtons = () => {
+    if (this.state.hasButtons){
+      return <div className="btn_container">
+        <button className="btn" onClick={this.onClearAll}>
+          CLEAR FILTERS
+        </button>
+        <button className="btn" onClick={this.onApply}>
+          APPLY COURSES
+        </button>
+      </div>
+    }
+    return null
+  }
 
   render() {
     return (
       <form className="interest_selection">
-        <h4>My Interests</h4>
-        {this.props.errorMessage(
-          <div>
-            <div className="interest-list">
-              {this.props.tags.map((interest, index) => (
-                <TagCheckBox
-                  key={index}
-                  index={index}
-                  name={interest.name}
-                  checked={
-                    this.selectedCheckboxes.has(interest.name) ? true : false
-                  }
-                  handleChange={e =>
-                    this.handleChange(index, e.target.checked, e.target.name)
-                  }
-                />
-              ))}
-            </div>
-            <div className="btn_container">
-              <button className="btn" onClick={this.onClearAll}>
-                CLEAR ALL
-              </button>
-            </div>
+        <h4>Filters:</h4>
+        <div>
+          <div className="interest-list">
+            {this.props.tags.map((interest, index) => (
+              <TagCheckBox
+                key={index}
+                index={index}
+                name={interest.name}
+                checked={this.selectedTags.has(interest.name) ? true : false}
+                handleChange={e =>
+                  this.handleChange(index, e.target.checked, e.target.name)
+                }
+              />
+            ))}
           </div>
-        )}
+          <this.renderButtons/>
+        </div>
       </form>
     );
   }

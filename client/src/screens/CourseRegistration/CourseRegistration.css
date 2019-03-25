@@ -4,6 +4,7 @@
 
 .instruction {
   margin: 20px 25px;
+  line-height: 20px;
 }
 
 .content {
@@ -13,13 +14,6 @@
 .selection-side {
   flex: 1 1 0;
   margin: 0 25px;
-}
-
-.selection-semester {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
 }
 
 .selection-dropdown {
@@ -39,22 +33,58 @@
   flex-grow: 1;
 }
 
-.selection-button {
-  margin-left: 20px;
-  padding: 10px 25px;
-  background-color: #b20007;
-  color: white;
-  border-radius: 5px;
+.search-section {
+  display: flex;
 }
 
 .selected-side {
   list-style-type: none;
   padding: 0;
-  flex: 1 1 0;
-  margin: 0 25px;
+  margin: 0 25px 0 5px;
+  height: 470px;
+  overflow: scroll;
+  border: 1px solid #eaeaea;
 }
 
 .select {
   flex-grow: 1;
   margin-left: 20px;
+}
+
+.selection-save {
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 5px 25px 0 0;
+}
+
+.save-button {
+  margin-top: 10px;
+  padding: 10px 30px;
+  background-color: #b20007;
+  color: white;
+  border-radius: 5px;
+  border: none;
+}
+
+.save-button:hover {
+  cursor: pointer;
+  background-color: #7a0000;
+}
+
+.save-button:active {
+  outline: none;
+  background-color: #7a0000;
+}
+
+.save-button:disabled {
+  background-color: #afafaf;
+}
+
+.selected-size-frame {
+  flex: 1 1 0;
+}
+
+.animation-wrapper {
+  margin-left: 20px;
+  text-align: center;
 }

@@ -1,150 +1,173 @@
 const mysql = require("../../sql/connection");
 const format = require("../../validation/format");
 const hasher = require("../../validation/hash");
+let CustomError = require("../../validation/CustomErrors").CustomError;
 
-var insertStudentUser = async (username, password, email, id) => {
+var insertStudentUser = async (
+  username,
+  password,
+  email,
+  id,
+  program,
+  year,
+  curr_type
+) => {
   // Connect to database
-  let error = false;
   // Check for invalid formatting
-  //todo, handle errors after formatting configured to throw errors
-  if (!format.verifyUsername(username)) {
-    error = "invalid format username";
-  } else if (!format.verifyPassword(password)) {
-    error = "invalid format password";
-  } else if (!format.verifyEmail(email)) {
-    error = "invalid format email";
-  } else if (!format.verifyStudentId(id)) {
-    error = "invalid format id";
+  format.verifyUsername(username);
+  format.verifyPassword(password);
+  format.verifyEmail(email);
+  format.verifyStudentId(id);
+  format.verifyCurriculumName(program);
+  format.verifyYear(year);
+  format.verifyCurriculumName(curr_type);
+
+  let nextYear = (parseInt(year, 10) + 1).toString(10);
+  let major = program.concat("|", year, "|", nextYear, "|", curr_type);
+
+  let conn = await mysql.getNewConnection();
+  let ifMajorExist;
+
+  try {
+    ifMajorExist = await conn.query(
+      `SELECT COUNT(*) AS count FROM curriculums WHERE curriculum_name = ?;`,
+      [major]
+    );
+  } catch (err) {
+    console.log(err);
+    throw Error("Internal Server Error!\n");
+  } finally {
+    conn.release();
   }
 
-  if (!error == false) {
-    console.error(error);
-    throw new Error(error);
+  if (ifMajorExist[0].count === 0) {
+    throw Error(`Curriculum with name ${major} does not exist!`);
   }
 
   let connection = await mysql.getNewConnection();
-
   // Hash the password
   let hash = hasher.hashPass(password);
 
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
-    await connection.query("INSERT INTO students VALUES(?, ?);", [id, username]);
+    await connection.query(
+      "INSERT INTO users (username, email, password) VALUES(?, ?, ?);",
+      [username, email, hash]
+    );
+    await connection.query(
+      "INSERT INTO students (student_id, username) VALUES(?, ?);",
+      [id, username]
+    );
+    await connection.query(
+      "INSERT INTO student_majors (student_id, curriculum_name) VALUES(?, ?);",
+      [id, major]
+    );
     await connection.commit();
     connection.release();
-    return true;
+    return email;
   } catch (error) {
     connection.rollback();
     connection.release();
-    console.error(error);
-    throw new Error(false);
+    throw error;
   }
 };
 
 var deleteStudentUser = async username => {
-  if (!format.verifyUsername(username)) {
-    let error = "invalid username";
-    console.error(error);
-    throw new Error(error);
-  }
-
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    console.error(error);
-    throw new Error("failed to establish connection with database");
-  }
-
+  format.verifyUsername(username);
+  let connection = await mysql.getNewConnection();
   try {
     await connection.beginTransaction();
-    let student_id = await connection.query("SELECT student_id FROM students WHERE username = ?;", username);
-    await connection.query("DELETE FROM students WHERE student_id = ?;", [student_id[0].student_id]);
+    let student_id = await connection.query(
+      "SELECT student_id FROM students WHERE username = ?;",
+      username
+    );
+    await connection.query("DELETE FROM student_majors WHERE student_id = ?;", [
+      student_id[0].student_id
+    ]);
+    await connection.query("DELETE FROM student_minors WHERE student_id = ?;", [
+      student_id[0].student_id
+    ]);
+    await connection.query(
+      "DELETE FROM student_desired_courses WHERE student_id = ?;",
+      [student_id[0].student_id]
+    );
+    await connection.query(
+      "DELETE FROM student_course_offerings WHERE student_id = ?;",
+      [student_id[0].student_id]
+    );
+    await connection.query("DELETE FROM students WHERE username = ?;", [
+      username
+    ]);
     await connection.query("DELETE FROM users WHERE username = ?;", [username]);
     await connection.commit();
     connection.release();
     return true;
   } catch (error) {
-    console.error(error);
     connection.rollback();
     connection.release();
-    throw new Error(false);
+    throw error;
   }
 };
 
 var insertAdminUser = async (username, password, email, id) => {
   // Connect to database
-  let error = false;
   // Check for invalid formatting
-  //todo, handle errors after formatting configured to throw errors
-  if (!format.verifyUsername(username)) {
-    error = "invalid format username";
-  } else if (!format.verifyPassword(password)) {
-    error = "invalid format password";
-  } else if (!format.verifyEmail(email)) {
-    error = "invalid format email";
-  } else if (!format.verifyAdminId(id)) {
-    error = "invalid format id";
-  }
-
-  if (!error == false) {
-    console.error(error);
-    throw new Error(error);
-  }
+  format.verifyUsername(username);
+  format.verifyPassword(password);
+  format.verifyEmail(email);
+  format.verifyId(id);
 
   let connection = await mysql.getNewConnection();
-
   // Hash the password
   let hash = hasher.hashPass(password);
   try {
     await connection.beginTransaction();
-    await connection.query("INSERT INTO users VALUES(?, ?, ?);", [username, email, hash]);
-    await connection.query("INSERT INTO staff_members VALUES(?, ?);", [id, username]);
+    await connection.query(
+      "INSERT INTO users (username, email, password) VALUES(?, ?, ?);",
+      [username, email, hash]
+    );
+    await connection.query(
+      "INSERT INTO staff_members (staff_id, username) VALUES(?, ?);",
+      [id, username]
+    );
     await connection.commit();
     connection.release();
     return true;
   } catch (error) {
     connection.rollback();
     connection.release();
-    console.error(error);
-    throw new Error(false);
+    throw error;
   }
 };
 
 var deleteAdminUser = async username => {
-  if (!format.verifyUsername(username)) {
-    let error = "invalid username";
-    console.error(error);
-    throw new Error(error);
-  }
+  format.verifyUsername(username);
 
-  let connection;
-  try {
-    connection = await mysql.getNewConnection();
-  } catch (error) {
-    console.error(error);
-    throw new Error("failed to establish connection with database");
-  }
+  let connection = await mysql.getNewConnection();
 
   try {
     await connection.beginTransaction();
-    let staff_id = await connection.query("SELECT staff_id FROM staff_members WHERE username = ?;", username);
-    await connection.query("DELETE FROM staff_members WHERE staff_id = ?;", [staff_id[0].staff_id]);
+    let staff_id = await connection.query(
+      "SELECT staff_id FROM staff_members WHERE username = ?;",
+      username
+    );
+    await connection.query("DELETE FROM staff_members WHERE staff_id = ?;", [
+      staff_id[0].staff_id
+    ]);
+
     await connection.query("DELETE FROM users WHERE username = ?;", [username]);
     await connection.commit();
-    connection.release();
     return true;
   } catch (error) {
-    console.error(error);
     connection.rollback();
+    throw error;
+  } finally {
     connection.release();
-    throw new Error(false);
   }
 };
 
 var getCompletedCourses = async studentID => {
-  let courses = [];
+  format.verifyStudentId(studentID);
 
   const sql_query = `SELECT course_code, semester
   		FROM course_offerings
@@ -152,98 +175,328 @@ var getCompletedCourses = async studentID => {
   		IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`;
 
   let conn = await mysql.getNewConnection();
-  let results;
   try {
-    results = await conn.query(sql_query, [studentID]);
-    if (results.length !== 0) {
-      courses = JSON.stringify(results);
-    }
-
-    return courses;
+    let results = await conn.query(sql_query, [studentID]);
+    return results;
   } catch (err) {
-    console.log(err);
-    return "Interval serever error!";
+    throw err;
   } finally {
     conn.release();
   }
 };
 
 var getStudentData = async studentID => {
-  let error = false;
-  if (!format.verifyStudentId(studentID)) {
-    error = "invalid format id";
-  }
+  format.verifyStudentId(studentID);
 
-  if (!error == false) {
-    console.error(error);
-    throw new Error(error);
-  }
-
-  let data;
   let conn = await mysql.getNewConnection();
-  let courses, major, minor;
+  let completedCourses, major, minors;
   try {
-    courses = await conn.query(
-      `SELECT course_code, semester
+    completedCourses = await conn.query(
+      `SELECT course_offerings.course_code, course_offerings.semester, 
+            courses.title, courses.description, courses.credits
     FROM course_offerings
-    WHERE (id, semester)
+    JOIN courses ON (course_offerings.course_code = courses.course_code)
+    WHERE (course_offerings.id, course_offerings.semester)
     IN (SELECT offering_id, semester FROM student_course_offerings WHERE student_id = ?);`,
       [studentID]
     );
-    major = await conn.query(`SELECT curriculum_name FROM student_majors WHERE student_id = ?;`, [studentID]);
-    minor = await conn.query(`SELECT curriculum_name FROM student_minors WHERE student_id = ?;`, [studentID]);
+
+    major = await conn.query(
+      `SELECT curriculum_name FROM student_majors WHERE student_id = ?;`,
+      [studentID]
+    );
+
+    minors = await conn.query(
+      `SELECT curriculum_name FROM student_minors WHERE student_id = ?;`,
+      [studentID]
+    );
+
+    let currYear = new Date().getFullYear();
+    let currMonth = new Date().getMonth();
+    let fallSem, winterSem;
+
+    if (major.length == 0) {
+      throw new Error("Student does not have any majors");
+    }
+
+    let curriculumName = major[0].curriculum_name;
+
+    if (currMonth < 3) {
+      fallSem = "";
+      winterSem = "W" + currYear;
+    } else {
+      fallSem = "F" + currYear;
+      winterSem = "W" + (currYear + 1);
+    }
+
+    let incompleteCore = await conn.query(
+      `SELECT course_code, semester 
+      FROM course_offerings 
+      WHERE (course_code 
+        NOT IN (SELECT co.course_code 
+        FROM student_course_offerings sco 
+        join course_offerings co 
+        on sco.offering_id = co.id WHERE student_id = ?))
+      AND (semester = ? OR semester = ?) 
+      AND (course_code 
+          IN (SELECT course_code 
+              FROM curriculum_core_classes 
+              WHERE curriculum_name = ?));`,
+      [studentID, fallSem, winterSem, curriculumName]
+    );
+    let desiredTC = await conn.query(
+      `SELECT course_code, semester 
+      FROM course_offerings 
+      WHERE (id 
+            NOT IN (SELECT offering_id 
+                    FROM student_course_offerings 
+                    WHERE student_id = ?))
+      AND (semester = ? OR semester = ?) 
+      AND (course_code 
+          IN (SELECT course_code 
+              FROM curriculum_tech_comps 
+              WHERE curriculum_name = ?)) 
+      AND (course_code
+          IN (SELECT course_code 
+              FROM student_desired_courses 
+              WHERE student_id = ?));`,
+      [studentID, fallSem, winterSem, curriculumName, studentID]
+    );
+
+    for (let i = 0; i < incompleteCore.length; i++) {
+      let c = incompleteCore[i];
+      c.prereqs = await conn.query(
+        `SELECT prereq_course_code 
+        FROM course_prereqs 
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      c.coreqs = await conn.query(
+        `SELECT coreq_course_code 
+        FROM course_coreqs 
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      let course_info = await conn.query(
+        `SELECT description, title, credits
+        FROM courses
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      c.description = course_info[0].description;
+      c.title = course_info[0].title;
+      c.credits = course_info[0].credits;
+    }
+
+    for (let i = 0; i < desiredTC.length; i++) {
+      let c = desiredTC[i];
+      c.prereqs = await conn.query(
+        `SELECT prereq_course_code 
+        FROM course_prereqs 
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      c.coreqs = await conn.query(
+        `SELECT coreq_course_code 
+        FROM course_coreqs 
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      let course_info = await conn.query(
+        `SELECT description, title, credits
+        FROM courses
+        WHERE course_code = ?;`,
+        [c.course_code]
+      );
+      c.description = course_info[0].description;
+      c.title = course_info[0].title;
+      c.credits = course_info[0].credits;
+    }
+
     conn.release();
 
-    let results = { major: major, minor: minor, courses: courses };
+    let results = {
+      major: major,
+      minor: minors,
+      completedCourses: completedCourses,
+      incompletedCore: incompleteCore,
+      desiredTC: desiredTC
+    };
 
-    if (results) {
-      data = JSON.stringify(results);
-    }
-    return data;
+    return results;
   } catch (err) {
     conn.release();
-    console.log(err);
-    throw new Error(err);
+    throw err;
   }
 };
 
 var login = async (username, password) => {
-  let error = false;
-
   let isValidPassword = function(userpass, password) {
     return hasher.hashPass(password) === userpass;
   };
 
   // Check for invalid formatting
-  if (!format.verifyUsername(username)) {
-    error = "Invalid format username";
-  } else if (!format.verifyPassword(password)) {
-    error = "Invalid format password";
-  }
+  format.verifyUsername(username);
+  format.verifyPassword(password);
 
-  if (!error == false) {
-    console.error(error);
-    throw new Error(error);
-  }
-
-  // Begin transaction with database
+  let connection = await mysql.getNewConnection();
   try {
-    let connection = await mysql.getNewConnection();
-    let userInfo = await connection.query("SELECT * FROM users WHERE username = ?;", [username]);
+    let userInfo = await connection.query(
+      "SELECT * FROM users WHERE username = ?;",
+      [username]
+    );
 
-    if (!userInfo || !isValidPassword(userInfo[0].password, password)) {
-      throw new Error("Incorrect username or password.");
+    if (userInfo == undefined || userInfo.length == 0) {
+      throw new CustomError("User does not exist", 400);
     }
 
-    return true;
-  } catch (error) {
-    console.error(error);
-    throw new Error(error.message);
+    if (!userInfo || !isValidPassword(userInfo[0].password, password)) {
+      throw new CustomError("Incorrect username or password.", 400);
+    }
+
+    return userInfo[0].email;
+  } catch (err) {
+    throw err;
   } finally {
     connection.release();
   }
 };
 
+var assignStudentMinor = async (studentID, minor) => {
+  format.verifyStudentId(studentID);
+  format.verifyCurriculumName(minor);
+
+  let ifUserExist;
+  let ifMinorExist;
+  let existingMinor;
+
+  let conn = await mysql.getNewConnection();
+  try {
+    ifUserExist = await conn.query(
+      `SELECT COUNT(*) AS count FROM students WHERE student_id = ?;`,
+      [studentID]
+    );
+    ifMinorExist = await conn.query(
+      `SELECT COUNT(*) AS count FROM curriculums WHERE curriculum_name = ?;`,
+      [minor]
+    );
+    existingMinor = await conn.query(
+      `SELECT COUNT(*) AS count FROM student_minors WHERE student_id = ?;`,
+      [studentID]
+    );
+  } catch (err) {
+    console.log(err);
+    throw Error("Internal Server Error!\n");
+  } finally {
+    conn.release();
+  }
+
+  if (ifUserExist[0].count === 0) {
+    throw Error(`Student user with student ID ${studentID} does not exist!`);
+  } else if (ifMinorExist[0].count === 0) {
+    throw Error(`Curriculum with name ${minor} does not exist!`);
+  } else if (
+    existingMinor[0].count !== 0 &&
+    existingMinor[0].curriculum_name === minor
+  ) {
+    throw Error(`Student is already assigned to ${minor} as a minor`);
+  }
+
+  conn = await mysql.getNewConnection();
+  try {
+    await conn.beginTransaction();
+    if (existingMinor[0].count === 0) {
+      await conn.query(
+        "INSERT INTO student_minors (student_id, curriculum_name) VALUES(?, ?);",
+        [studentID, minor]
+      );
+    } else {
+      await conn.query(
+        "UPDATE student_minors SET curriculum_name = ? WHERE student_id = ?",
+        [minor, studentID]
+      );
+    }
+    await conn.commit();
+    return true;
+  } catch (err) {
+    await conn.rollback();
+    console.log(err);
+    throw new Error("Internal Server Error!\n");
+  } finally {
+    conn.release();
+  }
+};
+
+var updateStudentMajor = async (student_id, program, year, curr_type) => {
+  format.verifyStudentId(student_id);
+  format.verifyCurriculumName(program);
+  format.verifyYear(year);
+  format.verifyCurriculumName(curr_type);
+
+  let nextYear = (parseInt(year, 10) + 1).toString(10);
+  let major = program.concat("|", year, "|", nextYear, "|", curr_type);
+
+  let conn = await mysql.getNewConnection();
+  let ifUserExist;
+  let ifMajorExist;
+  try {
+    ifUserExist = await conn.query(
+      `SELECT COUNT(*) AS count FROM students WHERE student_id = ?;`,
+      [student_id]
+    );
+    ifMajorExist = await conn.query(
+      `SELECT COUNT(*) AS count FROM curriculums WHERE curriculum_name = ?;`,
+      [major]
+    );
+  } catch (err) {
+    console.log(err);
+    throw Error("Internal Server Error!\n");
+  } finally {
+    conn.release();
+  }
+
+  if (ifUserExist[0].count === 0) {
+    throw Error(`Student user with student ID ${student_id} does not exist!`);
+  } else if (ifMajorExist[0].count === 0) {
+    throw Error(`Curriculum with name ${major} does not exist!`);
+  }
+  let connection = await mysql.getNewConnection();
+  try {
+    await connection.beginTransaction();
+    await connection.query(
+      "UPDATE student_majors SET curriculum_name = ? WHERE student_id = ?",
+      [major, student_id]
+    );
+    await connection.commit();
+    return true;
+  } catch (error) {
+    connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
+
+let getRemainingCourses = async studentId => {
+  format.verifyStudentId(studentId);
+  let conn = await mysql.getNewConnection();
+  let incompleteCoreCourses = await conn.query(
+    `SELECT distinct c.course_code, c.title, c.description
+    FROM course_offerings co join courses c on co.course_code = c.course_code
+    WHERE (c.course_code 
+            NOT IN (SELECT co.course_code 
+            FROM student_course_offerings sco 
+            join course_offerings co 
+            on sco.offering_id = co.id)) 
+    AND (c.course_code 
+        IN (SELECT course_code 
+            FROM curriculum_core_classes 
+            WHERE curriculum_name = (SELECT curriculum_name FROM student_majors where student_id = ? limit 1)));`,
+    [studentId]
+  );
+  conn.release();
+  return incompleteCoreCourses;
+};
 
 module.exports = {
   insertStudentUser,
@@ -252,5 +505,8 @@ module.exports = {
   deleteAdminUser,
   getCompletedCourses,
   login,
-  getStudentData
+  getStudentData,
+  assignStudentMinor,
+  updateStudentMajor,
+  getRemainingCourses
 };

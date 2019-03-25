@@ -6,59 +6,11 @@
 
 .interest-list {
   padding: 1rem 1.5rem;
-  /* height: 350px; */
+  height: 325px;
   border: 1px solid rgb(0, 0, 0, 0.2);
   flex: 1;
   margin-bottom: 25px;
-  /* overflow-y: scroll; */
-}
-input[type='checkbox'] {
-  visibility: hidden;
-}
-
-.checkbox_area {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  position: relative;
-}
-.custom_checkbox {
-  margin-top: 0.7rem;
-  margin-bottom: 0.5rem;
-  cursor: pointer;
-  position: absolute;
-  width: 13px;
-  height: 13px;
-  top: 0;
-  left: 0;
-  background: transparent;
-  border: 1px solid #b20007;
-}
-.custom_checkbox:after {
-  opacity: 1;
-  content: '';
-  position: absolute;
-  width: 8px;
-  height: 5px;
-  background: transparent;
-  top: 2px;
-  left: 2px;
-  border: 1px solid white;
-  border-top: none;
-  border-right: none;
-
-  transform: rotate(-48deg);
-}
-
-.custom_checkbox:hover::after {
-  opacity: 0.5;
-}
-
-input[type='checkbox']:checked ~ .custom_checkbox {
-  background: #b20007;
-}
-.checkbox_label {
-  padding-left: 1.5rem;
-  font-weight: 500;
+  overflow-y: scroll;
 }
 
 .btn_container {
@@ -75,7 +27,8 @@ input[type='checkbox']:checked ~ .custom_checkbox {
   border: none;
   outline: none;
   background: none;
-  padding: 0 0.5rem;
+  padding: 0 0.7rem;
+  cursor: pointer;
 }
 .btn:hover {
   color: #b20007;

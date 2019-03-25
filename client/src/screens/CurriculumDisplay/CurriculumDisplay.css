@@ -2,9 +2,14 @@ div.curriculum-display{
   padding: 24px 32px 24px 32px ;
 }
 
+div.instructions{
+  font-size: 20px;
+  padding: 16px 0px 0px 0px;
+}
+
 div.page-header{
   font-weight: bold;
-  font-size: 36px;
+  font-size: 30px;
 }
 
 div.curriculum-selection-menu{
@@ -25,8 +30,22 @@ div.semester-course-display{
 }
 
 div.semester-name{
-  padding: 0px 0px 12px 0px ;
+  padding-top: 12px;
   font-weight: bold;
-  font-size: 24px;
+  font-size: 22px;
   color: black;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 1;
 }

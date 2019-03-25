@@ -1,88 +1,91 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { SnackbarProvider, withSnackbar } from 'notistack';
 
+import Api from '../../services/Api';
 import TagList from '../TagList/TagList';
+import RedirectError from '../RedirectError/RedirectError';
 import CourseSuggestionList from '../CourseSuggestionList/CourseSuggestionList';
 import './ComplementaryPanel.css';
 
 const TagListWithSnackBar = withSnackbar(TagList);
 
 class ComplementaryPanel extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      tags: [],
-      tagsAreLoading: true,
-      tagError: null,
+  state = {
+    tags: [],
+    tagsAreLoading: true,
 
-      suggestions: [],
-      suggestionsAreLoading: false,
-      suggestionError: null,
-    };
-  }
+    suggestions: [],
+    selectedCourses: new Set(),
+  };
 
-  addCheckedProperty(json) {
-    return json.map(obj => {
+  addCheckedProperty(data) {
+    return data.map(obj => {
       obj.checked = false;
       return obj;
     });
   }
 
-  fetchTags() {
-    axios
-      .get('http://localhost:3001/tags/getAllTags')
-      .then(response =>
-        this.setState({
-          tags: this.addCheckedProperty(response.data),
-          tagsAreLoading: false,
-        })
-      )
-      .catch(tagError => this.setState({ tagError, tagsAreLoading: false }));
-  }
-
-  fetchCourseSuggestions(newTag) {
-    axios
-      .get('http://localhost:3001/courses/getCourseByTag?tag=' + newTag)
-      .then(response => {
-        this.setState(prevState => ({
-          suggestions: [
-            ...prevState.suggestions,
-            {
-              name: newTag,
-              courses: this.addCheckedProperty(response.data),
-            },
-          ],
-          suggestionsAreLoading: false,
-        }));
+  addDesiredCourses = async courses => {
+    await Api()
+      .post(`/courses/updateDesiredCourse`, {
+        student_id: this.props.sid,
+        courses: courses,
       })
-      .catch(suggestionError =>
-        this.setState({ suggestionError, suggestionsAreLoading: false })
-      );
-  }
+      .catch(error => {
+        RedirectError(error);
+      });
+  };
 
-  componentDidMount() {
+  fetchTags = async () => {
+    const response = await Api()
+      .get(`tags/getAllTags`)
+      .catch(error => {
+        RedirectError(error);
+      });
+    if (response) {
+      this.setState({
+        tags: this.addCheckedProperty(response.data.Response),
+        tagsAreLoading: false,
+      });
+    }
+  };
+
+  fetchCourseSuggestions = async newTag => {
+    const response = await Api()
+      .get(`courses/getCourseByTag?tag=${newTag}&studentID=${this.props.sid}`)
+      .catch(error => {
+        RedirectError(error);
+      });
+    if (response) {
+      const courses = response.data.Response;
+      courses.forEach(this.populateDesiredCourses);
+      this.setState(prevState => ({
+        suggestions: [
+          ...prevState.suggestions,
+          { name: newTag, courses: courses },
+        ],
+      }));
+    }
+  };
+
+  componentDidMount = () => {
     this.fetchTags();
-  }
+  };
 
   componentWillMount = () => {
-    this.loadedCourses = new Set();
     this.checkedTags = new Set();
+    this.loadedCourses = new Set();
   };
 
   updateTagsCheckedState = newTags => {
-    this.setState({
-      tags: newTags,
-      suggestionsAreLoading: true,
-    });
-
-    var newSuggestions = [...this.state.suggestions];
+    this.setState({ tags: newTags });
+    let newSuggestions = [...this.state.suggestions];
     newTags.map(tag => {
       if (tag.checked && !newSuggestions.some(e => e.name === tag.name)) {
         this.fetchCourseSuggestions(tag.name);
       } else if (!tag.checked) {
-        var index = newSuggestions.findIndex(e => e.name === tag.name);
+        const index = newSuggestions.findIndex(e => e.name === tag.name);
         if (index !== -1) {
           newSuggestions.splice(index, 1);
           this.setState({ suggestions: newSuggestions });
@@ -92,49 +95,47 @@ class ComplementaryPanel extends Component {
     });
   };
 
-  updateCoursesCheckedState = (tagName, courseName, newCourses) => {
-    var newSuggestions = [...this.state.suggestions];
-    var tagIndex = newSuggestions.findIndex(e => e.name === tagName);
-    newSuggestions[tagIndex].courses = newCourses;
-    this.setState({ suggestions: newSuggestions });
+  updateSelected = (isSelected, checkbox) => {
+    const { selectedCourses } = this.state;
+    this.newSelectedCourses = new Set(selectedCourses);
+    if (isSelected) {
+      this.newSelectedCourses.add(checkbox);
+    } else {
+      this.newSelectedCourses.delete(checkbox);
+    }
+    this.setState({ selectedCourses: this.newSelectedCourses });
   };
 
-  clearSelection = e => {
-    e.preventDefault();
-    var newSuggestions = [...this.state.suggestions];
-    newSuggestions.forEach(function(obj) {
-      obj.courses.map(course => {
-        if (course.checked) {
-          course.checked = false;
-        }
-        return null;
-      });
-    });
-    this.setState({ suggestions: newSuggestions });
+  populateDesiredCourses = course => {
+    const code = course.course_code;
+    if (course.desired === 1) {
+      this.loadedCourses.add(code);
+    } else if (this.loadedCourses.has(code)) {
+      this.loadedCourses.delete(code);
+    }
+    this.setState({ selectedCourses: new Set(this.loadedCourses) });
   };
 
-  loadSuggestions = (tag, courses) => {
-    const { suggestionError } = this.state;
-    return (
-      <CourseSuggestionList
-        key={tag}
-        tag={tag}
-        courses={courses}
-        loadedCourses={this.loadedCourses}
-        updateCoursesCheckedState={this.updateCoursesCheckedState}
-        errorMessage={content =>
-          suggestionError ? (
-            <p className="Error">{suggestionError.message}</p>
-          ) : (
-            content
-          )
-        }
-      />
-    );
+  hasChange = () => {
+    let as = this.loadedCourses;
+    let bs = this.state.selectedCourses;
+    if (as.size !== bs.size) return true;
+    for (var a of as) if (!bs.has(a)) return true;
+    return false;
+  };
+
+  applySelection = () => {
+    if (this.hasChange()) {
+      this.loadedCourses = new Set(this.state.selectedCourses);
+      let course_array = [...this.loadedCourses];
+      this.addDesiredCourses(course_array);
+      return true;
+    }
+    return false;
   };
 
   render() {
-    const { tagsAreLoading, tags, tagError, suggestions } = this.state;
+    const { tagsAreLoading, tags, suggestions, selectedCourses } = this.state;
     return (
       <div className="tab_content">
         <div className="spacer" />
@@ -143,32 +144,31 @@ class ComplementaryPanel extends Component {
             <SnackbarProvider maxSnack={3}>
               <TagListWithSnackBar
                 tags={tags}
-                clearSelection={this.clearSelection}
+                applySelection={this.applySelection}
                 checkedTags={this.checkedTags}
                 updateTagsCheckedState={this.updateTagsCheckedState}
-                errorMessage={content =>
-                  tagError ? (
-                    <p className="Error">{tagError.message}</p>
-                  ) : (
-                    content
-                  )
-                }
               />
             </SnackbarProvider>
           ) : (
-            <h3>Loading the tags...</h3>
+            <h3>Loading filter tags...</h3>
           )}
         </div>
         <div className="spacer" />
         <div className="courses-container">
           {suggestions.length > 0 ? (
-            suggestions.map(elem =>
-              this.loadSuggestions(elem.name, elem.courses)
-            )
+            suggestions.map(elem => (
+              <CourseSuggestionList
+                key={elem.name}
+                tag={elem.name}
+                courses={elem.courses}
+                updateSelected={this.updateSelected}
+                selectedCourses={selectedCourses}
+              />
+            ))
           ) : (
             <p>
-              You did not select any interest. Please select at least one
-              interest from the list.
+              You did not select any filter. Please select a filter to see the
+              courses.
             </p>
           )}
         </div>
