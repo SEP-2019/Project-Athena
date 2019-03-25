@@ -59,6 +59,7 @@ class CustomizedInputs extends Component {
             className={this.props.classes.root}
             id={this.props.id}
             label={this.props.label}
+            InputProps={this.props.InputProps}
             type={this.props.type}
             name={this.props.name}
             autoComplete={this.props.type}

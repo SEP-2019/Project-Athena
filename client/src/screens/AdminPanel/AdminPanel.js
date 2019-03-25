@@ -70,7 +70,7 @@ class AdminPanel extends Component {
 
   componentDidMount() {
     //TODO put this in to prevent going in admin page without logging in
-    // if (this.props.location.isAdmin !== true) history.push('/login');
+    if (this.props.location.isAdmin !== true) history.push('/login');
 
     this.updateCourseList();
     this.fetchTags();
@@ -177,7 +177,7 @@ class AdminPanel extends Component {
     // in the case of the TagCheckBox component, the value cannot be parsed directly, but rather
     // comes from the "checked" property of the event
     const newValue =
-      name === 'Phased_out' ? event.target && event.target.checked : value;
+      name === 'phased_out' ? event.target && event.target.checked : value;
 
     this.setState(prevState => ({
       courseToEdit: {
@@ -222,8 +222,8 @@ class AdminPanel extends Component {
     if (
       !this.state.courseToEdit.title ||
       !this.state.courseToEdit.course_code ||
-      !this.courseToEdit.description ||
-      !this.courseToEdit.credit
+      !this.state.courseToEdit.description ||
+      !this.state.courseToEdit.credit
     ) {
       console.error('missing field');
       this.setState({
@@ -343,7 +343,6 @@ class AdminPanel extends Component {
               />
             </div>
 
-            {/* Buttons */}
             <button className="primary-button" onClick={this.onEdit}>
               Edit course
             </button>
