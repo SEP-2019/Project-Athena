@@ -63,6 +63,7 @@ class AdminForm extends Component {
             label="Number of credits"
             id="credits-input"
             type="number"
+            InputProps={{ inputProps: { min: 1, max: 9 } }}
             name="credits"
             defaultValue={this.props.selectedCourse.credits}
             onChange={this.props.handleInputChange}
@@ -77,7 +78,7 @@ class AdminForm extends Component {
             // the name property is a duplicate property referring to the label of the checkbox
             // as well as the property that is passed to the event handler. keep it as
             // "phased_out" or else it won't set the new value properly
-            name={'Phased_out'}
+            name={'phased_out'}
             checked={this.props.selectedCourse.phased_out}
             handleChange={this.props.handleInputChange}
           />

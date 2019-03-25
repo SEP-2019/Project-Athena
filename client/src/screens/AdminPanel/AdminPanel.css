@@ -53,7 +53,7 @@ body {
 }
 
 .selection_search {
-  padding: 0.6rem 1rem;
+  padding: 0.6rem 1rem 1rem 0;
 }
 
 .panel_form {
@@ -71,6 +71,10 @@ body {
 .edit:disabled {
   background-color: rgba(184, 184, 184, 0.973);
   cursor: default;
+}
+
+.primary-button {
+  white-space: nowrap;
 }
 
 .primary-button:focus {
