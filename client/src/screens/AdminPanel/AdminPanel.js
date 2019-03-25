@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import Api from '../../services/Api';
 import PropTypes from 'prop-types';
+
 import './AdminPanel.css';
-
 import SearchBar from '../../components/SearchBar';
-
 import MandatoryPanel from '../../components/MandatoryPanel/MandatoryPanel';
 import Section from '../../components/Section';
 import TagList from '../../components/TagList/TagList';
@@ -120,7 +119,9 @@ class AdminPanel extends Component {
       let checkedTags = this.state.tags;
 
       // check the tags that are fetched from the endpoint
-      checkedTags.map(tag => tag.checked = courseTags.some(t => t.tag_name === tag.name))
+      checkedTags.map(
+        tag => (tag.checked = courseTags.some(t => t.tag_name === tag.name))
+      );
 
       this.setState({
         tags: checkedTags,
@@ -151,7 +152,8 @@ class AdminPanel extends Component {
 
     // in the case of the TagCheckBox component, the value cannot be parsed directly, but rather
     // comes from the "checked" property of the event
-    const newValue = name === "phased_out" ? event.target && event.target.checked : value
+    const newValue =
+      name === 'phased_out' ? event.target && event.target.checked : value;
 
     this.setState(prevState => ({
       courseToEdit: {
@@ -203,8 +205,7 @@ class AdminPanel extends Component {
   }
 
   renderTagsBox(props) {
-   
-    console.log(this.state.checkedTagsSet)
+    console.log(this.state.checkedTagsSet);
 
     return !props.tagsAreLoading ? (
       <TagList
@@ -289,13 +290,17 @@ class AdminPanel extends Component {
 
     return (
       <div className="admin-panel">
-        <Section>
-          <SearchBar
-            className="selection-search"
-            data={allCourses}
-            getValue={this.onSelectFromSearch}
-            placeholder={this.state.placeHolder}
-          />
+        <div className="top_bar">
+          <a>Administrator Panel</a>
+        </div>
+        <Section className="action_bar">
+          <div className="selection_search">
+            <SearchBar
+              data={allCourses}
+              getValue={this.onSelectFromSearch}
+              placeholder={this.state.placeHolder}
+            />
+          </div>
           <button
             className="primary-button"
             onClick={() => this.handleSwitchView('list')}
