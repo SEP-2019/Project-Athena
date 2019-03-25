@@ -43,6 +43,7 @@ class AdminPanel extends Component {
     if (Object.keys(selection).length > 0) {
       this.setState({
         selectedSearch: selection,
+        disableEdit: false,
       }); // this is where the warning appears :(
     } else {
       this.setState({
@@ -152,7 +153,8 @@ class AdminPanel extends Component {
 
     // in the case of the TagCheckBox component, the value cannot be parsed directly, but rather
     // comes from the "checked" property of the event
-    const newValue = name === "phased_out" ? event.target && event.target.checked : value
+    const newValue =
+      name === 'phased_out' ? event.target && event.target.checked : value;
 
     this.setState(prevState => ({
       courseToEdit: {
@@ -168,7 +170,6 @@ class AdminPanel extends Component {
 
   onEdit() {
     console.log(this.state.courseToEdit);
-    //TODO
 
     let updatedCourse = {
       course: this.state.courseToEdit.course_code,
@@ -176,7 +177,10 @@ class AdminPanel extends Component {
       new_description: this.state.courseToEdit.description,
       new_credits: this.state.courseToEdit.credits,
       new_tags: Array.from(this.state.checkedTagsSet),
+      phased_out: this.state.courseToEdit.phased_out,
     };
+
+    console.log(updatedCourse);
 
     Api()
       .post('/courses/updateCourse', updatedCourse)
@@ -195,24 +199,25 @@ class AdminPanel extends Component {
       courseCode: this.state.courseToEdit.course_code,
       title: this.state.courseToEdit.title,
       departement: this.state.courseToEdit.course_code.substring(0, 4),
-      phasedOut: '0', //TODO checkbox
+      phasedOut: this.state.courseToEdit.phased_out,
       description: this.state.courseToEdit.description,
       credits: this.state.courseToEdit.credits,
     };
 
     Api()
       .post('/courses/createCourse', newCourse)
-      .then(res => console.log(res))
-      .catch(error => console.log('ERROR', error));
+      .then(res => {
+        console.log(res);
+        let newTags = {
+          courseCode: this.state.courseToEdit.course_code,
+          tags: Array.from(this.state.checkedTagsSet),
+        };
 
-    let newTags = {
-      courseCode: this.state.courseToEdit.course_code,
-      tags: Array.from(this.state.checkedTagsSet),
-    };
-
-    Api()
-      .post('/courses/assignTagsToCourse', newTags)
-      .then(res => console.log(res))
+        Api()
+          .post('/tags/assignTagsToCourse', newTags)
+          .then(res => console.log(res))
+          .catch(error => console.log('ERROR', error));
+      })
       .catch(error => console.log('ERROR', error));
   }
 
@@ -264,11 +269,7 @@ class AdminPanel extends Component {
             </div>
 
             {/* Buttons */}
-            <button
-              className="primary-button"
-              onClick={this.onEdit}
-              disabled={this.state.disableEdit}
-            >
+            <button className="primary-button" onClick={this.onEdit}>
               Edit course
             </button>
           </Section>
@@ -323,7 +324,11 @@ class AdminPanel extends Component {
           >
             Add
           </button>
-          <button className="primary-button" onClick={this.onEditView}>
+          <button
+            className="primary-button"
+            onClick={this.onEditView}
+            disabled={this.state.disableEdit}
+          >
             Edit
           </button>
         </Section>
