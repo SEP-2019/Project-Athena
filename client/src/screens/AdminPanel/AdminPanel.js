@@ -231,6 +231,7 @@ class AdminPanel extends Component {
       });
       return true;
     }
+    this.setState({ errorMessage: '' });
     return false;
   }
 
