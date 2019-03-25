@@ -70,12 +70,15 @@ class AdminPanel extends Component {
   }
 
   componentDidMount() {
-    //TODO put this in to prevent going in admin page without logging in
     if (this.props.location.isAdmin !== true) history.push('/login');
 
     this.updateCourseList();
     this.fetchTags();
   }
+
+  logout = () => {
+    history.push('/login');
+  };
 
   addCheckedProperty(data) {
     return data.map(obj => {
@@ -367,7 +370,6 @@ class AdminPanel extends Component {
               <this.renderTagsBox tags={tags} tagsAreLoading={tagsAreLoading} />
             </div>
 
-            {/* Buttons */}
             <button className="primary-button" onClick={this.onAdd}>
               Add course
             </button>
@@ -381,7 +383,10 @@ class AdminPanel extends Component {
     return (
       <div className="admin-panel">
         <div className="top_bar">
-          <a>Administrator Panel</a>
+          <div className="title">Administrator Panel</div>
+          <button className="logout" onClick={this.logout}>
+            Logout
+          </button>
         </div>
         <Section className="action_bar">
           <div className="selection_search">

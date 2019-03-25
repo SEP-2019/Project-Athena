@@ -31,7 +31,6 @@ class LeftDrawer extends React.Component {
   };
 
   logout = () => {
-    console.log('Logging out');
     const cookies = new Cookies();
     cookies.remove('studentId', '/');
     cookies.remove('email', '/');
