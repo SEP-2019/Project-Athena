@@ -64,7 +64,7 @@ var addCourse = async (
   format.verifyCourseCode(courseCode);
   format.verifyTitle(title);
   format.verifyDepartmentSubName(departement);
-  format.verifyPhaseOut(phasedOut);
+  //format.verifyPhaseOut(phasedOut);
   await format.verifyDescription(description);
   await format.verifyCredits(credits);
   // Connect to database
@@ -316,6 +316,7 @@ var updateCourse = async (
   newTags,
   phasedOut
 ) => {
+  console.log(phasedOut);
   format.verifyCourseCode(course);
   format.verifyCredits(newCredits);
   let connection = await mysql.getNewConnection();
@@ -363,7 +364,7 @@ let phaseOutCourse = async (courseCode, phasedOut) => {
     phasedOut = "0";
   }
   format.verifyCourseCode(courseCode);
-  format.verifyPhaseOut(phasedOut);
+  //format.verifyPhaseOut(phasedOut);
 
   let connection = await mysql.getNewConnection();
 

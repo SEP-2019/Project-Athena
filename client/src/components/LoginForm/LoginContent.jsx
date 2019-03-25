@@ -4,6 +4,7 @@ import EditText from '../EditText';
 import Api from '../../services/Api';
 import './LoginForm.css';
 import * as validation from './Validation';
+import * as login from '../../services/Login';
 import Cookies from 'universal-cookie';
 import history from '../../history';
 
@@ -39,7 +40,31 @@ class LoginContent extends Component {
   }
 
   sendRequest() {
-    if (this.isInputValid()) {
+    if (
+      login.checkAdminUsername(this.state.username) &&
+      login.checkAdminPassword(this.state.password)
+    ) {
+      console.log('Admin detected');
+      Api()
+        .post(LOGIN_URL, {
+          username: login.username,
+          password: login.pwd,
+        })
+        .then(response => {
+          if (login.checkResponse(response.data.Response)) {
+            this.redirectAdmin();
+          } else {
+            this.setInvalidCredentials();
+          }
+        })
+        .catch(error => {
+          if (validation.isEmpty(error.response)) {
+            this.setError(error);
+          } else {
+            this.setInvalidCredentials();
+          }
+        });
+    } else if (this.isInputValid()) {
       Api()
         .post(LOGIN_URL, {
           username: this.state.username.replace(/\s/g, ''),
@@ -82,6 +107,14 @@ class LoginContent extends Component {
 
   redirect = () => {
     history.push(HOME_URL);
+  };
+
+  redirectAdmin = () => {
+    this.setError('ADMIN LOGIN');
+    history.push({
+      pathname: '/admin',
+      isAdmin: true,
+    });
   };
 
   isInputValid() {
