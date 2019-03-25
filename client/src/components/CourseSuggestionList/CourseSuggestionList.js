@@ -12,6 +12,10 @@ class CourseSuggestionList extends Component {
     };
   }
 
+  componentDidUpdate = () => {
+    this.selectedCheckboxes = this.props.selectedCourses;
+  };
+
   componentWillMount = () => {
     this.selectedCheckboxes = this.props.selectedCourses;
   };
@@ -26,8 +30,10 @@ class CourseSuggestionList extends Component {
 
     if (this.selectedCheckboxes.has(checkbox)) {
       this.selectedCheckboxes.delete(checkbox);
+      this.props.updateSelected(false, checkbox);
     } else {
       this.selectedCheckboxes.add(checkbox);
+      this.props.updateSelected(true, checkbox);
     }
   };
 
@@ -42,6 +48,7 @@ class CourseSuggestionList extends Component {
       <div className="course-list">
         <div>
           <h4 className="tag-label">{this.props.tag}</h4>
+          {console.log(this.props.tag, this.selectedCheckboxes)}
           {this.props.courses.map((course, index) => (
             <CourseCheckBox
               key={index}

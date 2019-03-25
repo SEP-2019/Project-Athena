@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import Api from '../../services/Api';
 import PropTypes from 'prop-types';
+
 import './AdminPanel.css';
-
 import SearchBar from '../../components/SearchBar';
-
 import MandatoryPanel from '../../components/MandatoryPanel/MandatoryPanel';
 import Section from '../../components/Section';
 import TagList from '../../components/TagList/TagList';
@@ -305,13 +304,17 @@ class AdminPanel extends Component {
 
     return (
       <div className="admin-panel">
-        <Section>
-          <SearchBar
-            className="selection-search"
-            data={allCourses}
-            getValue={this.onSelectFromSearch}
-            placeholder={this.state.placeHolder}
-          />
+        <div className="top_bar">
+          <a>Administrator Panel</a>
+        </div>
+        <Section className="action_bar">
+          <div className="selection_search">
+            <SearchBar
+              data={allCourses}
+              getValue={this.onSelectFromSearch}
+              placeholder={this.state.placeHolder}
+            />
+          </div>
           <button
             className="primary-button"
             onClick={() => this.handleSwitchView('list')}

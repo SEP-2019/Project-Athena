@@ -52,6 +52,7 @@
   font-weight: bold;
   color: #b20007;
   padding: 1rem 4rem;
+  cursor: pointer;
   transition: background 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 

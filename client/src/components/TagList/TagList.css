@@ -28,6 +28,7 @@
   outline: none;
   background: none;
   padding: 0 0.7rem;
+  cursor: pointer;
 }
 .btn:hover {
   color: #b20007;

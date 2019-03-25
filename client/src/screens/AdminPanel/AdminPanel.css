@@ -29,9 +29,38 @@ body {
   margin-inline-end: 10vh;
 }
 
+.top_bar {
+  display: flex;
+  width: 100%;
+  height: 65px; /* arbritrary height */
+  top: 0;
+  left: 0;
+  background-color: #b20007;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.19);
+}
+
+.top_bar a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.5rem;
+  padding: 1rem 1.5rem;
+}
+
+.action_bar {
+  display: flex;
+  margin-top: 1rem;
+}
+
+.selection_search {
+  padding: 0.6rem 1rem;
+}
+
 .form {
   width: 24rem;
+  margin: 1rem 1rem;
   margin-inline-end: 10vh;
+  padding: 1.5rem 3rem;
+  border: 1px solid rgb(0, 0, 0, 0.2);
 }
 
 .footer {

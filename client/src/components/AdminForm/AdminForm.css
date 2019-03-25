@@ -13,11 +13,23 @@
   margin-inline-end: 10vh;
 }
 
-.form {
+.admin_form {
   width: 24rem;
   margin-inline-end: 10vh;
 }
 
-.check {
-  padding: 12px 0px 0px 12px
+.check .checkbox_area {
+  margin-left: 5px;
+}
+.check .checkbox_label {
+  padding: 1rem 0.5rem;
+}
+
+.subform {
+  padding-left: 0 1rem;
+  width: 100%;
+}
+
+.subform .MuiFormControl-root-2 {
+  width: 100%;
 }
