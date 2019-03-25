@@ -3,6 +3,7 @@ import Api from '../../services/Api';
 import PropTypes from 'prop-types';
 
 import './AdminPanel.css';
+import history from '../../history';
 import SearchBar from '../../components/SearchBar';
 import MandatoryPanel from '../../components/MandatoryPanel/MandatoryPanel';
 import Section from '../../components/Section';
@@ -223,7 +224,7 @@ class AdminPanel extends Component {
       !this.state.courseToEdit.title ||
       !this.state.courseToEdit.course_code ||
       !this.state.courseToEdit.description ||
-      !this.state.courseToEdit.credit
+      !this.state.courseToEdit.credits
     ) {
       console.error('missing field');
       this.setState({
