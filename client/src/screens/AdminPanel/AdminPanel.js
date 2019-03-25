@@ -70,7 +70,7 @@ class AdminPanel extends Component {
 
   componentDidMount() {
     //TODO put this in to prevent going in admin page without logging in
-    // if (this.props.location.isAdmin !== true) history.push('/login');
+    if (this.props.location.isAdmin !== true) history.push('/login');
 
     this.updateCourseList();
     this.fetchTags();
@@ -222,8 +222,8 @@ class AdminPanel extends Component {
     if (
       !this.state.courseToEdit.title ||
       !this.state.courseToEdit.course_code ||
-      !this.courseToEdit.description ||
-      !this.courseToEdit.credit
+      !this.state.courseToEdit.description ||
+      !this.state.courseToEdit.credit
     ) {
       console.error('missing field');
       this.setState({
