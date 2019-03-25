@@ -44,10 +44,11 @@ class AdminPanel extends Component {
       this.setState({
         selectedSearch: selection,
         disableEdit: false,
-      }); // this is where the warning appears :(
+      });
     } else {
       this.setState({
         selectedSearch: {},
+        disableEdit: true,
       });
       if (this.state.view === 'edit') this.handleSwitchView('');
     }
@@ -57,19 +58,20 @@ class AdminPanel extends Component {
     return await Api().get('/courses/getAllCourses');
   };
 
-  updateCourseList(){
-    this.fetchAllCourses().then(response => {
-      let courseData = response.data.Response
-      this.setState({ allCourses: courseData });
-    })
-    .catch(error => console.log('ERROR', error));
+  updateCourseList() {
+    this.fetchAllCourses()
+      .then(response => {
+        let courseData = response.data.Response;
+        this.setState({ allCourses: courseData });
+      })
+      .catch(error => console.log('ERROR', error));
   }
 
   componentDidMount() {
     //TODO put this in to prevent going in admin page without logging in
     // if (this.props.location.isAdmin !== true) history.push('/login');
 
-    this.updateCourseList()
+    this.updateCourseList();
     this.fetchTags();
   }
 
@@ -155,7 +157,7 @@ class AdminPanel extends Component {
     // in the case of the TagCheckBox component, the value cannot be parsed directly, but rather
     // comes from the "checked" property of the event
     const newValue =
-      name === 'phased_out' ? event.target && event.target.checked : value;
+      name === 'Phased_out' ? event.target && event.target.checked : value;
 
     this.setState(prevState => ({
       courseToEdit: {
@@ -186,8 +188,8 @@ class AdminPanel extends Component {
     Api()
       .post('/courses/updateCourse', updatedCourse)
       .then(res => {
-        console.log(res)
-        this.updateCourseList()
+        console.log(res);
+        this.updateCourseList();
       })
       .catch(error => console.log('ERROR', error));
   }
@@ -226,7 +228,7 @@ class AdminPanel extends Component {
       })
       .then(res => {
         // get the list of courses to update it with the course that was just added
-        this.updateCourseList()
+        this.updateCourseList();
       })
       .catch(error => console.log('ERROR', error));
   }
@@ -256,7 +258,11 @@ class AdminPanel extends Component {
     let view;
     switch (this.state.view) {
       case 'list':
-        view = <MandatoryPanel url={'courses/getAllCourses'} />;
+        view = (
+          <div className="view_list">
+            <MandatoryPanel url={'courses/getAllCourses'} />
+          </div>
+        );
         break;
       case 'edit':
         view = (
@@ -293,13 +299,7 @@ class AdminPanel extends Component {
             </span>
 
             <AdminForm
-              selectedCourse={{
-                course_code: '',
-                title: '',
-                description: '',
-                credits: '',
-                phased_out: false,
-              }}
+              selectedCourse={{}}
               handleInputChange={this.handleInputChange}
               view={this.state.view === 'edit'}
             />
@@ -345,7 +345,7 @@ class AdminPanel extends Component {
             Add
           </button>
           <button
-            className="primary-button"
+            className="primary-button edit"
             onClick={this.onEditView}
             disabled={this.state.disableEdit}
           >

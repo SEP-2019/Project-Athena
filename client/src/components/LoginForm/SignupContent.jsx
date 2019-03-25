@@ -256,7 +256,7 @@ class SignupContent extends Component {
             error={this.state.confirmError}
           />
         </Section>
-        <Section className="subform" flexDirection="row">
+        <Section className="subform_dropdown" flexDirection="row">
           <DropDown
             label="ECSE major"
             menuList={tempMajors}
