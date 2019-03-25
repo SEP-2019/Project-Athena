@@ -173,7 +173,7 @@ class AdminPanel extends Component {
     // in the case of the TagCheckBox component, the value cannot be parsed directly, but rather
     // comes from the "checked" property of the event
     const newValue =
-      name === 'Phased_out' ? event.target && event.target.checked : value;
+      name === 'phased_out' ? event.target && event.target.checked : value;
 
     this.setState(prevState => ({
       courseToEdit: {
