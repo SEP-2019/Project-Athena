@@ -33,9 +33,6 @@ class CurriculumDisplay extends Component {
         studentId: this.props.studentId,
       },
       () => {
-        console.log('this is a state', this.state);
-        console.log('this is a prop', this.props.studentId);
-
         this.getStudentData(this.state.studentId); //TODO set this to state
       }
     );

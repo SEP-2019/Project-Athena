@@ -111,9 +111,6 @@ class CourseRegistration extends Component {
         studentId: this.props.studentId,
       },
       () => {
-        console.log('this is a state', this.state);
-        console.log('this is a prop', this.props.studentId);
-
         this.fetchUserData()
           .then(response => {
             let userData = response.data.Response;
@@ -163,12 +160,10 @@ class CourseRegistration extends Component {
       student_id: this.state.studentId,
     };
 
-    console.log(JSON.stringify(completedCourses));
-
     Api()
       .post('/courses/addCompletedCourses', completedCourses)
       .then(res => {
-        console.log(res);
+        // console.log(res);
       })
       .catch(error => console.log('ERROR', error));
   }
