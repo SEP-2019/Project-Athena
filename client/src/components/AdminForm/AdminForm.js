@@ -48,6 +48,7 @@ class AdminForm extends Component {
             name="description"
             defaultValue={this.props.selectedCourse.description}
             onChange={this.props.handleInputChange}
+            type="description"
             // error={this.state.emailError}
           />
         </Section>

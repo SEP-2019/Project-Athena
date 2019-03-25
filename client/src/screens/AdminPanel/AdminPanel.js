@@ -233,7 +233,7 @@ class AdminPanel extends Component {
         break;
       case 'edit':
         view = (
-          <Section className="form" flexDirection="column">
+          <Section className="panel_form" flexDirection="column">
             <span className="error" id="error-msg">
               {this.state.errorMessage}
             </span>
@@ -263,13 +263,19 @@ class AdminPanel extends Component {
         break;
       case 'add':
         view = (
-          <Section className="form" flexDirection="column">
+          <Section className="panel_form" flexDirection="column">
             <span className="error" id="error-msg">
               {this.state.errorMessage}
             </span>
 
             <AdminForm
-              selectedCourse={{}}
+              selectedCourse={{
+                course_code: '',
+                title: '',
+                description: '',
+                credits: '',
+                phased_out: false,
+              }}
               handleInputChange={this.handleInputChange}
             />
 

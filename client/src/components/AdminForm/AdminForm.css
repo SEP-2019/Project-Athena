@@ -14,7 +14,7 @@
 }
 
 .admin_form {
-  width: 24rem;
+  width: 100%;
   margin-inline-end: 10vh;
 }
 
@@ -30,6 +30,7 @@
   width: 100%;
 }
 
-.subform .MuiFormControl-root-2 {
+.subform [class^='MuiFormControl-root-'] {
   width: 100%;
+  height: auto;
 }
